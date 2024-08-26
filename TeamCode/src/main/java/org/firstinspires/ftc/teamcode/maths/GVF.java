@@ -43,10 +43,10 @@ public class GVF {
     }
 
     public double calculateError(Vector2d tangent) {
-        double magnitudeOfR = Maths.distanceBetween(R, new Vector2d(0,0));
+        double magnitudeOfR = Maths.magnitudeOf(R);
         magnitudeOfR = Math.pow(1.3, magnitudeOfR - 10) - 0.073;
-        magnitudeOfR *= -(Math.signum(Maths.crossOf(R,tangent)));
-        if (Math.abs(magnitudeOfR) > 100) return Maths.distanceBetween(R, new Vector2d(0,0)) * -(Math.signum(Maths.crossOf(R,tangent)));
+        magnitudeOfR *= -Math.signum(Maths.crossOf(R,tangent));
+        if (Math.abs(magnitudeOfR) > 100) return Maths.magnitudeOf(R) * -(Math.signum(Maths.crossOf(R,tangent)));
         return magnitudeOfR;
     }
 

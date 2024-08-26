@@ -81,8 +81,8 @@ public class GoToPoint {
         telemetry.addData("yOut: ", yOut);
         telemetry.addData("statepointX",statePoint.x);
         telemetry.addData("statepointY",statePoint.y);
-        telemetry.addData("xerror",distanceToState*Math.cos(angleToEndPoint)-(pose.getX()-startPose.getX()));
-        telemetry.addData("yerror",distanceToState*Math.sin(angleToEndPoint)-(pose.getY()-startPose.getY()));
+        telemetry.addData("xerror",distanceToState*Math.cos(angleToEndPoint)-(pose.position.x-startPose.position.x));
+        telemetry.addData("yerror",distanceToState*Math.sin(angleToEndPoint)-(pose.position.y-startPose.position.y));
     }
 
     public void driveToPointWithoutProfile(Pose2d pose,Pose2d desiredPose) {
