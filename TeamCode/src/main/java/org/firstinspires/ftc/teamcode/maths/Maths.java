@@ -1,8 +1,12 @@
 package org.firstinspires.ftc.teamcode.maths;
 
-import com.acmerobotics.roadrunner.ftc.Vector2d;
+import androidx.appcompat.widget.VectorEnabledTintResources;
 
-public class mathsOperations {
+import com.acmerobotics.roadrunner.Vector2d;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
+public class Maths {
 
     //normalizes the angle given
     public static double angleWrap(double wrap) {
@@ -69,29 +73,34 @@ public class mathsOperations {
         return 360 / (wrap + 1) + state / ratio;
     }
 
-    public static boolean equals(double state, double equals, double thresh){
+    public static boolean epsilonEquals(double state, double equals, double thresh){
         return Math.abs(state - equals) < thresh;
     }
 
-    public static double power(double x, double pow) {
-        for (int i = 0; i < pow; i++){
-            x *= x;
-        }
-        return x;
+    public static double magnitudeOf(Vector2d vec) { return Math.sqrt(Math.pow(vec.x,2)+Math.pow(vec.y,2)); }
+
+    public static double distanceBetween(Vector2d a, Vector2d b) { return magnitudeOf(a.minus(b)); }
+
+    public static Vector2d rotateVectorBy(Vector2d vec, double radians) {
+        double x = vec.x * Math.cos(radians) - vec.y * Math.sin(radians);
+        double y = vec.x * Math.sin(radians) + vec.y * Math.cos(radians);
+        return new Vector2d(x,y);
     }
 
-    public static Vector2d interpolate(Vector2d start, Vector2d end, double midy){
-        double m = (start.getY() - end.getY()) / (start.getX() - end.getX());
-        double b = -(m*start.getX()) + start.getY();
+    public static double angleOf(Vector2d vec) { return AngleUnit.normalizeRadians(Math.atan2(vec.y,vec.x)); }
+
+    public static Vector2d interpolateBetween(Vector2d start, Vector2d end, double midy){
+        double m = (start.y - end.y) / (start.x - end.x);
+        double b = -(m*start.x) + start.y;
 
         return new Vector2d((midy - b) / m, midy);
     }
 
-    public static double cross(Vector2d a, Vector2d b) {
-        return a.getX() * b.getY() - a.getY() * b.getX();
+    public static double crossOf(Vector2d a, Vector2d b) {
+        return a.x * b.y - a.y * b.x;
     }
 
-    public static Vector2d swapXY(Vector2d vec) {
-        return new Vector2d(vec.getY(), vec.getX());
+    public static Vector2d swapXYOf(Vector2d vec) {
+        return new Vector2d(vec.y, vec.x);
     }
 }

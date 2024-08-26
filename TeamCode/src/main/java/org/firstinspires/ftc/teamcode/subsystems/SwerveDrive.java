@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.maths.PIDcontroller;
-import org.firstinspires.ftc.teamcode.maths.mathsOperations;
+import org.firstinspires.ftc.teamcode.maths.Maths;
 import org.firstinspires.ftc.teamcode.maths.swerveKinematics;
 import org.firstinspires.ftc.teamcode.utility.DcMotorExW;
 
@@ -85,20 +85,20 @@ public class SwerveDrive {
         mod1P -= module1Adjust;
 
         //Anglewrap all the angles so that the module turns both ways
-        mod1P = mathsOperations.angleWrap(mod1P);
-        mod2P = mathsOperations.angleWrap(mod2P);
-        mod3P = mathsOperations.angleWrap(mod3P);
+        mod1P = Maths.angleWrap(mod1P);
+        mod2P = Maths.angleWrap(mod2P);
+        mod3P = Maths.angleWrap(mod3P);
 
-        mod1reference = mathsOperations.angleWrap(mod1reference);
-        mod2reference = mathsOperations.angleWrap(mod2reference);
-        mod3reference = mathsOperations.angleWrap(mod3reference);
+        mod1reference = Maths.angleWrap(mod1reference);
+        mod2reference = Maths.angleWrap(mod2reference);
+        mod3reference = Maths.angleWrap(mod3reference);
 
         //Make sure that a module never turns more than 90 degrees
-        double[] mod1efvalues = mathsOperations.efficientTurn(mod1reference,mod1P,mod1power);
+        double[] mod1efvalues = Maths.efficientTurn(mod1reference,mod1P,mod1power);
 
-        double[] mod2efvalues = mathsOperations.efficientTurn(mod2reference,mod2P,mod2power);
+        double[] mod2efvalues = Maths.efficientTurn(mod2reference,mod2P,mod2power);
 
-        double[] mod3efvalues = mathsOperations.efficientTurn(mod3reference,mod3P,mod3power);
+        double[] mod3efvalues = Maths.efficientTurn(mod3reference,mod3P,mod3power);
 
         if (eff) {
             mod1reference=mod1efvalues[0];
@@ -110,13 +110,13 @@ public class SwerveDrive {
         }
 
         //change coax values into diffy values from pid and power
-        double[] mod1values = mathsOperations.diffyConvert(mod1PID.pidOut(AngleUnit.normalizeDegrees(mod1reference-mod1P)),-mod1power);
+        double[] mod1values = Maths.diffyConvert(mod1PID.pidOut(AngleUnit.normalizeDegrees(mod1reference-mod1P)),-mod1power);
         mod1m1.setPower(mod1values[0]);
         mod1m2.setPower(mod1values[1]);
-        double[] mod2values = mathsOperations.diffyConvert(-mod2PID.pidOut(AngleUnit.normalizeDegrees(mod2reference-mod2P)),mod2power);
+        double[] mod2values = Maths.diffyConvert(-mod2PID.pidOut(AngleUnit.normalizeDegrees(mod2reference-mod2P)),mod2power);
         mod2m1.setPower(mod2values[0]);
         mod2m2.setPower(mod2values[1]);
-        double[] mod3values = mathsOperations.diffyConvert(-mod3PID.pidOut(AngleUnit.normalizeDegrees(mod3reference-mod3P)),mod3power);
+        double[] mod3values = Maths.diffyConvert(-mod3PID.pidOut(AngleUnit.normalizeDegrees(mod3reference-mod3P)),mod3power);
         mod3m1.setPower(mod3values[0]);
         mod3m2.setPower(mod3values[1]);
 

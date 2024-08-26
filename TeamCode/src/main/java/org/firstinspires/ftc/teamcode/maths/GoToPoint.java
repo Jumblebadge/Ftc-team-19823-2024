@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode.maths;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.profile.MotionProfile;
 import com.acmerobotics.roadrunner.profile.MotionProfileGenerator;
 import com.acmerobotics.roadrunner.profile.MotionState;
@@ -41,12 +41,12 @@ public class GoToPoint {
      */
 
     public void driveToPoint(Pose2d pose,Pose2d desiredPose,Pose2d startPose,boolean update){
-        distanceNow = Math.abs(Math.hypot(desiredPose.getX()-pose.getX(),desiredPose.getY()-pose.getY()));
-        double distanceAtStart = Math.abs(Math.hypot(desiredPose.getX()-startPose.getX(),desiredPose.getY()-startPose.getY()));
+        distanceNow = Math.abs(Math.hypot(desiredPose.position.x-pose.position.x,desiredPose.position.y-pose.position.y));
+        double distanceAtStart = Math.abs(Math.hypot(desiredPose.position.x-startPose.position.x,desiredPose.position.y-startPose.position.y));
         //distance starts at 0 and goes to the distance from start as the robot gets closer
         double distance = distanceAtStart-distanceNow;
         //angle from start to finish
-        double angleToEndPoint = Math.atan2(desiredPose.getY()-startPose.getY(),desiredPose.getX()-startPose.getX());
+        double angleToEndPoint = Math.atan2(desiredPose.position.y-startPose.position.y,desiredPose.position.x-startPose.position.x);
         //if the target position has changed, then create a new motion profile and reset the profile timer
         if(update){
             profile = MotionProfileGenerator.generateSimpleMotionProfile(new MotionState(0, 0, 0), new MotionState(distanceAtStart, 0, 0), 30, 50, 70);
@@ -55,14 +55,14 @@ public class GoToPoint {
         MotionState state = profile.get(profileTime.seconds());
         double stateOut = state.getX();
         //create a point from the motion profile output, which is normally just a distance value
-        Point statePoint = new Point(startPose.getX()+(stateOut * Math.cos(angleToEndPoint)),startPose.getY()+(stateOut * Math.sin(angleToEndPoint)));
+        Point statePoint = new Point(startPose.position.x+(stateOut * Math.cos(angleToEndPoint)),startPose.position.y+(stateOut * Math.sin(angleToEndPoint)));
         //distance from current position to the target point, determined by the motion profile
-        double distanceToState = Math.abs(Math.hypot(statePoint.x-startPose.getX(),statePoint.y-startPose.getY()));
+        double distanceToState = Math.abs(Math.hypot(statePoint.x-startPose.position.x,statePoint.y-startPose.position.y));
         //use pid on x and y position to move towards the target point determined by the state
         //distanceToState * sin or cos of the angle to end point will give the x or y component of the distance vector, which ensures that x and y arrive at the same time. pose-startpos is the current state
-        double xOut = xPID.pidOut(distanceToState * Math.cos(angleToEndPoint) - (pose.getX() - startPose.getX()));
-        double yOut = yPID.pidOut(distanceToState * Math.sin(angleToEndPoint) - (pose.getY() - startPose.getY()));
-        headingError = AngleUnit.normalizeRadians(desiredPose.getHeading()-pose.getHeading());
+        double xOut = xPID.pidOut(distanceToState * Math.cos(angleToEndPoint) - (pose.position.x - startPose.position.x));
+        double yOut = yPID.pidOut(distanceToState * Math.sin(angleToEndPoint) - (pose.position.y - startPose.position.y));
+        headingError = AngleUnit.normalizeRadians(desiredPose.heading.log()-pose.heading.log());
         double headingOut = headingPID.pidOut(headingError);
         //feed the pid output into swerve kinematics and draw the robot on FTCdash field
         driver.drive(-yOut,-xOut,-headingOut);
@@ -86,16 +86,16 @@ public class GoToPoint {
     }
 
     public void driveToPointWithoutProfile(Pose2d pose,Pose2d desiredPose) {
-        distanceNow = Math.abs(Math.hypot(desiredPose.getX()-pose.getX(),desiredPose.getY()-pose.getY()));
+        distanceNow = Math.abs(Math.hypot(desiredPose.position.x-pose.position.x,desiredPose.position.y-pose.position.y));
         //angle from start to finish
-        double angleToEndPoint = Math.atan2(desiredPose.getY()-pose.getY(),desiredPose.getX()-pose.getX());
+        double angleToEndPoint = Math.atan2(desiredPose.position.y-pose.position.y,desiredPose.position.y-pose.position.x);
         //create a point from the motion profile output, which is normally just a distance value
-        double distanceToState = Math.abs(Math.hypot(desiredPose.getX()-pose.getX(),desiredPose.getY()-pose.getY()));
+        double distanceToState = Math.abs(Math.hypot(desiredPose.position.x-pose.position.x,desiredPose.position.y-pose.position.y));
         //use pid on x and y position to move towards the target point determined by the state
         //distanceToState * sin or cos of the angle to end point will give the x or y component of the distance vector, which ensures that x and y arrive at the same time. pose-startpos is the current state
         double xOut = xPID.pidOut(distanceToState * Math.cos(angleToEndPoint));
         double yOut = yPID.pidOut(distanceToState * Math.sin(angleToEndPoint));
-        headingError = AngleUnit.normalizeRadians(desiredPose.getHeading()-pose.getHeading());
+        headingError = AngleUnit.normalizeRadians(desiredPose.heading.log()-pose.heading.log());
         double headingOut = headingPID.pidOut(headingError);
         //feed the pid output into swerve kinematics and draw the robot on FTCdash field
         driver.drive(yOut,xOut,-headingOut);
@@ -146,10 +146,10 @@ public class GoToPoint {
 
     //draw the robot on the FTCdash field (copied from the roadrunner quickstart)
     public static void drawRobot(Canvas canvas, Pose2d pose) {
-        canvas.strokeCircle(pose.getX(), pose.getY(), 9);
-        Vector2d v = pose.headingVec().times(9);
-        double x1 = pose.getX() + v.getX() / 2, y1 = pose.getY() + v.getY() / 2;
-        double x2 = pose.getX() + v.getX(), y2 = pose.getY() + v.getY();
+        canvas.strokeCircle(pose.position.x, pose.position.y, 9);
+        Vector2d v = pose.heading.vec().times(9);
+        double x1 = pose.position.x + v.x / 2, y1 = pose.position.y + v.y / 2;
+        double x2 = pose.position.x + v.x, y2 = pose.position.y + v.y;
         canvas.strokeLine(x1, y1, x2, y2);
     }
 
@@ -166,9 +166,9 @@ public class GoToPoint {
         fieldOverlay.setStroke("#B53F51");
         drawRobot(fieldOverlay,startPose);
 
-        packet.put("x", pose.getX());
-        packet.put("y", pose.getY());
-        packet.put("heading (deg)", Math.toDegrees(pose.getHeading()));
+        packet.put("x", pose.position.x);
+        packet.put("y", pose.position.y);
+        packet.put("heading (deg)", Math.toDegrees(pose.heading.log()));
 
         dash.sendTelemetryPacket(packet);
 

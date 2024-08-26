@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.maths;
 
-import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.Vector2d;
 
 public class Bezier {
 
@@ -35,8 +35,8 @@ public class Bezier {
     }
 
     public Vector2d getPoint(double T) {
-        double weightA = (-Math.pow((T),3) + 3 * Math.pow((T),2) - 3 * T + 1);
-        double weightB = (3 * Math.pow((T),3) - 6 * Math.pow((T),2) + 3 * T);
+        double weightA = (-1 * Math.pow((T),3) + 3 * Math.pow((T),2) - 3 * T + 1);
+        double weightB = (3  * Math.pow((T),3) - 6 * Math.pow((T),2) + 3 * T);
         double weightC = (-3 * Math.pow((T),3) + 3 * Math.pow((T),2));
         double weightD = Math.pow((T),3);
 
@@ -44,21 +44,21 @@ public class Bezier {
     }
 
     public Vector2d firstDerivative(double T) {
-        double weightA = (-3 * Math.pow((T),2) + 6 * T - 3);
-        double weightB = (9 * Math.pow((T),2) - 12 * T + 3);
-        double weightC = (-9 * Math.pow((T),2) + 6 * T);
-        double weightD = (3 * Math.pow((T),2));
+        double weightA = (-3 * Math.pow((T),2) + 6  * T - 3);
+        double weightB = (9 *  Math.pow((T),2) - 12 * T + 3);
+        double weightC = (-9 * Math.pow((T),2) + 6  * T);
+        double weightD = (3 *  Math.pow((T),2));
 
         return A.times(weightA).plus(B.times(weightB)).plus(C.times(weightC)).plus(D.times(weightD));
     }
 
     public Vector2d getNormalizedTangent(double T) {
         Vector2d firstDerivative = firstDerivative(T);
-        return firstDerivative.div(firstDerivative.distTo(new Vector2d(0,0)));
+        return firstDerivative.div(Maths.magnitudeOf(firstDerivative));
     }
 
     public Vector2d getNormalizedNormal(double T) {
-        return getNormalizedTangent(T).rotated(90 / (180 / Math.PI));
+        return Maths.rotateVectorBy(getNormalizedTangent(T), (90 * (180 / Math.PI)));
     }
 
     public double getTotalArcLength() {
@@ -68,7 +68,7 @@ public class Bezier {
     public void calculateTotalArcLength() {
         double total = 0;
         for (double i = 0; i <= 50; i++) {
-            total += getPoint(i / 50).distTo(getPoint((i + 1) / 50));
+            total += Maths.distanceBetween(getPoint(i / 50), getPoint((i + 1) / 50));
         }
         totalArcLength = total;
     }
@@ -77,7 +77,7 @@ public class Bezier {
         double total = 0;
         for (double i = 0; i <= 50; i++) {
             if(i / 50 < T) {
-                total += getPoint(i / 50).distTo(getPoint((i + 1) / 50));
+                total += Maths.distanceBetween(getPoint(i / 50), getPoint((i + 1) / 50));
             }
             else break;
         }
@@ -87,12 +87,12 @@ public class Bezier {
     public double distanceToT(double distance) {
         int index = 0;
         for (int i = 0; i < lookup.length; i++) {
-            if (i == lookup.length - 1) { return lookup[i].getX(); }
-            if (lookup[i].getY() <= distance && lookup[i + 1].getY() >= distance) {
+            if (i == lookup.length - 1) { return lookup[i].x; }
+            if (lookup[i].y <= distance && lookup[i + 1].y >= distance) {
                 index = i;
                 break;
             }
         }
-        return mathsOperations.interpolate(lookup[index], lookup[index + 1], distance).getX();
+        return Maths.interpolateBetween(lookup[index], lookup[index + 1], distance).x;
     }
 }

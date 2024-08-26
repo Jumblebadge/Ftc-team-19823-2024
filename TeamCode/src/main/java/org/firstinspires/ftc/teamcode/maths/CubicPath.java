@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.maths;
 
-import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.Vector2d;
 
 public class CubicPath {
 
@@ -82,7 +82,7 @@ public class CubicPath {
     public Vector2d findClosestPointOnPath(Vector2d Robot) {
         for (int i = 0; i <= 10; i++) {
             Vector2d guess = getPoint(guessT);
-            Vector2d robotVector = new Vector2d(Robot.getX() - guess.getX(), Robot.getY() - guess.getY());
+            Vector2d robotVector = new Vector2d(Robot.x - guess.x, Robot.y - guess.y);
             Vector2d normalizedTangent = getNormalizedTangent(guessT);
             double totalArcLength = getTotalArcLength();
             arcLength += normalizedTangent.dot(robotVector);
