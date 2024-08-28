@@ -22,9 +22,9 @@ public class GoToPoint {
     private boolean isDone;
     private double distanceNow, headingError;
     private final ElapsedTimeW profileTime = new ElapsedTimeW();
-    private final PIDcontroller headingPID = new PIDcontroller(6,0,5,0, 0.1);
-    private final PIDcontroller xPID = new PIDcontroller(1,0,0,1, 0.1);
-    private final PIDcontroller yPID = new PIDcontroller(1,0,0,1, 0.1);
+    private final PID headingPID = new PID(6,0,5,0, 0.1);
+    private final PID xPID = new PID(1,0,0,1, 0.1);
+    private final PID yPID = new PID(1,0,0,1, 0.1);
     private MotionProfile profile = MotionProfileGenerator.generateSimpleMotionProfile(new MotionState(0, 0, 0), new MotionState(1, 0, 0), 2, 3,4);
 
     public GoToPoint(Driveable driver, Telemetry telemetry, FtcDashboard dashboard){

@@ -6,14 +6,14 @@ import com.acmerobotics.roadrunner.profile.MotionProfile;
 import com.acmerobotics.roadrunner.profile.MotionProfileGenerator;
 import com.acmerobotics.roadrunner.profile.MotionState;
 
-import org.firstinspires.ftc.teamcode.maths.PIDcontroller;
+import org.firstinspires.ftc.teamcode.maths.PID;
 
 public class RunMotionProfile {
 
     private double lastTarget;
     private double maxVel, maxAccel, maxJerk;
     private MotionState motionState;
-    private final PIDcontroller PID;
+    private final org.firstinspires.ftc.teamcode.maths.PID PID;
     private final ElapsedTime timer = new ElapsedTime();
     private MotionProfile profile = MotionProfileGenerator.generateSimpleMotionProfile(new MotionState(0,0,0),new MotionState(1,0,0),1,1,1);
 
@@ -22,7 +22,7 @@ public class RunMotionProfile {
         this.maxAccel = maxAccel;
         this.maxJerk = maxJerk;
 
-        PID = new PIDcontroller(Kp, Kd, Ki, Kf, limit);
+        PID = new PID(Kp, Kd, Ki, Kf, limit);
     }
 
     public void setMotionConstraints(double maxVel, double maxAccel, double maxJerk){

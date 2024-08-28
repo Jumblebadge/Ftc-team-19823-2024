@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.maths.PIDcontroller;
+import org.firstinspires.ftc.teamcode.maths.PID;
 import org.firstinspires.ftc.teamcode.maths.SlewRateLimiter;
 
 public class EncoderServo {
@@ -12,7 +12,7 @@ public class EncoderServo {
     private final CRServoImplEx servo;
     private final AnalogInput encoder;
     private final SlewRateLimiter slew = new SlewRateLimiter();
-    private final PIDcontroller PID = new PIDcontroller(0.05,0.00002,2,0,0.1);
+    private final org.firstinspires.ftc.teamcode.maths.PID PID = new PID(0.05,0.00002,2,0,0.1);
     private double target, r = 5;
 
     public EncoderServo(CRServoImplEx servo, AnalogInput encoder){

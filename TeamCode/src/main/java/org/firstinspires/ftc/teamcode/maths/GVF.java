@@ -14,9 +14,9 @@ public class GVF {
     CubicPath path;
     Vector2d R, closestPoint, out, tangent;
     FtcDashboard dashboard;
-    PIDcontroller headingPID = new PIDcontroller(0.1,0.001,0,0.75,0.1);
-    PIDcontroller xPID = new PIDcontroller(0.6,0,0,0.275, 0.1);
-    PIDcontroller yPID = new PIDcontroller(0.5,0,0,0.25, 0.1);
+    PID headingPID = new PID(0.1,0.001,0,0.75,0.1);
+    PID xPID = new PID(0.6,0,0,0.275, 0.1);
+    PID yPID = new PID(0.5,0,0,0.25, 0.1);
     double Kn, Kf, Ks;
     private double distance, headingDistance;
     Vector2d temp = new Vector2d(0,0);

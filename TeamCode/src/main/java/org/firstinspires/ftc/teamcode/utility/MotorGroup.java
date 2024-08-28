@@ -2,12 +2,12 @@ package org.firstinspires.ftc.teamcode.utility;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.teamcode.maths.PIDcontroller;
+import org.firstinspires.ftc.teamcode.maths.PID;
 
 public class MotorGroup {
 
     public final DcMotorExW[] motors;
-    private final PIDcontroller controller = new PIDcontroller(0,0,0,0,100);
+    private final PID controller = new PID(0,0,0,0,100);
 
     public MotorGroup(DcMotorExW... motors){
         this.motors = motors;

@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.maths.PIDcontroller;
+import org.firstinspires.ftc.teamcode.maths.PID;
 import org.firstinspires.ftc.teamcode.maths.Maths;
 import org.firstinspires.ftc.teamcode.maths.swerveKinematics;
 import org.firstinspires.ftc.teamcode.utility.DcMotorExW;
@@ -20,9 +20,9 @@ public class SwerveDrive {
     final private Telemetry telemetry;
     final private boolean eff;
     private double module1Adjust = -10, module2Adjust = -10, module3Adjust = -45;
-    private final PIDcontroller mod1PID = new PIDcontroller(0.1,0.002,3,1, 0.5);
-    private final PIDcontroller mod2PID = new PIDcontroller(0.1,0.002,2,0.5, 0.5);
-    private final PIDcontroller mod3PID = new PIDcontroller(0.1,0.002,1,0.5, 0.75);
+    private final PID mod1PID = new PID(0.1,0.002,3,1, 0.5);
+    private final PID mod2PID = new PID(0.1,0.002,2,0.5, 0.5);
+    private final PID mod3PID = new PID(0.1,0.002,1,0.5, 0.75);
     private final swerveKinematics swavemath = new swerveKinematics();
 
     private double mod1reference = 0;

@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.maths;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-public class PIDcontroller {
+public class PID {
     //PID controller class
 
     private double integralSum,out,lastError;
@@ -11,7 +11,7 @@ public class PIDcontroller {
     private final double KpS, KdS, KiS, KfS, KlS;
     private final ElapsedTime timer = new ElapsedTime();
 
-    public PIDcontroller(double Kp, double Kd, double Ki, double Kf, double Kl) {
+    public PID(double Kp, double Kd, double Ki, double Kf, double Kl) {
         this.Kp = Kp;
         this.Kd = Kd;
         this.Ki = Ki;
