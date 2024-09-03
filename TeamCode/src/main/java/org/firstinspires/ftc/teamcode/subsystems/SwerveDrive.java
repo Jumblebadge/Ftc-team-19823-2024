@@ -19,7 +19,7 @@ public class SwerveDrive {
     final private AnalogInput mod1E,mod2E,mod3E;
     final private Telemetry telemetry;
     final private boolean eff;
-    private double module1Adjust = -10, module2Adjust = -10, module3Adjust = -45;
+    private double module1Adjust = -0, module2Adjust = -0, module3Adjust = -0;
     private final PID mod1PID = new PID(0.1,0.002,3,1, 0.5);
     private final PID mod2PID = new PID(0.1,0.002,2,0.5, 0.5);
     private final PID mod3PID = new PID(0.1,0.002,1,0.5, 0.75);
@@ -67,7 +67,7 @@ public class SwerveDrive {
         double heading = imu.getHeadingInDegrees();
 
         //Retrieve the angle and power for each module
-        double[] output = swavemath.calculate(y,-x,-rot, heading,true);
+        double[] output = swavemath.calculate(y,x,rot, heading,true);
         double mod1power = output[0];
         double mod3power = output[1];
         double mod2power = output[2];
@@ -110,13 +110,13 @@ public class SwerveDrive {
         }
 
         //change coax values into diffy values from pid and power
-        double[] mod1values = Maths.diffyConvert(mod1PID.pidOut(AngleUnit.normalizeDegrees(mod1reference-mod1P)),-mod1power);
+        double[] mod1values = Maths.diffyConvert(mod1PID.pidOut(AngleUnit.normalizeDegrees(mod1reference-mod1P)),mod1power);
         mod1m1.setPower(mod1values[0]);
         mod1m2.setPower(mod1values[1]);
-        double[] mod2values = Maths.diffyConvert(-mod2PID.pidOut(AngleUnit.normalizeDegrees(mod2reference-mod2P)),mod2power);
+        double[] mod2values = Maths.diffyConvert(mod2PID.pidOut(AngleUnit.normalizeDegrees(mod2reference-mod2P)),mod2power);
         mod2m1.setPower(mod2values[0]);
         mod2m2.setPower(mod2values[1]);
-        double[] mod3values = Maths.diffyConvert(-mod3PID.pidOut(AngleUnit.normalizeDegrees(mod3reference-mod3P)),mod3power);
+        double[] mod3values = Maths.diffyConvert(mod3PID.pidOut(AngleUnit.normalizeDegrees(mod3reference-mod3P)),mod3power);
         mod3m1.setPower(mod3values[0]);
         mod3m2.setPower(mod3values[1]);
 
