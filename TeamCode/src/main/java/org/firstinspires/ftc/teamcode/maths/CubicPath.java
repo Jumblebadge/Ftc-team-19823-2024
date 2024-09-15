@@ -8,19 +8,19 @@ public class CubicPath {
     public Bezier[] beziers = {new Bezier(temp, temp, temp, temp), new Bezier(temp, temp, temp, temp), new Bezier(temp, temp, temp, temp)};
     public double guessT = 0, arcLength = 0;
     private double totalArcLength;
-    private Vector2d[] controlPoints;
+    Vector2d[] controlPoints;
     double[] arcLengths = new double[beziers.length];
 
-    public CubicPath(Vector2d[] controlPoints) {
-        this.controlPoints = controlPoints;
-        beziers[0].setControlPoints(controlPoints[0], controlPoints[1], controlPoints[2], controlPoints[3]);
-        beziers[1].setControlPoints(controlPoints[3], controlPoints[3].times(2).minus(controlPoints[2]), controlPoints[4], controlPoints[5]);
-        beziers[2].setControlPoints(controlPoints[5], controlPoints[5].times(2).minus(controlPoints[4]), controlPoints[6], controlPoints[7]);
+    public CubicPath(double[] controlPoints) {
+        this.controlPoints = Maths.pointListToVectorList(controlPoints);
+        beziers[0].setControlPoints(this.controlPoints[0], this.controlPoints[1], this.controlPoints[2], this.controlPoints[3]);
+        beziers[1].setControlPoints(this.controlPoints[3], this.controlPoints[3].times(2).minus(this.controlPoints[2]), this.controlPoints[4], this.controlPoints[5]);
+        beziers[2].setControlPoints(this.controlPoints[5], this.controlPoints[5].times(2).minus(this.controlPoints[4]), this.controlPoints[6], this.controlPoints[7]);
         calculateTotalArcLength();
     }
 
-    public void setControlPoints(Vector2d[] controlPoints) {
-        this.controlPoints = controlPoints;
+    public void setControlPointCoordinates(double[] controlPointCoordinates) {
+        controlPoints = Maths.pointListToVectorList(controlPointCoordinates);
         beziers[0].setControlPoints(controlPoints[0], controlPoints[1], controlPoints[2], controlPoints[3]);
         beziers[1].setControlPoints(controlPoints[3], controlPoints[3].times(2).minus(controlPoints[2]), controlPoints[4], controlPoints[5]);
         beziers[2].setControlPoints(controlPoints[5], controlPoints[5].times(2).minus(controlPoints[4]), controlPoints[6], controlPoints[7]);

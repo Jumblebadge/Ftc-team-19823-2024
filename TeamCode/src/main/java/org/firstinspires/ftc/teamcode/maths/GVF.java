@@ -42,7 +42,7 @@ public class GVF {
         calculateGVF(this.path.getControlPoint(0));
     }
 
-    public double calculateError(Vector2d tangent) {
+    public double calculateExponentialError(Vector2d tangent) {
         double magnitudeOfR = Maths.magnitudeOf(R);
         magnitudeOfR = Math.pow(1.3, magnitudeOfR - 10) - 0.073;
         magnitudeOfR *= -Math.signum(Maths.crossOf(R,tangent));
@@ -50,9 +50,18 @@ public class GVF {
         return magnitudeOfR;
     }
 
+    public double calculateSinusoidalError(Vector2d tangent) {
+        double horizontalStretch = 1;
+        double power = 1;
+        double magnitudeOfR = Maths.magnitudeOf(R);
+        double sign = -Math.signum(Maths.crossOf(R,tangent));
+        double internal = Math.pow(Math.abs(magnitudeOfR / horizontalStretch), power);
+        return ((internal *sign)/(1+ internal));
+    }
+
     public void calculateEverything(Vector2d Robot) {
         closestPoint = path.findClosestPointOnPath(Robot);
-        telemetry.addData("closestPoind",closestPoint);
+        telemetry.addData("closestPoint",closestPoint);
         R = new Vector2d(Robot.x - closestPoint.x, Robot.y - closestPoint.y);
     }
 
@@ -70,7 +79,7 @@ public class GVF {
         calculateEverything(Robot);
         tangent = path.getNormalizedTangent(path.guessT);
         Vector2d normal = path.getNormalizedNormal(path.guessT);
-        double error = calculateError(tangent);
+        double error = calculateExponentialError(tangent);
         out = tangent.minus(normal.times(Kn).times(error));
         telemetry.addData("error", error);
         double max = Math.max(Math.abs(out.x), Math.abs(out.y));
@@ -91,20 +100,6 @@ public class GVF {
             return new Vector2d(xOut / max, yOut / max);
         }
         return new Vector2d(-xOut, yOut);
-    }
-
-    public Vector2d cameraPID(Vector2d xy) {
-        double yOut = yPID.pidOut(13 - xy.y);
-        double xOut = xPID.pidOut(-xy.x);
-        double max = Math.max(Math.abs(yOut), Math.abs(xOut));
-        if (max > 1) {
-            return new Vector2d(xOut / max, yOut / max);
-        }
-        return new Vector2d(yOut, xOut);
-    }
-
-    public boolean isCameraDone(Vector2d xy) {
-        return 13 - xy.y < 3 && -xy.x < 3;
     }
 
     public double headingOut(double heading, double targetHeading, boolean followTangent, boolean reversed) {

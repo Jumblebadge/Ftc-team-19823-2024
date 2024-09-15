@@ -77,6 +77,19 @@ public class Maths {
         return Math.abs(state - equals) < thresh;
     }
 
+    public static Vector2d[] pointListToVectorList(double[] coordinateList) {
+        return new Vector2d[]{
+                new Vector2d(coordinateList[0], coordinateList[1]),
+                new Vector2d(coordinateList[2], coordinateList[3]),
+                new Vector2d(coordinateList[4], coordinateList[5]),
+                new Vector2d(coordinateList[6], coordinateList[7]),
+                new Vector2d(coordinateList[8], coordinateList[9]),
+                new Vector2d(coordinateList[10], coordinateList[11]),
+                new Vector2d(coordinateList[12], coordinateList[13]),
+                new Vector2d(coordinateList[14], coordinateList[15])
+        };
+    }
+
     public static double magnitudeOf(Vector2d vec) { return Math.sqrt(Math.pow(vec.x,2)+Math.pow(vec.y,2)); }
 
     public static double distanceBetween(Vector2d a, Vector2d b) { return magnitudeOf(a.minus(b)); }
