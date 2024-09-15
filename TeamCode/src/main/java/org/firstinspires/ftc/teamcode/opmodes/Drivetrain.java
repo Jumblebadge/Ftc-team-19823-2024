@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.teleop;
+package org.firstinspires.ftc.teamcode.opmodes;
 
 //Import EVERYTHING we need
 import com.acmerobotics.dashboard.config.Config;
