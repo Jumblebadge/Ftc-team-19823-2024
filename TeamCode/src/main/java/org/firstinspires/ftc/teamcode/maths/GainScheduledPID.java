@@ -1,32 +1,46 @@
 package org.firstinspires.ftc.teamcode.maths;
 
-import com.qualcomm.robotcore.util.Range;
+import android.util.Range;
+
+import com.arcrobotics.ftclib.util.InterpLUT;
+
+import java.util.ArrayList;
 
 public class GainScheduledPID {
 
-    public final PID[] pids;
+    private final PID pid = new PID(0,0,0,0,0,0);
+    private final InterpLUT Plut = new InterpLUT();
+    private final InterpLUT Dlut = new InterpLUT();
+    private final InterpLUT Ilut = new InterpLUT();
+    private final InterpLUT Flut = new InterpLUT();
+    private final InterpLUT Llut = new InterpLUT();
 
-    public GainScheduledPID(PID... pids) { this.pids = pids; }
-
-    public double pidOut(int PID, double error) {
-        return pids[PID].pidOut(error);
-    }
-
-    public double ffOut(int PID, double error, double velocityTarget, double accelerationTarget) {
-        return pids[PID].ffOut(error, velocityTarget, accelerationTarget);
-    }
-
-    public void setPIDgains(int PID, double Kp, double Kd, double Ki, double Kf, double Kl) {
-        pids[PID].setPIDgains(Kp, Kd, Ki, Kf, Kl);
-    }
-
-    public void setFFgains(int PID, double Kv, double Ka, double Kstatic) {
-        pids[PID].setFFgains(Kv, Ka, Kstatic);
-    }
-
-    public void toDefault() {
-        for (PID pid : pids) {
-            pid.toDefault();
+    public GainScheduledPID(ConstantsForPID... constants) {
+        for (ConstantsForPID constant : constants) {
+            addConstantsToLUT(constant);
         }
+        Plut.createLUT();
+        Dlut.createLUT();
+        Ilut.createLUT();
+        Flut.createLUT();
+        Llut.createLUT();
+    }
+
+    public double pidOut(double reference, double state) {
+        pid.setPIDgains(Plut.get(reference), Dlut.get(reference), Ilut.get(reference), Flut.get(reference), Llut.get(reference));
+        return pid.pidOut(reference-state);
+    }
+
+    public double ffOut(double error, double velocityTarget, double accelerationTarget) {
+        return pid.ffOut(error, velocityTarget, accelerationTarget);
+    }
+
+    public void addConstantsToLUT(ConstantsForPID constants) {
+        double pointTunedAt = constants.getPointTunedAt();
+        Plut.add(pointTunedAt, constants.Kp());
+        Dlut.add(pointTunedAt, constants.Kd());
+        Ilut.add(pointTunedAt, constants.Ki());
+        Flut.add(pointTunedAt, constants.Kf());
+        Llut.add(pointTunedAt, constants.Kl());
     }
 }

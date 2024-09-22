@@ -93,6 +93,6 @@ public class Bezier {
                 break;
             }
         }
-        return Maths.interpolateBetween(lookup[index], lookup[index + 1], distance).x;
+        return Maths.interpolateBetweenVectors(lookup[index], lookup[index + 1], distance).x;
     }
 }

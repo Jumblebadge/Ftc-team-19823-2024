@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.maths;
 
-import androidx.appcompat.widget.VectorEnabledTintResources;
-
 import com.acmerobotics.roadrunner.Vector2d;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -102,11 +100,15 @@ public class Maths {
 
     public static double angleOf(Vector2d vec) { return AngleUnit.normalizeRadians(Math.atan2(vec.y,vec.x)); }
 
-    public static Vector2d interpolateBetween(Vector2d start, Vector2d end, double midy){
+    public static Vector2d interpolateBetweenVectors(Vector2d start, Vector2d end, double interpolator){
         double m = (start.y - end.y) / (start.x - end.x);
         double b = -(m*start.x) + start.y;
 
-        return new Vector2d((midy - b) / m, midy);
+        return new Vector2d((interpolator - b) / m, interpolator);
+    }
+    
+    public static double averageOf(double a, double b) {
+        return (a+b)/2;
     }
 
     public static double crossOf(Vector2d a, Vector2d b) {

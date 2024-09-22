@@ -3,18 +3,13 @@ package org.firstinspires.ftc.teamcode.utility;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.maths.PID;
-
+//TODO integrate PID
 public class MotorGroup {
 
     public final DcMotorExW[] motors;
-    private final PID controller = new PID(0,0,0,0,100);
 
     public MotorGroup(DcMotorExW... motors){
         this.motors = motors;
-    }
-
-    public void setPIDgains(double Kp, double Kd, double Ki, double Kf, double limit){
-        controller.setPIDgains(Kp, Kd, Ki, Kf, limit);
     }
 
     public void setPowers(double... powers){
@@ -29,11 +24,6 @@ public class MotorGroup {
 
     public double getPosition(int motor){
         return motors[motor].getCurrentPosition();
-    }
-
-    //TODO set power of more than one motor
-    public void setPositions(double target){
-        setPowers(controller.pidOut(target-getAveragePosition()));
     }
 
     public double getAveragePosition(){

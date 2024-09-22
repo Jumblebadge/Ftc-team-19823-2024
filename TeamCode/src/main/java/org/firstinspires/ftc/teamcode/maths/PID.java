@@ -6,23 +6,16 @@ import com.qualcomm.robotcore.util.Range;
 public class PID {
     //PID controller class
 
+    private final ConstantsForPID constants;
     private double integralSum,out,lastError;
-    private double Kp, Kd, Ki, Kf, Kl, Kv, Ka, Kstatic;
-    private final double KpS, KdS, KiS, KfS, KlS;
     private final ElapsedTime timer = new ElapsedTime();
 
-    public PID(double Kp, double Kd, double Ki, double Kf, double Kl) {
-        this.Kp = Kp;
-        this.Kd = Kd;
-        this.Ki = Ki;
-        this.Kf = Kf;
-        this.Kl = Kl;
+    public PID(double Kp, double Kd, double Ki, double Kf, double Kl, double pointTunedAt) {
+        constants = new ConstantsForPID(Kp, Kd, Ki, Kf, Kl, pointTunedAt);
+    }
 
-        KpS = Kp;
-        KdS = Kd;
-        KiS = Ki;
-        KfS = Kf;
-        KlS = Kl;
+    public PID(double Kp, double Kd, double Ki, double Kf, double Kl) {
+        constants = new ConstantsForPID(Kp, Kd, Ki, Kf, Kl, 0);
     }
 
     //calculate
@@ -31,9 +24,9 @@ public class PID {
             //integral and derivative values
             double derivative = (error - lastError) / timer.seconds();
             integralSum += (error * timer.seconds());
-            integralSum = Range.clip(integralSum, -Kl, Kl);
+            integralSum = Range.clip(integralSum, -constants.Kl(), constants.Kl());
             //weight each term so that tuning makes a difference
-            out = (Kp * error) + (Kd * derivative) + (Ki * integralSum) + (Kf * Math.signum(error));
+            out = (constants.Kp() * error) + (constants.Kd() * derivative) + (constants.Ki() * integralSum) + (constants.Kf() * Math.signum(error));
             out /= 10;
             lastError = error;
             timer.reset();
@@ -42,29 +35,19 @@ public class PID {
     }
 
     public double ffOut(double error, double velocityTarget, double accelerationTarget) {
-        return pidOut(error) + Kv * velocityTarget + Ka * accelerationTarget + Kstatic;
+        return pidOut(error) + constants.Kv() * velocityTarget + constants.Ka() * accelerationTarget + constants.Ks();
     }
 
     public void setPIDgains(double Kp, double Kd, double Ki, double Kf, double Kl) {
-        this.Kp = Kp;
-        this.Kd = Kd;
-        this.Ki = Ki;
-        this.Kf = Kf;
-        this.Kl = Kl;
+        constants.setPIDgains(Kp, Kd, Ki, Kf, Kl);
     }
 
-    public void setFFgains(double Kv, double Ka, double Kstatic) {
-        this.Kv = Kv;
-        this.Ka = Ka;
-        this.Kstatic = Kstatic;
+    public void setFFgains(double Kv, double Ka, double Ks) {
+        constants.setFFgains(Kv, Ka, Ks);
     }
 
     public void toDefault() {
-        this.Kp = KpS;
-        this.Kd = KdS;
-        this.Ki = KiS;
-        this.Kf = KfS;
-        this.Kl = KlS;
+        constants.toDefault();
     }
 
 }
