@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.utility;
 
+import org.firstinspires.ftc.teamcode.maths.ConstantsForPID;
+
 public class DualServo {
 
     private final ServoImplExW servo1, servo2;
-    private final RunMotionProfile profile = new RunMotionProfile(0.1,0.1,0.1,0,0,0,0, 100);
+    private final RunMotionProfile profile = new RunMotionProfile(0.1,0.1,0.1,new ConstantsForPID(0,0,0,0,1,0));
     private double lastTarget;
 
     public DualServo(ServoImplExW servo2, ServoImplExW servo1){
@@ -27,10 +29,6 @@ public class DualServo {
 
     public void setMotionConstraints(double maxVel, double maxAccel, double maxJerk){
         profile.setMotionConstraints(maxVel, maxAccel, maxJerk);
-    }
-
-    public void setPIDcoeffs(double Kp, double Kd, double Ki, double Kf, double limit){
-        profile.setPIDcoeffs(Kp, Kd, Ki, Kf, limit);
     }
 
     public double getMotionTarget(){

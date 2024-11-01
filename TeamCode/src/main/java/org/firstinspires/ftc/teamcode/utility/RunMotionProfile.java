@@ -6,6 +6,8 @@ import com.acmerobotics.roadrunner.profile.MotionProfile;
 import com.acmerobotics.roadrunner.profile.MotionProfileGenerator;
 import com.acmerobotics.roadrunner.profile.MotionState;
 
+import org.firstinspires.ftc.teamcode.maths.ConstantsForPID;
+import org.firstinspires.ftc.teamcode.maths.GainScheduledPID;
 import org.firstinspires.ftc.teamcode.maths.PID;
 
 public class RunMotionProfile {
@@ -13,16 +15,16 @@ public class RunMotionProfile {
     private double lastTarget;
     private double maxVel, maxAccel, maxJerk;
     private MotionState motionState;
-    private final org.firstinspires.ftc.teamcode.maths.PID PID;
+    private final org.firstinspires.ftc.teamcode.maths.GainScheduledPID PID;
     private final ElapsedTime timer = new ElapsedTime();
     private MotionProfile profile = MotionProfileGenerator.generateSimpleMotionProfile(new MotionState(0,0,0),new MotionState(1,0,0),1,1,1);
 
-    public RunMotionProfile(double maxVel, double maxAccel, double maxJerk, double Kp, double Kd, double Ki, double Kf, double limit){
+    public RunMotionProfile(double maxVel, double maxAccel, double maxJerk, ConstantsForPID... constants){
         this.maxVel = maxVel;
         this.maxAccel = maxAccel;
         this.maxJerk = maxJerk;
 
-        PID = new PID(Kp, Kd, Ki, Kf, limit);
+        PID = new GainScheduledPID(constants);
     }
 
     public void setMotionConstraints(double maxVel, double maxAccel, double maxJerk){
@@ -30,8 +32,6 @@ public class RunMotionProfile {
         this.maxAccel=maxAccel;
         this.maxJerk=maxJerk;
     }
-
-    public void setPIDcoeffs(double Kp, double Kd, double Ki, double Kf, double limit){ PID.setPIDgains(Kp,Kd,Ki,Kf, limit); }
 
     public double profiledMovement(double target, double state){
         if (lastTarget != target) {
@@ -41,7 +41,7 @@ public class RunMotionProfile {
         }
         else{ lastTarget = target; }
         motionState = profile.get(timer.seconds());
-        return PID.pidOut(motionState.getX()-state);
+        return PID.pidOut(motionState.getX(), state);
     }
 
 

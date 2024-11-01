@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 //Import EVERYTHING we need
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.hardware.lynx.*;
 import com.qualcomm.robotcore.util.ElapsedTime;
