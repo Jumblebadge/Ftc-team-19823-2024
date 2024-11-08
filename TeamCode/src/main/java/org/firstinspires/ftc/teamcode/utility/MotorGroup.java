@@ -22,6 +22,12 @@ public class MotorGroup {
         motors[motor].setPower(power);
     }
 
+    public void setPowers(double power) {
+        for (DcMotorEx motor : motors) {
+            motor.setPower(power);
+        }
+    }
+
     public double getPosition(int motor){
         return motors[motor].getCurrentPosition();
     }
