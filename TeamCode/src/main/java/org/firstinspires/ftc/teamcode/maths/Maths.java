@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.maths;
 
-import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
@@ -88,21 +88,21 @@ public class Maths {
         };
     }
 
-    public static double magnitudeOf(Vector2d vec) { return Math.sqrt(Math.pow(vec.x,2)+Math.pow(vec.y,2)); }
+    public static double magnitudeOf(Vector2d vec) { return Math.sqrt(Math.pow(vec.getX(),2)+Math.pow(vec.getY(),2)); }
 
     public static double distanceBetween(Vector2d a, Vector2d b) { return magnitudeOf(a.minus(b)); }
 
     public static Vector2d rotateVectorBy(Vector2d vec, double radians) {
-        double x = vec.x * Math.cos(radians) - vec.y * Math.sin(radians);
-        double y = vec.x * Math.sin(radians) + vec.y * Math.cos(radians);
+        double x = vec.getX() * Math.cos(radians) - vec.getY() * Math.sin(radians);
+        double y = vec.getX() * Math.sin(radians) + vec.getY() * Math.cos(radians);
         return new Vector2d(x,y);
     }
 
-    public static double angleOf(Vector2d vec) { return AngleUnit.normalizeRadians(Math.atan2(vec.y,vec.x)); }
+    public static double angleOf(Vector2d vec) { return AngleUnit.normalizeRadians(Math.atan2(vec.getY(),vec.getX())); }
 
     public static Vector2d interpolateBetweenVectors(Vector2d start, Vector2d end, double interpolator){
-        double m = (start.y - end.y) / (start.x - end.x);
-        double b = -(m*start.x) + start.y;
+        double m = (start.getY() - end.getY()) / (start.getX() - end.getX());
+        double b = -(m*start.getX()) + start.getY();
 
         return new Vector2d((interpolator - b) / m, interpolator);
     }
@@ -112,10 +112,10 @@ public class Maths {
     }
 
     public static double crossOf(Vector2d a, Vector2d b) {
-        return a.x * b.y - a.y * b.x;
+        return a.getX() * b.getY() - a.getY() * b.getX();
     }
 
     public static Vector2d swapXYOf(Vector2d vec) {
-        return new Vector2d(vec.y, vec.x);
+        return new Vector2d(vec.getY(), vec.getX());
     }
 }

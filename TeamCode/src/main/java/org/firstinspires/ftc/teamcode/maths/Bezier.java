@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.maths;
 
-import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 
 public class Bezier {
 
@@ -87,12 +87,12 @@ public class Bezier {
     public double distanceToT(double distance) {
         int index = 0;
         for (int i = 0; i < lookup.length; i++) {
-            if (i == lookup.length - 1) { return lookup[i].x; }
-            if (lookup[i].y <= distance && lookup[i + 1].y >= distance) {
+            if (i == lookup.length - 1) { return lookup[i].getX(); }
+            if (lookup[i].getY() <= distance && lookup[i + 1].getY() >= distance) {
                 index = i;
                 break;
             }
         }
-        return Maths.interpolateBetweenVectors(lookup[index], lookup[index + 1], distance).x;
+        return Maths.interpolateBetweenVectors(lookup[index], lookup[index + 1], distance).getX();
     }
 }

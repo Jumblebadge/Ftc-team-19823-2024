@@ -28,11 +28,20 @@ public class GainScheduledPID {
 
     public double pidOut(double reference, double state) {
         pid.setPIDgains(Plut.get(reference), Dlut.get(reference), Ilut.get(reference), Flut.get(reference), Llut.get(reference));
-        return pid.pidOut(reference-state);
+        return pid.pidOut(reference, state);
     }
 
-    public double ffOut(double error, double velocityTarget, double accelerationTarget) {
-        return pid.ffOut(error, velocityTarget, accelerationTarget);
+    public double pidAngleOut(double reference, double state) {
+        pid.setPIDgains(Plut.get(reference), Dlut.get(reference), Ilut.get(reference), Flut.get(reference), Llut.get(reference));
+        return pid.pidAngleOut(reference, state);
+    }
+
+    public double ffOut(double reference, double state, double velocityTarget, double accelerationTarget) {
+        return pid.ffOut(reference, state, velocityTarget, accelerationTarget);
+    }
+
+    public double ffAngleOut(double reference, double state, double velocityTarget, double accelerationTarget) {
+        return pid.ffAngleOut(reference, state, velocityTarget, accelerationTarget);
     }
 
     public void addConstantsToLUT(ConstantsForPID constants) {

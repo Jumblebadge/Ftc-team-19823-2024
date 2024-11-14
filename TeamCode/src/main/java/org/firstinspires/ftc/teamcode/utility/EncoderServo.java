@@ -41,7 +41,7 @@ public class EncoderServo {
     }
 
     public void update(boolean reversed) {
-        double PIDout = PID.pidOut(AngleUnit.normalizeDegrees(target - getPosition()));
+        double PIDout = PID.pidAngleOut(target, getPosition());
         double limited = slew.rateLimit((reversed) ? -PIDout : PIDout,r);
         servo.setPower(limited);
     }
