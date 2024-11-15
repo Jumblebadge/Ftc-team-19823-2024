@@ -15,16 +15,16 @@ public class RunMotionProfile {
     private double lastTarget;
     private double maxVel, maxAccel, maxJerk;
     private MotionState motionState;
-    private final org.firstinspires.ftc.teamcode.maths.GainScheduledPID PID;
+    private final PID PID;
     private final ElapsedTime timer = new ElapsedTime();
     private MotionProfile profile = MotionProfileGenerator.generateSimpleMotionProfile(new MotionState(0,0,0),new MotionState(1,0,0),1,1,1);
 
-    public RunMotionProfile(double maxVel, double maxAccel, double maxJerk, ConstantsForPID... constants){
+    public RunMotionProfile(double maxVel, double maxAccel, double maxJerk, ConstantsForPID constants){
         this.maxVel = maxVel;
         this.maxAccel = maxAccel;
         this.maxJerk = maxJerk;
 
-        PID = new GainScheduledPID(constants);
+        PID = new PID(constants);
     }
 
     public void setMotionConstraints(double maxVel, double maxAccel, double maxJerk){
@@ -42,6 +42,17 @@ public class RunMotionProfile {
         else{ lastTarget = target; }
         motionState = profile.get(timer.seconds());
         return PID.pidOut(motionState.getX(), state);
+    }
+
+    public double profiledPivotMovement(double target, double state){
+        if (lastTarget != target) {
+            lastTarget = target;
+            profile = MotionProfileGenerator.generateSimpleMotionProfile(new MotionState(state, 0, 0), new MotionState(target, 0, 0), maxVel, maxAccel,maxJerk);
+            timer.reset();
+        }
+        else{ lastTarget = target; }
+        motionState = profile.get(timer.seconds());
+        return PID.pidPivotOut(motionState.getX(), state);
     }
 
 

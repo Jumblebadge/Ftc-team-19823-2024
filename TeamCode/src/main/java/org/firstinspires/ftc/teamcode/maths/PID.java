@@ -12,6 +12,10 @@ public class PID {
     private double integralSum, out, lastOut, lastError, lastReference;
     private final ElapsedTime timer = new ElapsedTime();
 
+    public PID(ConstantsForPID constants) {
+        this.constants = constants;
+    }
+
     public PID(double Kp, double Kd, double Ki, double Kf, double Kl, double pointTunedAt) {
         constants = new ConstantsForPID(Kp, Kd, Ki, Kf, Kl, pointTunedAt);
     }
@@ -62,6 +66,27 @@ public class PID {
         return out;
     }
 
+    public double pidPivotOut(double reference, double state) {
+
+        if (reference != lastReference) integralSum = 0;
+
+        double error = AngleUnit.normalizeDegrees(reference - state);
+        //integral and derivative values
+        double derivative = (error - lastError) / timer.seconds();
+        integralSum += (error * timer.seconds());
+        integralSum = Range.clip(integralSum, -constants.Kl(), constants.Kl());
+        //weight each term so that tuning makes a difference
+        out = (constants.Kp() * error) + (constants.Kd() * derivative) + (constants.Ki() * integralSum) + (constants.Kf() * Math.signum(error) * Math.sin(Math.toRadians(state)));
+        out /= 10;
+
+        lastError = error;
+        lastOut = out;
+        lastReference = reference;
+        timer.reset();
+
+        return out;
+    }
+
     public double[] inDepthOutput(double reference, double state) {
 
         double error = AngleUnit.normalizeDegrees(reference - state);
@@ -78,6 +103,10 @@ public class PID {
 
     public double ffAngleOut(double reference, double state, double velocityTarget, double accelerationTarget) {
         return pidAngleOut(reference, state + constants.Kv() * velocityTarget + constants.Ka() * accelerationTarget + constants.Ks());
+    }
+
+    public double ffPivotOut(double reference, double state, double velocityTarget, double accelerationTarget) {
+        return pidPivotOut(reference, state + constants.Kv() * velocityTarget + constants.Ka() * accelerationTarget + constants.Ks());
     }
 
     public void setPIDgains(double Kp, double Kd, double Ki, double Kf, double Kl) {

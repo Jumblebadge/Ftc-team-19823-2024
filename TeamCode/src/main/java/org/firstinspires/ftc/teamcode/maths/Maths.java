@@ -8,14 +8,14 @@ public class Maths {
 
     //normalizes the angle given
     public static double angleWrap(double wrap) {
-
-        while(wrap <= -180) {
-            wrap += 360;
+        double output = wrap;
+        if(wrap <= -180) {
+            output = wrap + 360;
         }
-        while(wrap > 180) {
-            wrap -= 360;
+        if(wrap > 180) {
+            output = wrap - 360;
         }
-        return wrap;
+        return output;
     }
 
     //replaces turning a module by 180 degrees with reversing motor power.

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import android.provider.MediaStore;
+
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -7,6 +9,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.maths.MedianFilter;
 import org.firstinspires.ftc.teamcode.maths.PID;
 import org.firstinspires.ftc.teamcode.maths.Maths;
 import org.firstinspires.ftc.teamcode.maths.swerveKinematics;
@@ -17,6 +20,8 @@ public class SwerveDrive {
     final private IMU imu;
     final private DcMotorExW mod1m1,mod1m2,mod2m1,mod2m2;
     final private AnalogInput module1Encoder, module2Encoder;
+    final private MedianFilter module1Filter = new MedianFilter(7);
+    final private MedianFilter module2Filter = new MedianFilter(7);
     final private Telemetry telemetry;
     private final boolean efficientTurnActive;
     private double module1Offset = 78, module2Offset = 45;
@@ -58,6 +63,12 @@ public class SwerveDrive {
         mod2P -= module2Offset;
         mod1P -= module1Offset;
 
+        mod1P = AngleUnit.normalizeDegrees(mod1P);
+        mod2P = AngleUnit.normalizeDegrees(mod2P);
+
+        mod1P = module1Filter.getFilteredValue(mod1P);
+        mod2P = module2Filter.getFilteredValue(mod2P);
+
         //Update heading of robot
         imu.updateHeading(2);
 
@@ -73,10 +84,6 @@ public class SwerveDrive {
             mod1reference = -output[2];
             mod2reference = -output[3];
         }
-
-        //Anglewrap all the angles so that the module turns both ways
-        mod1P = Maths.angleWrap(mod1P);
-        mod2P = Maths.angleWrap(mod2P);
 
         mod1reference = Maths.angleWrap(mod1reference);
         mod2reference = Maths.angleWrap(mod2reference);

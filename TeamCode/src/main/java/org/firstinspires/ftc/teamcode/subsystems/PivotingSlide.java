@@ -30,6 +30,10 @@ public class PivotingSlide {
     }
     private PossibleStates state = PossibleStates.MIN;
 
+    private final double DIAMETER = 1;
+    private final double RATIO = 1;
+    private final double CIRCUMFERENCE = DIAMETER * Math.PI;
+
     public PivotingSlide(HardwareMap hardwareMap) {
         DcMotorExW liftLeft = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "Llift"));
         DcMotorExW liftRight = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "Rlift"));
@@ -39,9 +43,6 @@ public class PivotingSlide {
         liftLeft.setPowerThresholds(0.05,0.05);
         pivotRight.setPowerThresholds(0.05,0.05);
         pivotLeft.setPowerThresholds(0.05,0.05);
-
-        liftLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        pivotLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
         slideLimitSwitch = hardwareMap.get(TouchSensor.class, "slideLimit");
         pivotLimitSwitch = hardwareMap.get(TouchSensor.class, "pivotLimit");
@@ -63,7 +64,7 @@ public class PivotingSlide {
             slideOffset = slideMotors.getPosition(0);
         }
         if (pivotLimitSwitch.isPressed()) {
-            pivotOffset = pivotEncoder.getVoltage() * 74.16;
+            pivotOffset = pivotEncoder.getVoltage() * 74.16 - 30;
         }
         slideMotors.setPowers(slideProfile.profiledMovement(slideTarget, getSlidePosition()));
         pivotMotors.setPowers(pivotProfile.profiledMovement(pivotTarget, getPivotAngle()));
@@ -80,7 +81,7 @@ public class PivotingSlide {
 
     public double getSlidePosition() { return slideMotors.getPosition(0) - slideOffset; }
 
-    public double getPivotAngle() { return  pivotEncoder.getVoltage() * 74.16 - pivotOffset; }
+    public double getPivotAngle() { return  pivotEncoder.getVoltage() * 74.16 - pivotOffset - 30; }
 
     public boolean isTimeDone() { return slideProfile.getProfileDuration() < slideProfile.getCurrentTime(); }
 

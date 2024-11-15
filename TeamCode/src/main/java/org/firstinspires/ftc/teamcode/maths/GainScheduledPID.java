@@ -36,6 +36,11 @@ public class GainScheduledPID {
         return pid.pidAngleOut(reference, state);
     }
 
+    public double pidPivotOut(double reference, double state) {
+        pid.setPIDgains(Plut.get(reference), Dlut.get(reference), Ilut.get(reference), Flut.get(reference), Llut.get(reference));
+        return pid.pidPivotOut(reference, state);
+    }
+
     public double ffOut(double reference, double state, double velocityTarget, double accelerationTarget) {
         return pid.ffOut(reference, state, velocityTarget, accelerationTarget);
     }
