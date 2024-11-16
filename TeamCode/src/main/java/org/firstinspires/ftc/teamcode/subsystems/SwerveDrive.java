@@ -23,7 +23,7 @@ public class SwerveDrive {
     final private MedianFilter module1Filter = new MedianFilter(7);
     final private MedianFilter module2Filter = new MedianFilter(7);
     final private Telemetry telemetry;
-    private double module1Offset = -78, module2Offset = 35;
+    private double module1Offset = -40, module2Offset = 32;
     private final PID module1PID = new PID(0.1,0.00188,0.1,0.05, 1);
     private final PID module2PID = new PID(0.1,0.00188,0.1,0.05, 1);
     private final swerveKinematics swavemath = new swerveKinematics();
@@ -73,7 +73,7 @@ public class SwerveDrive {
 
         //Retrieve the angle and power for each module
         double[] output = swavemath.calculate(x,y,rot, heading,true);
-        double mod1power = output[0];
+        double mod1power = -output[0];
         double mod2power = -output[1];
 
         //keep previous module heading if joystick not being used

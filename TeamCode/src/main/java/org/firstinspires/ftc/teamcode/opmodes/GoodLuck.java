@@ -128,13 +128,13 @@ public class GoodLuck extends LinearOpMode {
             if (pivotToggle.toggle(gamepad2.right_bumper)) {
                 slide.movePivotTo(85);
             }
-            else if (Maths.epsilonEquals(slideMotors.getPosition(0), 0, 25)) {
+            else if (slideMotors.getPosition(0) < 50) {
                 slide.movePivotTo(0);
             }
 
             slideMotors.setPowers(profile.profiledMovement(slideTarget, slideMotors.getPosition(0)));
 
-            if (gamepad2.triangle) {
+            if (gamepad2.triangle && slide.getPivotAngle() > 20) {
                 slideTarget = 900;
             }
             if (gamepad2.circle) {

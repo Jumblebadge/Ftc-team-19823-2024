@@ -14,7 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 public class IMU {
 
     private final BNO055IMU imu;
-    private double imuOffset = 0, count = 0;
+    private double imuOffset = 180, count = 0;
     private Orientation angle;
 
     public IMU(HardwareMap hardwareMap) {
