@@ -118,4 +118,26 @@ public class Maths {
     public static Vector2d swapXYOf(Vector2d vec) {
         return new Vector2d(vec.getY(), vec.getX());
     }
+
+    /**
+     * convert cartesian coordinates to polar coordinates
+     * @param vec the (x,y) ordered pair in cartesian coordinates
+     * @return ordered pair (r, theta) where theta is in radians
+     */
+    public static Vector2d toPolarCoordinates(Vector2d vec) {
+        double r = Math.sqrt(vec.getX() * vec.getX() + vec.getY() * vec.getY());
+        double theta = Math.atan2(vec.getY(), vec.getX());
+        return new Vector2d(r, theta);
+    }
+
+    /**
+     * convert polar coordinates to cartesian coordinates
+     * @param vec the (r, theta) ordered pair in polar coordinates with theta in radians
+     * @return ordered pair (x,y) in cartesian coordinates
+     */
+    public static Vector2d toCartesianCoordinates(Vector2d vec) {
+        double x = vec.getX() * Math.cos(vec.getY());
+        double y = vec.getX() * Math.sin(vec.getY());
+        return new Vector2d(x,y);
+    }
 }

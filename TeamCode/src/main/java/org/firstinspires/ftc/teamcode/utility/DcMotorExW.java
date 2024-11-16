@@ -9,9 +9,14 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
+/**
+ * wrapper class for DcMotor which eliminates irrelevant hardware calls.
+ * @see com.qualcomm.robotcore.hardware.DcMotorEx
+ */
 public class DcMotorExW implements DcMotorEx {
     private final DcMotorEx motor;
     private double lastPower = 0, powerStep = 0.05, minimum_power = 0.05;
+    private boolean isZero = false;
 
     public DcMotorExW(DcMotorEx motor){
         this.motor = motor;
@@ -19,12 +24,15 @@ public class DcMotorExW implements DcMotorEx {
 
     @Override
     public void setPower(double power) {
-        if(Math.abs(power - lastPower) >= powerStep){
+        if(!isZero && Math.abs(power) <= Math.abs(minimum_power)){
+            isZero = true;
+            lastPower = 0;
+            motor.setPower(0);
+        }
+        else if(Math.abs(power - lastPower) >= powerStep){
+            isZero = false;
             motor.setPower(power);
             lastPower = power;
-        }
-        if(Math.abs(power) <= Math.abs(minimum_power)){
-            //motor.setPower(0);
         }
     }
 

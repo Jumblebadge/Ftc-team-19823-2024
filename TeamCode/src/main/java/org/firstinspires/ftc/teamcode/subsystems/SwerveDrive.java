@@ -23,8 +23,7 @@ public class SwerveDrive {
     final private MedianFilter module1Filter = new MedianFilter(7);
     final private MedianFilter module2Filter = new MedianFilter(7);
     final private Telemetry telemetry;
-    private final boolean efficientTurnActive;
-    private double module1Offset = 78, module2Offset = 45;
+    private double module1Offset = -78, module2Offset = 35;
     private final PID module1PID = new PID(0.1,0.00188,0.1,0.05, 1);
     private final PID module2PID = new PID(0.1,0.00188,0.1,0.05, 1);
     private final swerveKinematics swavemath = new swerveKinematics();
@@ -32,7 +31,7 @@ public class SwerveDrive {
     double mod1reference;
     double mod2reference;
 
-    public SwerveDrive(Telemetry telemetry, HardwareMap hardwareMap, boolean eff){
+    public SwerveDrive(Telemetry telemetry, HardwareMap hardwareMap){
         mod1m1 = new DcMotorExW(hardwareMap.get(DcMotorEx.class,"mod1m1"));
         mod1m2 = new DcMotorExW(hardwareMap.get(DcMotorEx.class,"mod1m2"));
         mod2m1 = new DcMotorExW(hardwareMap.get(DcMotorEx.class,"mod2m1"));
@@ -45,12 +44,9 @@ public class SwerveDrive {
         mod2m1.setPowerThresholds(0.05,0.01);
         mod2m2.setPowerThresholds(0.05,0.01);
 
-        mod2m1.setDirection(DcMotorSimple.Direction.REVERSE);
-
         imu = new IMU(hardwareMap);
 
         this.telemetry = telemetry;
-        this.efficientTurnActive = eff;
     }
 
     public void drive(double x, double y, double rot){
@@ -66,8 +62,9 @@ public class SwerveDrive {
         mod1P = AngleUnit.normalizeDegrees(mod1P);
         mod2P = AngleUnit.normalizeDegrees(mod2P);
 
-        mod1P = module1Filter.getFilteredValue(mod1P);
-        mod2P = module2Filter.getFilteredValue(mod2P);
+        //TODO fix the filter
+        //mod1P = module1Filter.getFilteredValue(mod1P);
+        //mod2P = module2Filter.getFilteredValue(mod2P);
 
         //Update heading of robot
         imu.updateHeading(2);
@@ -75,9 +72,9 @@ public class SwerveDrive {
         double heading = -imu.getHeadingInDegrees();
 
         //Retrieve the angle and power for each module
-        double[] output = swavemath.calculate(y,x,rot, heading,true);
+        double[] output = swavemath.calculate(x,y,rot, heading,true);
         double mod1power = output[0];
-        double mod2power = output[1];
+        double mod2power = -output[1];
 
         //keep previous module heading if joystick not being used
         if (y != 0 || x != 0 || rot != 0){
@@ -93,12 +90,10 @@ public class SwerveDrive {
 
         double[] mod2efvalues = Maths.efficientTurn(mod2reference,mod2P,mod2power);
 
-        if (efficientTurnActive) {
-            mod1reference = mod1efvalues[0];
-            mod1power = mod1efvalues[1];
-            mod2reference = mod2efvalues[0];
-            mod2power = mod2efvalues[1];
-        }
+        mod1reference = mod1efvalues[0];
+        mod1power = mod1efvalues[1];
+        mod2reference = mod2efvalues[0];
+        mod2power = mod2efvalues[1];
 
         //change coax values into diffy values from pid and power
         double[] mod1values = Maths.diffyConvert(module1PID.pidAngleOut(mod1reference, mod1P),mod1power);

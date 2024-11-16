@@ -27,7 +27,7 @@ public class Drivetrain extends LinearOpMode {
         LynxModule controlHub = hardwareMap.get(LynxModule.class, "Control Hub");
 
         //class to swerve the swerve
-        SwerveDrive swerve = new SwerveDrive(telemetry, hardwareMap, true);
+        SwerveDrive swerve = new SwerveDrive(telemetry, hardwareMap);
 
         ElapsedTime hztimer = new ElapsedTime();
 

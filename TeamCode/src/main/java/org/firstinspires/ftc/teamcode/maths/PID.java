@@ -8,7 +8,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 public class PID {
     //PID controller class
 
-    private final ConstantsForPID constants;
+    private ConstantsForPID constants;
     private double integralSum, out, lastOut, lastError, lastReference;
     private final ElapsedTime timer = new ElapsedTime();
 
@@ -111,6 +111,10 @@ public class PID {
 
     public void setPIDgains(double Kp, double Kd, double Ki, double Kf, double Kl) {
         constants.setPIDgains(Kp, Kd, Ki, Kf, Kl);
+    }
+
+    public void setPIDgains(ConstantsForPID constants) {
+        this.constants = constants;
     }
 
     public void setFFgains(double Kv, double Ka, double Ks) {

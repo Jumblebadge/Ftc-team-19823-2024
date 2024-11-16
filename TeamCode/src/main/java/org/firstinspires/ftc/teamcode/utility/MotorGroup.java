@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.utility;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.maths.PID;
@@ -25,6 +26,13 @@ public class MotorGroup {
     public void setPowers(double power) {
         for (DcMotorEx motor : motors) {
             motor.setPower(power);
+        }
+    }
+
+    public void resetEncoders() {
+        for (DcMotorEx motor : motors) {
+            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
     }
 

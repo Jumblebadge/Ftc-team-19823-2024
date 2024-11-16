@@ -33,6 +33,10 @@ public class RunMotionProfile {
         this.maxJerk=maxJerk;
     }
 
+    public void setPidConstants(ConstantsForPID constants) {
+        PID.setPIDgains(constants);
+    }
+
     public double profiledMovement(double target, double state){
         if (lastTarget != target) {
             lastTarget = target;

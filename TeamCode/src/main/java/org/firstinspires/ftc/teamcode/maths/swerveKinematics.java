@@ -1,31 +1,47 @@
 package org.firstinspires.ftc.teamcode.maths;
 
+import com.acmerobotics.roadrunner.geometry.Vector2d;
+
 public class swerveKinematics {
 
-    //swerve kinematics
-    public double[] calculate(double forward, double strafe, double rotate, double imu, boolean fieldCentricActive){
+    /**
+     * calculates a speed and angle for each module based on the joystick input and current heading of robot
+     * @param translateX desired translation in x direction [-1,1]
+     * @param translateY driver left stick y [-1,1]
+     * @param rotateX driver right stick x [-1,1]
+     * @param currentHeading in degrees
+     * @param fieldCentricActive is robot in headless mode
+     * @return list of doubles in the form of {module1Speed, module2Speed, module1Angle, module2Angle}
+     */
 
-        //rotate vectors by imu heading for field centric (if toggled on)
-        double strafe1 = -strafe;
-        double forward1 = -forward;
+    public double[] calculate(double translateX, double translateY, double rotateX, double currentHeading, boolean fieldCentricActive){
+
+        //convert joystick coordinates into polar coordinates
+        Vector2d joystickVec = Maths.toPolarCoordinates(new Vector2d(translateX, translateY));
+        //square r and retain the sign (allows precise control)
+        joystickVec = new Vector2d(joystickVec.getX() * Math.abs(joystickVec.getX()), joystickVec.getY());
 
         if (fieldCentricActive) {
-            strafe1 = Math.cos(Math.toRadians(imu)) * strafe - Math.sin(Math.toRadians(imu)) * forward;
-            forward1 = Math.sin(Math.toRadians(imu)) * strafe + Math.cos(Math.toRadians(imu)) * forward;
+            //rotates input vector by heading (i am aware it is scuffed)
+            joystickVec = new Vector2d(joystickVec.getX(), joystickVec.getY() + currentHeading * Math.PI / 180);
         }
 
+        joystickVec = Maths.toCartesianCoordinates(joystickVec);
+        double strafe = joystickVec.getX();
+        double forward = joystickVec.getY();
+
         //displacement vectors of wheel positions
-        double module1X = strafe1 - rotate * 103d / 113d; // top left wheel x
-        double module2X = strafe1 - rotate * -103d / 113d; // bottom right wheel y
+        double module1X = strafe - rotateX * 103d / 113d; // top left wheel x
+        double module2X = strafe - rotateX * -103d / 113d; // bottom right wheel y
 
-        double module1Y = forward1 + rotate * -1; //top left wheel x
-        double module2Y = forward1 + rotate * 1; // bottom right wheel x
+        double module1Y = forward + rotateX * -1; //top left wheel x
+        double module2Y = forward + rotateX * 1; // bottom right wheel x
 
-        //extracting the length of our wheel specific vectors (speed)
+        //extracting the magnitude of our wheel specific vectors (speed)
         double module1Speed = Math.sqrt((module1X * module1X) + (module1Y * module1Y));
         double module2Speed = Math.sqrt((module2X * module2X) + (module2Y * module2Y));
 
-        //make sure that speed values are scaled properly (none go above 1)
+        //make sure that speed values are scaled properly
         double max = Math.max(Math.abs(module1Speed), Math.abs(module2Speed));
         if (max > 1) {
             module1Speed /= max;

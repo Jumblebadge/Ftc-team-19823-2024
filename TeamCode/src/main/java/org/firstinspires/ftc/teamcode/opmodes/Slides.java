@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 
 @Config
+@Disabled
 @TeleOp(name="Slides", group="Linear Opmode")
 public class Slides extends LinearOpMode {
 
