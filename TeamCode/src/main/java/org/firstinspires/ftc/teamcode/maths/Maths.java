@@ -51,7 +51,7 @@ public class Maths {
     }
 
     //math for detecting when an absolute encoder has wrapped around
-    public static double modWrap(double state, double wrap, double last, double ratio){
+    public static double absoluteBoundaryDetection(double state, double wrap, double last, double ratio){
         double delta = state - last;
 
         if (delta > 180) wrap += 1;
@@ -95,20 +95,20 @@ public class Maths {
     public static Vector2d rotateVectorBy(Vector2d vec, double radians) {
         double x = vec.getX() * Math.cos(radians) - vec.getY() * Math.sin(radians);
         double y = vec.getX() * Math.sin(radians) + vec.getY() * Math.cos(radians);
-        return new Vector2d(x,y);
+        return new Vector2d(x, y);
     }
 
     public static double angleOf(Vector2d vec) { return AngleUnit.normalizeRadians(Math.atan2(vec.getY(),vec.getX())); }
 
     public static Vector2d interpolateBetweenVectors(Vector2d start, Vector2d end, double interpolator){
         double m = (start.getY() - end.getY()) / (start.getX() - end.getX());
-        double b = -(m*start.getX()) + start.getY();
+        double b = -(m * start.getX()) + start.getY();
 
         return new Vector2d((interpolator - b) / m, interpolator);
     }
     
     public static double averageOf(double a, double b) {
-        return (a+b)/2;
+        return (a + b) / 2;
     }
 
     public static double crossOf(Vector2d a, Vector2d b) {
@@ -139,5 +139,36 @@ public class Maths {
         double x = vec.getX() * Math.cos(vec.getY());
         double y = vec.getX() * Math.sin(vec.getY());
         return new Vector2d(x,y);
+    }
+
+    /**
+     * snaps normal atan2 function to intervals of π/4.
+     * @return atan2 output rounded to π/4
+     */
+    public static double peicewiseAtan2(double y, double x) {
+        double theta = Math.atan2(y, x);
+
+        if (theta >= -Math.PI / 8 && theta < Math.PI / 8) {
+            return 0;
+        }
+        else if (theta >= Math.PI / 8 && theta < 3 * Math.PI / 8) {
+            return Math.PI / 4;
+        }
+        else if (theta >= 3 * Math.PI / 8 && theta < 5 * Math.PI / 8) {
+            return Math.PI / 2;
+        }
+        else if (theta >= 5 * Math.PI / 8 && theta < 7 * Math.PI / 8) {
+            return 3 * Math.PI / 4;
+        }
+        else if (theta >= -7 * Math.PI / 8 && theta < -5 * Math.PI / 8) {
+            return -3 * Math.PI / 4;
+        }
+        else if (theta >= -5 * Math.PI / 8 && theta < -3 * Math.PI / 8) {
+            return -Math.PI / 2;
+        }
+        else if (theta >= -3 * Math.PI / 8 && theta < -Math.PI / 8) {
+            return -Math.PI / 4;
+        }
+        return Math.PI;
     }
 }

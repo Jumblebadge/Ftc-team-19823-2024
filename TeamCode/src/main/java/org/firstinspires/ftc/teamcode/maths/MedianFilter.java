@@ -7,7 +7,7 @@ import java.util.Collections;
 public class MedianFilter {
 
     private ArrayList<Double> dataSet;
-    private int filterSize;
+    private final int filterSize;
     private boolean isInitialized = false, isEven = false;
 
     public MedianFilter(int filterSize) {

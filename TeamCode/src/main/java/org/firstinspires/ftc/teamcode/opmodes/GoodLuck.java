@@ -112,8 +112,11 @@ public class GoodLuck extends LinearOpMode {
                 heading = -90;
                 headingPIDtoggle.toTrue();
             }
+            if (gamepad1.right_stick_x >= 0.2 || gamepad1.right_stick_y >= 0.2) {
+                heading = Maths.peicewiseAtan2(gamepad1.right_stick_y, gamepad1.right_stick_x);
+            }
 
-            swerve.drive(gamepad1.left_stick_x, gamepad1.left_stick_y, rotation + gamepad1.right_stick_x);
+            swerve.drive(gamepad1.left_stick_x, gamepad1.left_stick_y, rotation);
 
             if (clawToggle.toggle(gamepad2.left_bumper)) {
                 claw.setClawClose();
