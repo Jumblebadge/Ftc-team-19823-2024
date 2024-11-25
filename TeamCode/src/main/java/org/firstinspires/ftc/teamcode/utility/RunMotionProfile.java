@@ -8,6 +8,7 @@ import com.acmerobotics.roadrunner.profile.MotionState;
 
 import org.firstinspires.ftc.teamcode.maths.ConstantsForPID;
 import org.firstinspires.ftc.teamcode.maths.GainScheduledPID;
+import org.firstinspires.ftc.teamcode.maths.Maths;
 import org.firstinspires.ftc.teamcode.maths.PID;
 
 public class RunMotionProfile {
@@ -38,7 +39,7 @@ public class RunMotionProfile {
     }
 
     public double profiledMovement(double target, double state){
-        if (lastTarget != target) {
+        if (!Maths.epsilonEquals(lastTarget, target, 0.1)) {
             lastTarget = target;
             profile = MotionProfileGenerator.generateSimpleMotionProfile(new MotionState(state, 0, 0), new MotionState(target, 0, 0), maxVel, maxAccel,maxJerk);
             timer.reset();
@@ -49,7 +50,7 @@ public class RunMotionProfile {
     }
 
     public double profiledPivotMovement(double target, double state){
-        if (lastTarget != target) {
+        if (!Maths.epsilonEquals(lastTarget, target, 0.1)) {
             lastTarget = target;
             profile = MotionProfileGenerator.generateSimpleMotionProfile(new MotionState(state, 0, 0), new MotionState(target, 0, 0), maxVel, maxAccel,maxJerk);
             timer.reset();
@@ -61,7 +62,7 @@ public class RunMotionProfile {
 
 
     public double profiledServoMovement(double target, double state){
-        if (lastTarget != target) {
+        if (!Maths.epsilonEquals(lastTarget, target, 0.1)) {
             lastTarget = target;
             profile = MotionProfileGenerator.generateSimpleMotionProfile(new MotionState(state, 0, 0), new MotionState(target, 0, 0), maxVel, maxAccel,maxJerk);
             timer.reset();

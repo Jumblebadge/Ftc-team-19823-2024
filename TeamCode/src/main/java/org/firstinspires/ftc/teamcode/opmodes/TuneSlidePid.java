@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.maths.ConstantsForPID;
 import org.firstinspires.ftc.teamcode.subsystems.PivotingSlide;
@@ -22,7 +23,7 @@ import org.firstinspires.ftc.teamcode.utility.RunMotionProfile;
 public class TuneSlidePid extends LinearOpMode {
 
     public static double maxVel = 1, maxAccel = 1, maxJerk = 1, Kp = 0, Kd = 0, Ki = 0, Kf = 0, Kl = 1;
-    public static double slideReference = 0, pivotReference = 90;
+    public static double slideReference = 0, offset = 0;
     private double hz = 0,nanoTime = 0;
 
     public void runOpMode() {
@@ -31,10 +32,12 @@ public class TuneSlidePid extends LinearOpMode {
         //Bulk sensor reads
         LynxModule controlHub = hardwareMap.get(LynxModule.class, "Control Hub");
 
-        PivotingSlide slide = new PivotingSlide(hardwareMap);
+        //PivotingSlide slide = new PivotingSlide(hardwareMap);
 
         DcMotorExW liftLeft = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "Lpivot"));
         DcMotorExW liftRight = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "Rpivot"));
+
+        //liftRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         AnalogInput ma3 = hardwareMap.get(AnalogInput.class, "pivotEncoder");
 
@@ -45,7 +48,7 @@ public class TuneSlidePid extends LinearOpMode {
         FtcDashboard dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
 
-        slide.resetEncoders();
+        //slide.resetEncoders();
 
         //Bulk sensor reads
         controlHub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
@@ -55,8 +58,9 @@ public class TuneSlidePid extends LinearOpMode {
             //Clear the cache for better loop times (bulk sensor reads)
             controlHub.clearBulkCache();
 
-            slideMotors.setPowers(profile.profiledPivotMovement(slideReference, -ma3.getVoltage() * 74.16  + 164));
+            slideMotors.setPowers(profile.profiledMovement(slideReference, slideMotors.getPosition(0)));
             profile.setPidConstants(new ConstantsForPID(Kp, Kd, Ki, Kf, Kl, 0));
+            profile.setMotionConstraints(maxVel, maxAccel, maxJerk);
 
             //slide.update();
             //slide.moveSlideTo(slideReference);
@@ -75,7 +79,7 @@ public class TuneSlidePid extends LinearOpMode {
             //telemetry.addData("state",slide.getSlidePosition());
             //telemetry.addData("cable",slide.getCableDifference());
             telemetry.addData("motion",profile.getMotionTarget());
-            telemetry.addData("state",-ma3.getVoltage() * 74.16  + 164);
+            telemetry.addData("state",slideMotors.getPosition(0));
             telemetry.update();
         }
     }

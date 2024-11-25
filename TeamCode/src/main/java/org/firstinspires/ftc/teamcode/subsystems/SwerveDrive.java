@@ -23,7 +23,7 @@ public class SwerveDrive {
     final private MedianFilter module1Filter = new MedianFilter(7);
     final private MedianFilter module2Filter = new MedianFilter(7);
     final private Telemetry telemetry;
-    private double module1Offset = -40, module2Offset = 32;
+    private double module1Offset = -80, module2Offset = 32;
     private final PID module1PID = new PID(0.1,0.00188,0.1,0.05, 1);
     private final PID module2PID = new PID(0.1,0.00188,0.1,0.05, 1);
     private final swerveKinematics swavemath = new swerveKinematics();
@@ -52,8 +52,8 @@ public class SwerveDrive {
     public void drive(double x, double y, double rot){
 
         //Turn our MA3 absolute encoder signals from volts to degrees
-        double mod1P = module1Encoder.getVoltage() * 74.16;
-        double mod2P = module2Encoder.getVoltage() * 74.16;
+        double mod1P = module1Encoder.getVoltage() * 72;
+        double mod2P = module2Encoder.getVoltage() * 72;
 
         //zero the encoder values
         mod2P -= module2Offset;

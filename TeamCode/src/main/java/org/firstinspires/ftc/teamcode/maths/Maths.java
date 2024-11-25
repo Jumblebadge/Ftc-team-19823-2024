@@ -36,8 +36,6 @@ public class Maths {
         return new double[] {reference,power};
     }
 
-    public static boolean dynamicTurn(double error){ return Math.abs(error) > 90; }
-
     //converts two degrees of freedom into a differential
     public static double[] diffyConvert(double rotate, double translate){
         double m1 = rotate + translate;
@@ -52,16 +50,6 @@ public class Maths {
 
     //math for detecting when an absolute encoder has wrapped around
     public static double absoluteBoundaryDetection(double state, double wrap, double last, double ratio){
-        double delta = state - last;
-
-        if (delta > 180) wrap += 1;
-        if (delta < -180) wrap += 1;
-        if (wrap > ratio - 1) wrap = 0;
-        if (wrap == 0) return state / ratio;
-        return 360 / (wrap + 1) + state / ratio;
-    }
-
-    public static double wappa(double state, double wrap, double last, double ratio){
         double delta = state - last;
 
         if (delta > 180) wrap += 1;

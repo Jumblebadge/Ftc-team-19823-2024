@@ -26,6 +26,7 @@ public class swerveKinematics {
             joystickVec = new Vector2d(joystickVec.getX(), joystickVec.getY() + currentHeading * Math.PI / 180);
         }
 
+        //back to cartesian for maths!
         joystickVec = Maths.toCartesianCoordinates(joystickVec);
         double strafe = joystickVec.getX();
         double forward = joystickVec.getY();

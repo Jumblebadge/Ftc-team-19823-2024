@@ -2,8 +2,8 @@ package org.firstinspires.ftc.teamcode.utility;
 
 public class ButtonDetector {
 
-    public boolean current = false;
-    public boolean last = false;
+    private boolean current = false;
+    private boolean last = false;
 
     public boolean toggle(boolean currentState) {
         if (currentState && !last) {
@@ -12,6 +12,14 @@ public class ButtonDetector {
 
         last = currentState;
         return current;
+    }
+
+    public void toggleVoid(boolean currentState) {
+        if (currentState && !last) {
+            current = !current;
+        }
+
+        last = currentState;
     }
 
     public boolean risingEdge(boolean currentState) {

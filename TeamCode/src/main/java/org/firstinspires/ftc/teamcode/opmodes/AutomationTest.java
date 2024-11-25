@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -24,11 +25,21 @@ import org.firstinspires.ftc.teamcode.utility.RunMotionProfile;
 import java.util.List;
 
 @Config
-@TeleOp(name="GOOD LUCK", group="Linear Opmode")
-public class GoodLuck extends LinearOpMode {
+@TeleOp(name="autlomation test", group="Linear Opmode")
+public class AutomationTest extends LinearOpMode {
 
     private double headingTarget;
     private double nanoTime;
+
+    private enum States {
+        MANUAL,
+        INTAKE,
+        HORIZONTAL_RETRACTION,
+        PIVOT_STANDBY,
+        SCORE,
+        VERTICAL_RETRACTION,
+        STANDBY
+    }
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -46,16 +57,6 @@ public class GoodLuck extends LinearOpMode {
         PivotingSlide slide = new PivotingSlide(hardwareMap);
         ButtonDetector pivotToggle = new ButtonDetector();
 
-        double slideTarget = 0;
-        DcMotorExW liftLeft = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "Llift"));
-        DcMotorExW liftRight = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "Rlift"));
-
-        MotorGroup slideMotors = new MotorGroup(liftLeft, liftRight);
-
-        RunMotionProfile profile = new RunMotionProfile(37500,42500,42500,new ConstantsForPID(0.2,0,0.2,0.2,2,0));
-
-        slideMotors.resetEncoders();
-
         ThreeAxisClaw claw = new ThreeAxisClaw(hardwareMap);
         ButtonDetector clawToggle = new ButtonDetector();
         ButtonDetector wristToggle = new ButtonDetector();
@@ -67,6 +68,8 @@ public class GoodLuck extends LinearOpMode {
 
         Gamepad current2 = new Gamepad();
         Gamepad previous2 = new Gamepad();
+
+        States state = States.STANDBY;
 
         for (LynxModule hub : allHubs) { hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL); }
 
@@ -83,11 +86,9 @@ public class GoodLuck extends LinearOpMode {
             double rotation;
             if (headingPIDtoggle.toggle(gamepad1.right_bumper)) {
                 rotation = headingPID.pidAngleOut(headingTarget, swerve.getHeading());
-                gamepad1.setLedColor(1,0,0,Gamepad.LED_DURATION_CONTINUOUS);
             }
             else {
                 rotation = 0;
-                gamepad1.setLedColor(0,1,0,Gamepad.LED_DURATION_CONTINUOUS);
             }
 
             if (current1.left_bumper && !previous1.left_bumper) {
@@ -120,44 +121,136 @@ public class GoodLuck extends LinearOpMode {
 
             swerve.drive(gamepad1.left_stick_x, gamepad1.left_stick_y, rotation);
 
-            if (clawToggle.toggle(gamepad2.left_bumper)) {
+            if (current1.share) state = States.MANUAL;
+
+            switch (state) {
+                case MANUAL:
+
+                    clawToggle.toggleVoid(gamepad2.left_trigger > 0.2);
+
+                    wristToggle.toggleVoid(gamepad2.right_trigger > 0.2);
+
+                    pivotToggle.toggleVoid(gamepad2.right_bumper);
+
+                    if (gamepad2.triangle && slide.getPivotAngle() > 20) {
+                        slide.toMax();
+                    }
+                    if (gamepad2.circle) {
+                        slide.toSetPoint3();
+                    }
+                    if (gamepad2.square) {
+                        slide.toSetPoint1();
+                    }
+                    if (gamepad2.cross) {
+                        slide.toMin();
+                        pivotToggle.toFalse();
+                    }
+
+                    break;
+                case STANDBY:
+
+                    slide.toMin();
+                    clawToggle.toFalse();
+                    wristToggle.toFalse();
+                    pivotToggle.toFalse();
+
+                    if (gamepad1.right_bumper) state = States.INTAKE;
+
+                    break;
+                case INTAKE:
+
+                    if (gamepad2.circle) {
+                        slide.toSetPoint3();
+                    }
+                    if (gamepad2.square) {
+                        slide.toSetPoint1();
+                    }
+                    if (gamepad2.cross) {
+                        slide.toMin();
+                    }
+
+                    clawToggle.toggleVoid(gamepad1.left_trigger > 0.2);
+
+                    wristToggle.toggleVoid(gamepad1.right_trigger > 0.2);
+
+                    if (gamepad1.right_bumper) state = States.HORIZONTAL_RETRACTION;
+                    if (gamepad1.left_bumper) state = States.STANDBY;
+
+                    break;
+                case HORIZONTAL_RETRACTION:
+
+                    wristToggle.toFalse();
+                    slide.toMin();
+
+                    if (gamepad1.right_bumper) state = States.PIVOT_STANDBY;
+                    if (gamepad1.left_bumper) state = States.INTAKE;
+
+                    break;
+                case PIVOT_STANDBY:
+
+                    pivotToggle.toTrue();
+
+                    if (gamepad1.right_bumper) state = States.SCORE;
+                    if (gamepad1.left_bumper) state = States.HORIZONTAL_RETRACTION;
+
+                    break;
+
+                case SCORE:
+
+                    slide.toMax();
+
+                    clawToggle.toggleVoid(gamepad1.left_trigger > 0.2);
+
+                    wristToggle.toggleVoid(gamepad1.right_trigger > 0.2);
+
+                    if (gamepad1.right_bumper) state = States.VERTICAL_RETRACTION;
+                    if (gamepad1.left_bumper) state = States.PIVOT_STANDBY;
+
+                    break;
+
+                case VERTICAL_RETRACTION:
+
+                    clawToggle.toFalse();
+                    wristToggle.toTrue();
+
+                    slide.toMin();
+                    pivotToggle.toFalse();
+
+                    if (slide.getPivotAngle() < 20) state = States.STANDBY;
+                    if (gamepad1.left_bumper) state = States.SCORE;
+
+                    break;
+            }
+
+            if (state == States.MANUAL) {
+                gamepad2.setLedColor(1,0,0,Gamepad.LED_DURATION_CONTINUOUS);
+                gamepad1.setLedColor(0,0,0,Gamepad.LED_DURATION_CONTINUOUS);
+            }
+            else {
+                gamepad1.setLedColor(1,0,0,Gamepad.LED_DURATION_CONTINUOUS);
+                gamepad2.setLedColor(0,0,0,Gamepad.LED_DURATION_CONTINUOUS);
+            }
+
+            if (clawToggle.getState()) {
                 claw.setClawClose();
             }
             else claw.setClawOpen();
 
-            if (wristToggle.toggle(gamepad2.left_trigger > 0.2)) {
+            if (wristToggle.getState()) {
                 claw.setWristDown();
             }
             else claw.setWristUp();
 
-            if (pivotToggle.toggle(gamepad2.right_bumper)) {
+            if (pivotToggle.getState()) {
                 slide.movePivotTo(85);
             }
-            else if (slideMotors.getPosition(0) < 50) {
+            else if (slide.getSlidePosition() < 50) {
                 slide.movePivotTo(0);
-            }
-
-            slideMotors.setPowers(profile.profiledMovement(slideTarget, slideMotors.getPosition(0)));
-
-            if (gamepad2.triangle && slide.getPivotAngle() > 20) {
-                slideTarget = 900;
-            }
-            if (gamepad2.circle) {
-                slideTarget = 600;
-            }
-            if (gamepad2.square) {
-                slideTarget = 300;
-            }
-            if (gamepad2.cross) {
-                slideTarget = 0;
-                pivotToggle.toFalse();
             }
 
             slide.update();
 
             telemetry.addData("hz", 1000000000 / (System.nanoTime() - nanoTime));
-            telemetry.addData("motion",profile.getMotionTarget());
-            telemetry.addData("current", slideMotors.getPosition(0));
             nanoTime = System.nanoTime();
 
             telemetry.update();

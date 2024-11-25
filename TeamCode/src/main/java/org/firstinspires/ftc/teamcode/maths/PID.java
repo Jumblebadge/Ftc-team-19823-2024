@@ -27,7 +27,7 @@ public class PID {
     //calculate
     public double pidOut(double reference, double state) {
 
-        if (reference != lastReference) integralSum = 0;
+        if (!Maths.epsilonEquals(lastReference, reference, 0.01)) integralSum = 0;
 
         double error = reference - state;
 
@@ -47,7 +47,7 @@ public class PID {
 
     public double pidAngleOut(double reference, double state) {
 
-        if (reference != lastReference) integralSum = 0;
+        if (!Maths.epsilonEquals(lastReference, reference, 0.01)) integralSum = 0;
 
         double error = AngleUnit.normalizeDegrees(reference - state);
         //integral and derivative values
@@ -68,7 +68,7 @@ public class PID {
 
     public double pidPivotOut(double reference, double state) {
 
-        if (reference != lastReference) integralSum = 0;
+        if (!Maths.epsilonEquals(lastReference, reference, 0.01)) integralSum = 0;
 
         double error = AngleUnit.normalizeDegrees(reference - state);
         //integral and derivative values
