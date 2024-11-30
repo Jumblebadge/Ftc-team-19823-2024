@@ -28,8 +28,9 @@ public class CubicPath {
     }
 
     public Vector2d getPoint(double T) {
-        if (T < 0) { T = 0; }
-        if (T >= 3) { T = 2.9999; }
+        // bounds may be off? check
+        //if (T < 0) { T = 0; }
+        //if (T >= 3) { T = 2.9999; }
         return beziers[(int) T].getPoint(T - Math.floor(T));
     }
 
@@ -67,8 +68,9 @@ public class CubicPath {
         else if (arcLengths[0] + arcLengths[1] <= distance && distance <= arcLengths[0] + arcLengths[1] + arcLengths[2]) {
             return 2;
         }
-        //return -(int) distance
-        return 2;
+        //throws error (check if this works)
+        return -(int) distance;
+        //return 2;
     }
 
     public double distanceToT(double distance) {
@@ -81,15 +83,16 @@ public class CubicPath {
 
     public Vector2d findClosestPointOnPath(Vector2d Robot) {
         for (int i = 0; i <= 10; i++) {
+            //I have disabled the failsafes. Get ready for errors
             Vector2d guess = getPoint(guessT);
             Vector2d robotVector = new Vector2d(Robot.getX() - guess.getX(), Robot.getY() - guess.getY());
             Vector2d normalizedTangent = getNormalizedTangent(guessT);
-            double totalArcLength = getTotalArcLength();
+            //double totalArcLength = getTotalArcLength();
             arcLength += normalizedTangent.dot(robotVector);
-            if (arcLength < 0) { guessT = 0; arcLength = 0; }
-            if (arcLength >= totalArcLength) { arcLength = totalArcLength - 0.01; }
+            //if (arcLength < 0) { guessT = 0; arcLength = 0; }
+            //if (arcLength >= totalArcLength) { arcLength = totalArcLength - 0.01; }
             guessT = distanceToT(arcLength);
-            if (guessT > 2.999) { guessT = 2.999; }
+            //if (guessT > 2.999) { guessT = 2.999; }
         }
         return getPoint(guessT);
     }

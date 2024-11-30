@@ -14,7 +14,7 @@ public class GVF {
     CubicPath path;
     Vector2d R, closestPoint, out, tangent;
     FtcDashboard dashboard;
-    PID headingPID = new PID(0.1,0.001,0,0.75,0.1);
+    PID headingPID = new PID(0.09,0.00188,0,0.025,1);
     PID xPID = new PID(0.6,0,0,0.275, 0.1);
     PID yPID = new PID(0.5,0,0,0.25, 0.1);
     double Kn, Kf, Ks;
@@ -54,9 +54,9 @@ public class GVF {
         double horizontalStretch = 1;
         double power = 1;
         double magnitudeOfR = Maths.magnitudeOf(R);
-        double sign = -Math.signum(Maths.crossOf(R,tangent));
+        double sign = -Math.signum(Maths.crossOf(R, tangent));
         double internal = Math.pow(Math.abs(magnitudeOfR / horizontalStretch), power);
-        return ((internal *sign)/(1+ internal));
+        return ((internal * sign)/(1 + internal));
     }
 
     public void calculateEverything(Vector2d Robot) {
@@ -74,6 +74,7 @@ public class GVF {
     public boolean isDone(double positionTolerance, double headingTolerance) { return distance < positionTolerance && headingDistance < headingTolerance; }
 
     public Vector2d calculateGVF(Vector2d Robot) {
+        //TODO switch to sine error
         count++;
         temp = Robot;
         calculateEverything(Robot);

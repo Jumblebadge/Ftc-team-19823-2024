@@ -5,7 +5,8 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 public class Bezier {
 
     private Vector2d A,B,C,D;
-    public Vector2d[] lookup = new Vector2d[51];
+    private final int accuracy = 50;
+    public Vector2d[] lookup = new Vector2d[accuracy + 1];
     private double totalArcLength;
 
     public Bezier(Vector2d A, Vector2d B, Vector2d C, Vector2d D) {
@@ -28,9 +29,11 @@ public class Bezier {
         calculateTotalArcLength();
     }
 
+    //TODO optimize this by only adding the difference, not calculating full arc length each step
     public void generateLookup() {
-        for (int i = 0; i <= 50; i++) {
-            lookup[i] = new Vector2d((double) i / 50, getArcLength((double) i / 50));
+        for (int i = 0; i <= accuracy; i++) {
+            //ordered pair (T value, arc length at T value).
+            lookup[i] = new Vector2d(i / (double) accuracy, getArcLength(i / (double) accuracy));
         }
     }
 
@@ -67,17 +70,17 @@ public class Bezier {
 
     public void calculateTotalArcLength() {
         double total = 0;
-        for (double i = 0; i <= 50; i++) {
-            total += Maths.distanceBetween(getPoint(i / 50), getPoint((i + 1) / 50));
+        for (int i = 0; i < accuracy; i++) {
+            total += Maths.distanceBetween(getPoint(i / (double) accuracy), getPoint((i + 1) / (double) accuracy));
         }
         totalArcLength = total;
     }
 
     public double getArcLength(double T) {
         double total = 0;
-        for (double i = 0; i <= 50; i++) {
-            if(i / 50 < T) {
-                total += Maths.distanceBetween(getPoint(i / 50), getPoint((i + 1) / 50));
+        for (int i = 0; i < accuracy; i++) {
+            if (i / (double) accuracy < T) {
+                total += Maths.distanceBetween(getPoint(i / (double) accuracy), getPoint((i + 1) / (double) accuracy));
             }
             else break;
         }
@@ -85,9 +88,9 @@ public class Bezier {
     }
 
     public double distanceToT(double distance) {
-        int index = 0;
-        for (int i = 0; i < lookup.length; i++) {
-            if (i == lookup.length - 1) { return lookup[i].getX(); }
+        //throws error if point is not found
+        int index = -1;
+        for (int i = 0; i < accuracy; i++) {
             if (lookup[i].getY() <= distance && lookup[i + 1].getY() >= distance) {
                 index = i;
                 break;
