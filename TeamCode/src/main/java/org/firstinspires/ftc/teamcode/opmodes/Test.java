@@ -4,7 +4,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.hardware.lynx.*;
 import com.qualcomm.robotcore.hardware.AnalogInput;
@@ -12,17 +12,19 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.maths.ConstantsForPID;
 import org.firstinspires.ftc.teamcode.maths.Maths;
 import org.firstinspires.ftc.teamcode.maths.MedianFilter;
 import org.firstinspires.ftc.teamcode.subsystems.ThreeAxisClaw;
 import org.firstinspires.ftc.teamcode.utility.DcMotorExW;
+import org.firstinspires.ftc.teamcode.utility.RunMotionProfile;
 
 @Config
 @TeleOp(name="tst", group="Linear Opmode")
 public class Test extends LinearOpMode {
 
-    public static double moduleTarget = 0;
-    private double nanoTime, theta, max, average, count;
+    public static double motionTarget = 0;
+    private double nanoTime, average, count;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -33,9 +35,9 @@ public class Test extends LinearOpMode {
         //Bulk sensor reads
         LynxModule controlHub = hardwareMap.get(LynxModule.class, "Control Hub");
 
-        AnalogInput input = hardwareMap.get(AnalogInput.class, "ma3");
+        DcMotorExW motor = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "motor"));
 
-        MedianFilter filter = new MedianFilter(11);
+        RunMotionProfile profile = new RunMotionProfile(3000,3000,3000,new ConstantsForPID(0.6,0,0.2,0.1,3,0));
 
         //class to swerve the swerve
         ElapsedTime hztimer = new ElapsedTime();
@@ -51,15 +53,10 @@ public class Test extends LinearOpMode {
             controlHub.clearBulkCache();
 
 
-            double angle = input.getVoltage() * 72;
-
-            if (Math.abs(input.getVoltage()) > max) max = input.getVoltage();
-
-            telemetry.addData("original", angle);
-            angle = AngleUnit.normalizeDegrees(angle);
-            telemetry.addData("normalized",angle);
-            angle = filter.getFilteredValue(angle);
-            telemetry.addData("new", angle);
+            profile.profiledMovement(motionTarget, motor.getCurrentPosition());
+            telemetry.addData("motion taraget", profile.getMotionTarget());
+            telemetry.addData("state", motor.getCurrentPosition());
+            telemetry.addData("target",motionTarget);
 
             telemetry.addData("hz", 1000000000 / (System.nanoTime() - nanoTime));
             average += 1000000000 / (System.nanoTime() - nanoTime);
@@ -67,13 +64,7 @@ public class Test extends LinearOpMode {
             nanoTime = System.nanoTime();
             telemetry.addData("avearag",average / count);
 
-            telemetry.addData("octant", Math.toDegrees(theta));
-            telemetry.addData("theta", Math.toDegrees(Math.atan2(-gamepad1.right_stick_y, gamepad1.right_stick_x)));
-            telemetry.addData("x",gamepad1.right_stick_x);
-            telemetry.addData("y",gamepad1.right_stick_y);
-            telemetry.addData("max",max);
-            telemetry.addData("now",input.getVoltage());
-            telemetry.addData("artificial",input.getMaxVoltage());
+
             hztimer.reset();
             telemetry.update();
         }

@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode.maths;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -83,19 +83,19 @@ public class GVF {
         double error = calculateExponentialError(tangent);
         out = tangent.minus(normal.times(Kn).times(error));
         telemetry.addData("error", error);
-        double max = Math.max(Math.abs(out.x), Math.abs(out.y));
+        double max = Math.max(Math.abs(out.getX()), Math.abs(out.getY()));
         if (max > 1) {
-            out = new Vector2d(out.x / max, out.y / max);
+            out = new Vector2d(out.getX() / max, out.getY() / max);
         }
         out = out.times(Math.min(1,(distanceFromEnd()) / Kf));
         telemetry.addData("errer",(path.getTotalArcLength() - path.arcLength) / Kf);
-        out = new Vector2d(-out.x, out.y);
+        out = new Vector2d(-out.getX(), out.getY());
         return out.times(Ks);
     }
 
     public Vector2d calculatePID(Vector2d robot) {
-        double yOut = yPID.pidOut(path.getControlPoint(7).x, robot.y);
-        double xOut = xPID.pidOut(path.getControlPoint(7).x, robot.y);
+        double yOut = yPID.pidOut(path.getControlPoint(7).getX(), robot.getY());
+        double xOut = xPID.pidOut(path.getControlPoint(7).getX(), robot.getY());
         double max = Math.max(Math.abs(yOut), Math.abs(xOut));
         if (max > 1) {
             return new Vector2d(xOut / max, yOut / max);
@@ -118,7 +118,7 @@ public class GVF {
         telemetry.addData("count",count);
         telemetry.addData("robot",robot);
         if (isEnding()) telemetry.addData("isending",distanceFromEnd());
-        drawPath(dashboard, path, new Pose2d(robot.x, robot.y, 0));
+        drawPath(dashboard, path, new Pose2d(robot.getX(), robot.getY(), 0));
         telemetry.addData("tep",temp);
         if (isEnding()) return calculatePID(robot);
         else return calculateGVF(robot);
@@ -133,35 +133,35 @@ public class GVF {
         double[] y = new double[points.length];
         for (int i = 0; i < points.length; i++) {
             points[i] = path.getPoint((double) i * 3 / points.length);
-            x[i] = points[i].x;
-            y[i] = points[i].y;
+            x[i] = points[i].getX();
+            y[i] = points[i].getY();
         }
         canvas.strokePolyline(x,y);
         //drawRobot(canvas, robot, out, path);
-        drawPoint(canvas, new Pose2d(closestPoint.x, closestPoint.y, 0));
-        drawVectors(canvas, new Pose2d(closestPoint.x, closestPoint.y, 0), out, path);
+        drawPoint(canvas, new Pose2d(closestPoint.getX(), closestPoint.getY(), 0));
+        drawVectors(canvas, new Pose2d(closestPoint.getX(), closestPoint.getY(), 0), out, path);
         dash.sendTelemetryPacket(packet);
     }
 
     public static void drawPoint(Canvas canvas, Pose2d pose) {
-        canvas.fillCircle(pose.position.x, pose.position.y, 4);
+        canvas.fillCircle(pose.getX(), pose.getY(), 4);
     }
 
     public static void drawVectors(Canvas canvas, Pose2d pose, Vector2d out, CubicPath path) {
         Vector2d v = out.times(12);
-        double x1 = pose.position.x, y1 = pose.position.y;
-        double x2 = pose.position.x + v.x, y2 = pose.position.y + v.y;
+        double x1 = pose.getX(), y1 = pose.getY();
+        double x2 = pose.getX() + v.getX(), y2 = pose.getY() + v.getY();
         canvas.strokeLine(x1, y1, x2, y2);
         Vector2d tangent = path.getNormalizedTangent(path.guessT);
         Vector2d normal = path.getNormalizedNormal(path.guessT);
         canvas.setStroke("#B53F51");
-        double x11 = path.getPoint(path.guessT).x, y11 = path.getPoint(path.guessT).y;
+        double x11 = path.getPoint(path.guessT).getX(), y11 = path.getPoint(path.guessT).getY();
         Vector2d v1 = tangent.times(6);
-        double x12 = path.getPoint(path.guessT).x + v1.x, y12 = path.getPoint(path.guessT).y + v1.y;
+        double x12 = path.getPoint(path.guessT).getX() + v1.getX(), y12 = path.getPoint(path.guessT).getY() + v1.getY();
         canvas.strokeLine(x11, y11, x12, y12);
-        double x21 = path.getPoint(path.guessT).x, y21 = path.getPoint(path.guessT).y;
+        double x21 = path.getPoint(path.guessT).getX(), y21 = path.getPoint(path.guessT).getY();
         Vector2d v2 = normal.times(6);
-        double x22 = path.getPoint(path.guessT).x + v2.x, y22 = path.getPoint(path.guessT).y + v2.y;
+        double x22 = path.getPoint(path.guessT).getX() + v2.getX(), y22 = path.getPoint(path.guessT).getY() + v2.getY();
         canvas.strokeLine(x21, y21, x22, y22);
     }
 

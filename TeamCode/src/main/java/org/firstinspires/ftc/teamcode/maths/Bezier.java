@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.maths;
 
-import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 
 public class Bezier {
 
@@ -91,11 +91,11 @@ public class Bezier {
         //throws error if point is not found
         int index = -1;
         for (int i = 0; i < accuracy; i++) {
-            if (lookup[i].y <= distance && lookup[i + 1].y >= distance) {
+            if (lookup[i].getY() <= distance && lookup[i + 1].getY() >= distance) {
                 index = i;
                 break;
             }
         }
-        return Maths.interpolateBetweenVectors(lookup[index], lookup[index + 1], distance).x;
+        return Maths.interpolateBetweenVectors(lookup[index], lookup[index + 1], distance).getX();
     }
 }
