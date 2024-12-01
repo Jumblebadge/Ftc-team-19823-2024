@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode.maths;
 
-import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.Vector2d;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Maths {
 
@@ -59,9 +62,32 @@ public class Maths {
         return 360 / (wrap + 1) + state / ratio;
     }
 
-    public static boolean epsilonEquals(double state, double equals, double thresh){
+    public static boolean epsilonEquals(double state, double equals, double thresh) {
         return Math.abs(state - equals) < thresh;
     }
+
+    public static boolean epsilonEquals(double state, double equals) {
+        return Math.abs(state - equals) < 1e-6;
+    }
+
+    /**
+     * solves for all of the real roots of a quadratic equation in the form of ax^2+bx+c
+     * @param a ax^2
+     * @param b bx
+     * @param c c
+     * @return all real roots
+     */
+    public static List<Double> solveRealQuadratic(double a, double b, double c) {
+        double discriminant = b * b - 4 * a * c;
+        List<Double> realSolutions = new ArrayList<>();
+        if (Maths.epsilonEquals(discriminant, 0.0)) realSolutions.add(-b / (2 * a));
+        else if (discriminant > 0.0) {
+            realSolutions.add(-b + Math.sqrt(discriminant) / (2 * a));
+            realSolutions.add(-b - Math.sqrt(discriminant) / (2 * a));
+        }
+        return realSolutions;
+    }
+
 
     public static Vector2d[] pointListToVectorList(double[] coordinateList) {
         return new Vector2d[]{
@@ -76,21 +102,21 @@ public class Maths {
         };
     }
 
-    public static double magnitudeOf(Vector2d vec) { return Math.sqrt(Math.pow(vec.getX(),2)+Math.pow(vec.getY(),2)); }
+    public static double magnitudeOf(Vector2d vec) { return Math.sqrt(Math.pow(vec.x,2)+Math.pow(vec.y,2)); }
 
     public static double distanceBetween(Vector2d a, Vector2d b) { return magnitudeOf(a.minus(b)); }
 
     public static Vector2d rotateVectorBy(Vector2d vec, double radians) {
-        double x = vec.getX() * Math.cos(radians) - vec.getY() * Math.sin(radians);
-        double y = vec.getX() * Math.sin(radians) + vec.getY() * Math.cos(radians);
+        double x = vec.x * Math.cos(radians) - vec.y * Math.sin(radians);
+        double y = vec.x * Math.sin(radians) + vec.y * Math.cos(radians);
         return new Vector2d(x, y);
     }
 
-    public static double angleOf(Vector2d vec) { return AngleUnit.normalizeRadians(Math.atan2(vec.getY(),vec.getX())); }
+    public static double angleOf(Vector2d vec) { return AngleUnit.normalizeRadians(Math.atan2(vec.y,vec.x)); }
 
     public static Vector2d interpolateBetweenVectors(Vector2d start, Vector2d end, double interpolator){
-        double m = (start.getY() - end.getY()) / (start.getX() - end.getX());
-        double b = -(m * start.getX()) + start.getY();
+        double m = (start.y - end.y) / (start.x - end.x);
+        double b = -(m * start.x) + start.y;
 
         return new Vector2d((interpolator - b) / m, interpolator);
     }
@@ -100,11 +126,11 @@ public class Maths {
     }
 
     public static double crossOf(Vector2d a, Vector2d b) {
-        return a.getX() * b.getY() - a.getY() * b.getX();
+        return a.x * b.y - a.y * b.x;
     }
 
     public static Vector2d swapXYOf(Vector2d vec) {
-        return new Vector2d(vec.getY(), vec.getX());
+        return new Vector2d(vec.y, vec.x);
     }
 
     /**
@@ -113,8 +139,8 @@ public class Maths {
      * @return ordered pair (r, theta) where theta is in radians
      */
     public static Vector2d toPolarCoordinates(Vector2d vec) {
-        double r = Math.sqrt(vec.getX() * vec.getX() + vec.getY() * vec.getY());
-        double theta = Math.atan2(vec.getY(), vec.getX());
+        double r = Math.sqrt(vec.x * vec.x + vec.y * vec.y);
+        double theta = Math.atan2(vec.y, vec.x);
         return new Vector2d(r, theta);
     }
 
@@ -124,8 +150,8 @@ public class Maths {
      * @return ordered pair (x,y) in cartesian coordinates
      */
     public static Vector2d toCartesianCoordinates(Vector2d vec) {
-        double x = vec.getX() * Math.cos(vec.getY());
-        double y = vec.getX() * Math.sin(vec.getY());
+        double x = vec.x * Math.cos(vec.y);
+        double y = vec.x * Math.sin(vec.y);
         return new Vector2d(x,y);
     }
 

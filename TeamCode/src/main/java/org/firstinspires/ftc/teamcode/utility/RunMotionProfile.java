@@ -1,13 +1,13 @@
 package org.firstinspires.ftc.teamcode.utility;
 
 
+import com.acmerobotics.roadrunner.profile.VelocityConstraint;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.acmerobotics.roadrunner.profile.MotionProfile;
-import com.acmerobotics.roadrunner.profile.MotionProfileGenerator;
+import org.firstinspires.ftc.teamcode.utility.oldRR.MotionProfileGenerator;
 import com.acmerobotics.roadrunner.profile.MotionState;
 
 import org.firstinspires.ftc.teamcode.maths.ConstantsForPID;
-import org.firstinspires.ftc.teamcode.maths.GainScheduledPID;
 import org.firstinspires.ftc.teamcode.maths.Maths;
 import org.firstinspires.ftc.teamcode.maths.PID;
 
@@ -17,7 +17,14 @@ public class RunMotionProfile {
     private double maxVel, maxAccel, maxJerk;
     private MotionState motionState;
     private final PID PID;
+    private final VelocityConstraint constaint = new VelocityConstraint() {
+        @Override
+        public double get(double s) {
+            return 0;
+        }
+    };
     private final ElapsedTime timer = new ElapsedTime();
+    //private MotionProfile profile = MotionProfileGenerator.generateMotionProfile(new MotionState(0,0,0),new MotionState(1,0,0));
     private MotionProfile profile = MotionProfileGenerator.generateSimpleMotionProfile(new MotionState(0,0,0),new MotionState(1,0,0),1,1,1);
 
     public RunMotionProfile(double maxVel, double maxAccel, double maxJerk, ConstantsForPID constants){
