@@ -39,7 +39,7 @@ public class TuneSlidePid extends LinearOpMode {
 
         //liftRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        AnalogInput ma3 = hardwareMap.get(AnalogInput.class, "pivotEncoder");
+        //AnalogInput ma3 = hardwareMap.get(AnalogInput.class, "pivotEncoder");
 
         MotorGroup slideMotors = new MotorGroup(liftLeft, liftRight);
 

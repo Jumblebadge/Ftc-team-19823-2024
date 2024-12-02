@@ -2,13 +2,19 @@ package org.firstinspires.ftc.teamcode.maths;
 
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 
+/**
+ * Bezier curve defined by 4 discrete control points. The curve is parameterized by a T value [0, 1].
+ */
 public class Bezier {
 
     private Vector2d A,B,C,D;
-    private final int accuracy = 50;
+    public final int accuracy = 50; // can be edited, 50 is an arbitrary value which i thought was balanced enough.
     public Vector2d[] lookup = new Vector2d[accuracy + 1];
     private double totalArcLength;
 
+    /**
+     * A bezier curve must pass through all 4 control points. When created, total arc length of the curve as well as a lookup table of distance -> T
+     */
     public Bezier(Vector2d A, Vector2d B, Vector2d C, Vector2d D) {
         this.A = A;
         this.B = B;
@@ -16,7 +22,6 @@ public class Bezier {
         this.D = D;
 
         generateLookup();
-        calculateTotalArcLength();
     }
 
     public void setControlPoints(Vector2d A, Vector2d B, Vector2d C, Vector2d D) {
@@ -26,56 +31,35 @@ public class Bezier {
         this.D = D;
 
         generateLookup();
-        calculateTotalArcLength();
     }
 
-    //TODO optimize this by only adding the difference, not calculating full arc length each step
+    public Vector2d getA() { return this.A; }
+    public Vector2d getB() { return this.B; }
+    public Vector2d getC() { return this.C; }
+    public Vector2d getD() { return this.D; }
+
+    /**
+     * Generates a lookup table of ordered pairs (T value, arc length of curve at T value).
+     * This allows us to find the distance along the curve for any T value, or the t value for any distance along the curve.
+     */
     public void generateLookup() {
-        for (int i = 0; i <= accuracy; i++) {
-            //ordered pair (T value, arc length at T value).
-            lookup[i] = new Vector2d(i / (double) accuracy, getArcLength(i / (double) accuracy));
+        double arc = 0;
+        for (int i = 0; i < accuracy; i++) {
+            lookup[i] = new Vector2d(i / (double) accuracy, arc);
+            arc += Maths.distanceBetween(getPoint(i / (double) accuracy), getPoint((i + 1) / (double) accuracy));
         }
-    }
-
-    public Vector2d getPoint(double T) {
-        double weightA = (-1 * Math.pow((T),3) + 3 * Math.pow((T),2) - 3 * T + 1);
-        double weightB = (3  * Math.pow((T),3) - 6 * Math.pow((T),2) + 3 * T);
-        double weightC = (-3 * Math.pow((T),3) + 3 * Math.pow((T),2));
-        double weightD = Math.pow((T),3);
-
-        return A.times(weightA).plus(B.times(weightB)).plus(C.times(weightC)).plus(D.times(weightD));
-    }
-
-    public Vector2d firstDerivative(double T) {
-        double weightA = (-3 * Math.pow((T),2) + 6  * T - 3);
-        double weightB = (9 *  Math.pow((T),2) - 12 * T + 3);
-        double weightC = (-9 * Math.pow((T),2) + 6  * T);
-        double weightD = (3 *  Math.pow((T),2));
-
-        return A.times(weightA).plus(B.times(weightB)).plus(C.times(weightC)).plus(D.times(weightD));
-    }
-
-    public Vector2d getNormalizedTangent(double T) {
-        Vector2d firstDerivative = firstDerivative(T);
-        return firstDerivative.div(Maths.magnitudeOf(firstDerivative));
-    }
-
-    public Vector2d getNormalizedNormal(double T) {
-        return Maths.rotateVectorBy(getNormalizedTangent(T), (90 * (180 / Math.PI)));
+        //by the end, the arc variable has computed the arc length of the entire curve.
+        totalArcLength = arc;
+        lookup[accuracy] = new Vector2d(1, totalArcLength);
     }
 
     public double getTotalArcLength() {
         return totalArcLength;
     }
 
-    public void calculateTotalArcLength() {
-        double total = 0;
-        for (int i = 0; i < accuracy; i++) {
-            total += Maths.distanceBetween(getPoint(i / (double) accuracy), getPoint((i + 1) / (double) accuracy));
-        }
-        totalArcLength = total;
-    }
-
+    /**
+     * Finds the arc length from 0 to T along the curve using parametrization.
+     */
     public double getArcLength(double T) {
         double total = 0;
         for (int i = 0; i < accuracy; i++) {
@@ -87,6 +71,58 @@ public class Bezier {
         return total;
     }
 
+    /**
+     * Returns a point in cartesian coordinates along the curve
+     * @param T value which desired point is at
+     * @return (x,y) point on the curve at specified T value
+     */
+    public Vector2d getPoint(double T) {
+        double weightA = (-1 * Math.pow((T),3) + 3 * Math.pow((T),2) - 3 * T + 1);
+        double weightB = (3  * Math.pow((T),3) - 6 * Math.pow((T),2) + 3 * T);
+        double weightC = (-3 * Math.pow((T),3) + 3 * Math.pow((T),2));
+        double weightD = Math.pow((T),3);
+
+        return A.times(weightA).plus(B.times(weightB)).plus(C.times(weightC)).plus(D.times(weightD));
+    }
+
+    /**
+     * Returns a point in cartesian coordinates along this bezier curve's 1st derivative, which is a bezier curve with 3 control points.
+     * @param T value which desired point is at
+     * @return (x,y) point on the curve's first derivative at specified T value
+     */
+    public Vector2d firstDerivative(double T) {
+        double weightA = (-3 * Math.pow((T),2) + 6  * T - 3);
+        double weightB = (9 *  Math.pow((T),2) - 12 * T + 3);
+        double weightC = (-9 * Math.pow((T),2) + 6  * T);
+        double weightD = (3 *  Math.pow((T),2));
+
+        return A.times(weightA).plus(B.times(weightB)).plus(C.times(weightC)).plus(D.times(weightD));
+    }
+
+    /**
+     * Returns the normalized tangent vector to the curve at specified point
+     * @param T value at which to calculate tangent vector
+     * @return tangent to the curve at specified point
+     */
+    public Vector2d getNormalizedTangent(double T) {
+        Vector2d firstDerivative = firstDerivative(T);
+        return firstDerivative.div(Maths.magnitudeOf(firstDerivative));
+    }
+
+    /**
+     * Returns the normalized normal vector to the curve at specified point
+     * @param T value at which to calculate tangent vector
+     * @return normal to the curve at specified point
+     */
+    public Vector2d getNormalizedNormal(double T) {
+        return Maths.rotateVectorBy(getNormalizedTangent(T), (90 * (180 / Math.PI)));
+    }
+
+    /**
+     * Uses a pre generated lookup table to estimate what the T value is for a specific arc length.
+     * @param distance arc length along the curve at which we wish to find the T value
+     * @return the estimated T value at which this arc length is located
+     */
     public double distanceToT(double distance) {
         //throws error if point is not found
         int index = -1;

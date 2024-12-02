@@ -30,9 +30,6 @@ apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
     namespace = 'org.firstinspires.ftc.teamcode'
-    kotlinOptions {
-        jvmTarget = '17'
-    }
 
     packagingOptions {
         jniLibs.useLegacyPackaging true
@@ -50,7 +47,6 @@ repositories {
 
 dependencies {
     implementation project(':FtcRobotController')
-    implementation 'androidx.core:core-ktx:1.15.0'
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
     implementation 'com.acmerobotics.roadrunner:core:0.5.6'
     implementation "com.acmerobotics.dashboard:dashboard:0.4.16"

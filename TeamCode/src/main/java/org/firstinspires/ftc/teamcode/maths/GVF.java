@@ -132,7 +132,7 @@ public class GVF {
         double[] x = new double[points.length];
         double[] y = new double[points.length];
         for (int i = 0; i < points.length; i++) {
-            points[i] = path.getPoint((double) i * 3 / points.length);
+            points[i] = path.getPoint((double) i * 3 / (points.length - 1));
             x[i] = points[i].getX();
             y[i] = points[i].getY();
         }

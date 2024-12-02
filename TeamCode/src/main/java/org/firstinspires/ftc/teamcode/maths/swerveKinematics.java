@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.maths;
 
-import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 
 public class swerveKinematics {
 
@@ -19,17 +19,17 @@ public class swerveKinematics {
         //convert joystick coordinates into polar coordinates
         Vector2d joystickVec = Maths.toPolarCoordinates(new Vector2d(translateX, translateY));
         //square r and retain the sign (allows precise control)
-        joystickVec = new Vector2d(joystickVec.x * Math.abs(joystickVec.x), joystickVec.y);
+        joystickVec = new Vector2d(joystickVec.getX() * Math.abs(joystickVec.getX()), joystickVec.getY());
 
         if (fieldCentricActive) {
             //rotates input vector by heading (i am aware it is scuffed)
-            joystickVec = new Vector2d(joystickVec.x, joystickVec.y + currentHeading * Math.PI / 180);
+            joystickVec = new Vector2d(joystickVec.getX(), joystickVec.getY() + currentHeading * Math.PI / 180);
         }
 
         //back to cartesian for maths!
         joystickVec = Maths.toCartesianCoordinates(joystickVec);
-        double strafe = joystickVec.x;
-        double forward = joystickVec.y;
+        double strafe = joystickVec.getX();
+        double forward = joystickVec.getY();
 
         //displacement vectors of wheel positions
         double module1X = strafe - rotateX * 103d / 113d; // top left wheel x
