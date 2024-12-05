@@ -11,17 +11,21 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class GVF {
 
-    CubicPath path;
-    Vector2d R, closestPoint, out, tangent;
-    FtcDashboard dashboard;
-    PID headingPID = new PID(0.09,0.00188,0,0.025,1);
-    PID xPID = new PID(0.6,0,0,0.275, 0.1);
-    PID yPID = new PID(0.5,0,0,0.25, 0.1);
-    double Kn, Kf, Ks;
+    private CubicPath path;
+    private Vector2d R, closestPoint, out;
+    private Vector2d tangent, normal;
+    private final FtcDashboard dashboard;
+    private final PID headingPID = new PID(0.09,0.00188,0,0.025,1);
+    private final PID xPID = new PID(0.6,0,0,0.275, 0.1);
+    private final PID yPID = new PID(0.5,0,0,0.25, 0.1);
+    private double Kn, Kf, Ks;
     private double distance, headingDistance;
-    Vector2d temp = new Vector2d(0,0);
     int count = 0;
-    Telemetry telemetry;
+    private final Telemetry telemetry;
+
+
+    public Vector2d temp = new Vector2d(0,0), temp2 = new Vector2d(0,0);
+    public double temp3 = 0;
 
 
     public GVF(FtcDashboard dashboard, CubicPath path, double Kn, double Kf, double Ks, Telemetry telemetry) {
@@ -31,7 +35,7 @@ public class GVF {
         this.Ks = Ks;
         this.dashboard = dashboard;
         this.telemetry = telemetry;
-        calculateGVF(this.path.getControlPoint(0));
+        calculateGVF(path.getControlPoint(0));
     }
 
     public void setPath(CubicPath path, double Kn, double Kf, double Ks) {
@@ -39,10 +43,16 @@ public class GVF {
         this.Kn = Kn;
         this.Kf = Kf;
         this.Ks = Ks;
-        calculateGVF(this.path.getControlPoint(0));
+        calculateGVF(path.getControlPoint(0));
     }
 
-    public double calculateExponentialError(Vector2d tangent) {
+    public void tuneValues(double Kn, double Kf, double Ks) {
+        this.Kn = Kn;
+        this.Kf = Kf;
+        this.Ks = Ks;
+    }
+
+    public double calculateExponentialError() {
         double magnitudeOfR = Maths.magnitudeOf(R);
         magnitudeOfR = Math.pow(1.3, magnitudeOfR - 10) - 0.073;
         magnitudeOfR *= -Math.signum(Maths.crossOf(R,tangent));
@@ -50,46 +60,50 @@ public class GVF {
         return magnitudeOfR;
     }
 
-    public double calculateSinusoidalError(Vector2d tangent) {
-        double horizontalStretch = 1;
-        double power = 1;
+    public double calculateSinusoidalError() {
+        double horizontalStretch = 4.6;
+        double power = 2.6;
+        double verticalStretch = 5;
         double magnitudeOfR = Maths.magnitudeOf(R);
         double sign = -Math.signum(Maths.crossOf(R, tangent));
         double internal = Math.pow(Math.abs(magnitudeOfR / horizontalStretch), power);
-        return ((internal * sign)/(1 + internal));
+        return verticalStretch * (internal * sign) / (1 + internal);
     }
 
     public void calculateEverything(Vector2d Robot) {
         closestPoint = path.findClosestPointOnPath(Robot);
-        telemetry.addData("closestPoint",closestPoint);
+        tangent = path.getNormalizedTangent(path.guessT);
+        normal = path.getNormalizedNormal(path.guessT);
         R = Robot.minus(closestPoint);
+        telemetry.addData("closestPoint",closestPoint);
     }
 
     public double tangentHeading() { return AngleUnit.normalizeDegrees(90 + (360 - (Maths.angleOf(tangent) * (180 / Math.PI)))); }
 
-    public double distanceFromEnd() { return path.getTotalArcLength() - path.arcLength; }
+    public double arcLengthRemaining() { return path.getTotalArcLength() - path.arcLength; }
 
-    public boolean isEnding() { return distanceFromEnd() * 1.3 < Kf; }
+    public double distanceFromEndPoint(Vector2d robot) { return robot.distTo(path.getControlPoint(7)); }
+
+    public boolean isEnding() { return arcLengthRemaining() * 1.3 < Kf; }
 
     public boolean isDone(double positionTolerance, double headingTolerance) { return distance < positionTolerance && headingDistance < headingTolerance; }
 
-    public Vector2d calculateGVF(Vector2d Robot) {
-        //TODO switch to sine error
+    public Vector2d calculateGVF(Vector2d robot) {
         count++;
-        temp = Robot;
-        calculateEverything(Robot);
-        tangent = path.getNormalizedTangent(path.guessT);
-        Vector2d normal = path.getNormalizedNormal(path.guessT);
-        double error = calculateExponentialError(tangent);
+        calculateEverything(robot);
+        temp = tangent;
+        temp2 = normal;
+        double error = calculateSinusoidalError();
+        temp3 = error;
         out = tangent.minus(normal.times(Kn).times(error));
         telemetry.addData("error", error);
         double max = Math.max(Math.abs(out.getX()), Math.abs(out.getY()));
         if (max > 1) {
             out = new Vector2d(out.getX() / max, out.getY() / max);
         }
-        out = out.times(Math.min(1,(distanceFromEnd()) / Kf));
+        out = out.times(Math.min(1,(distanceFromEndPoint(robot)) / Kf));
         telemetry.addData("errer",(path.getTotalArcLength() - path.arcLength) / Kf);
-        out = new Vector2d(-out.getX(), out.getY());
+        out = new Vector2d(out.getX(), out.getY());
         return out.times(Ks);
     }
 
@@ -117,9 +131,10 @@ public class GVF {
         distance = Maths.distanceBetween(path.getControlPoint(7), robot);
         telemetry.addData("count",count);
         telemetry.addData("robot",robot);
-        if (isEnding()) telemetry.addData("isending",distanceFromEnd());
-        drawPath(dashboard, path, new Pose2d(robot.getX(), robot.getY(), 0));
-        telemetry.addData("tep",temp);
+        if (isEnding()) telemetry.addData("isending", arcLengthRemaining());
+        else telemetry.addData("NOT ENDING","NOT");
+        //drawPath(dashboard, path, new Pose2d(robot.getX(), robot.getY(), 0));
+        telemetry.addData("tep",temp.toString());
         if (isEnding()) return calculatePID(robot);
         else return calculateGVF(robot);
     }

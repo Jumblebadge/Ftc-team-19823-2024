@@ -106,10 +106,14 @@ public class Maths {
 
     public static double distanceBetween(Vector2d a, Vector2d b) { return magnitudeOf(a.minus(b)); }
 
-    public static Vector2d rotateVectorBy(Vector2d vec, double radians) {
+    public static Vector2d rotateCartesianVectorBy(Vector2d vec, double radians) {
         double x = vec.getX() * Math.cos(radians) - vec.getY() * Math.sin(radians);
         double y = vec.getX() * Math.sin(radians) + vec.getY() * Math.cos(radians);
         return new Vector2d(x, y);
+    }
+
+    public static Vector2d rotatePolarVectorBy(Vector2d vec, double radians) {
+        return new Vector2d(vec.getX(), vec.getY() + radians);
     }
 
     public static double angleOf(Vector2d vec) { return AngleUnit.normalizeRadians(Math.atan2(vec.getY(),vec.getX())); }
@@ -127,6 +131,10 @@ public class Maths {
 
     public static double crossOf(Vector2d a, Vector2d b) {
         return a.getX() * b.getY() - a.getY() * b.getX();
+    }
+
+    public static double dotOf(Vector2d a, Vector2d b) {
+        return a.getX() * b.getX() + a.getY() * b.getY();
     }
 
     public static Vector2d swapXYOf(Vector2d vec) {
@@ -153,6 +161,12 @@ public class Maths {
         double x = vec.getX() * Math.cos(vec.getY());
         double y = vec.getX() * Math.sin(vec.getY());
         return new Vector2d(x,y);
+    }
+
+    public static double tanhErrorMap(double x) {
+        double a = 1;
+        double b = 1.1;
+        return a * Math.tanh(b * x);
     }
 
     /**

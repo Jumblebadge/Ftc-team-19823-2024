@@ -8,8 +8,8 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 public class Bezier {
 
     private Vector2d A,B,C,D;
-    public final int accuracy = 50; // can be edited, 50 is an arbitrary value which i thought was balanced enough.
-    public Vector2d[] lookup = new Vector2d[accuracy + 1];
+    private final int accuracy = 50; // can be edited, 50 is an arbitrary value which i thought was balanced enough.
+    private Vector2d[] lookup = new Vector2d[accuracy + 1];
     private double totalArcLength;
 
     /**
@@ -115,7 +115,7 @@ public class Bezier {
      * @return normal to the curve at specified point
      */
     public Vector2d getNormalizedNormal(double T) {
-        return Maths.rotateVectorBy(getNormalizedTangent(T), (90 * (180 / Math.PI)));
+        return Maths.rotateCartesianVectorBy(getNormalizedTangent(T), Math.PI / 2);
     }
 
     /**
@@ -125,7 +125,7 @@ public class Bezier {
      */
     public double distanceToT(double distance) {
         //throws error if point is not found
-        int index = -1;
+        int index = - (int) distance;
         for (int i = 0; i < accuracy; i++) {
             if (lookup[i].getY() <= distance && lookup[i + 1].getY() >= distance) {
                 index = i;

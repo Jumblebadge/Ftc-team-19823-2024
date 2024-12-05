@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.maths;
 
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.qualcomm.robotcore.util.Range;
+
+import java.util.ArrayList;
 
 /**
  * Path comprised of 3 bezier curves. C1 continuous. Using 3 seperate curves allows for local control over the curve.
@@ -8,7 +11,7 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
  */
 public class CubicPath {
 
-    public Bezier[] beziers;
+    public Bezier[] beziers = new Bezier[3];
     public double guessT = 0, arcLength = 0;
     private double totalArcLength;
     private Vector2d[] controlPoints;
@@ -35,6 +38,8 @@ public class CubicPath {
         beziers[1].setControlPoints(controlPoints[3], controlPoints[3].times(2).minus(controlPoints[2]), controlPoints[4], controlPoints[5]);
         beziers[2].setControlPoints(controlPoints[5], controlPoints[5].times(2).minus(controlPoints[4]), controlPoints[6], controlPoints[7]);
 
+        guessT = 0;
+        arcLength = 0;
         calculateTotalArcLength();
     }
 
@@ -125,15 +130,16 @@ public class CubicPath {
      */
     public Vector2d findClosestPointOnPath(Vector2d point) {
         for (int i = 0; i < 10; i++) {
-            //I have disabled the failsafes. Get ready for errors
             Vector2d guess = getPoint(guessT);
             Vector2d robotVector = point.minus(guess);
             Vector2d normalizedTangent = getNormalizedTangent(guessT);
-            arcLength += normalizedTangent.dot(robotVector);
-            //if (arcLength < 0) { guessT = 0; arcLength = 0; }
-            //if (arcLength >= getTotalArcLength()) { arcLength = getTotalArcLength() - 0.01; }
+            double dotProduct = normalizedTangent.dot(robotVector);
+            //Dot product is applied to an error mapping function [-1,1], because otherwise newton's method results in oscillations
+            //This only works with fast loop times, and this was an arbitrary number. Not the best solution
+            dotProduct = Maths.tanhErrorMap(dotProduct);
+            arcLength += dotProduct;
+            arcLength = Range.clip(arcLength, 0.01, getTotalArcLength() - 0.01);
             guessT = distanceToT(arcLength);
-            //if (guessT > 2.999) { guessT = 2.999; }
         }
         return getPoint(guessT);
     }
