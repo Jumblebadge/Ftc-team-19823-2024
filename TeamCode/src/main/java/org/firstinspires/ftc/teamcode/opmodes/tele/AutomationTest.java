@@ -1,26 +1,20 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.opmodes.tele;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.maths.ConstantsForPID;
 import org.firstinspires.ftc.teamcode.maths.Maths;
 import org.firstinspires.ftc.teamcode.maths.PID;
 import org.firstinspires.ftc.teamcode.subsystems.PivotingSlide;
 import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
 import org.firstinspires.ftc.teamcode.subsystems.ThreeAxisClaw;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
-import org.firstinspires.ftc.teamcode.utility.DcMotorExW;
-import org.firstinspires.ftc.teamcode.utility.MotorGroup;
-import org.firstinspires.ftc.teamcode.utility.RunMotionProfile;
 
 import java.util.List;
 
@@ -29,7 +23,6 @@ import java.util.List;
 public class AutomationTest extends LinearOpMode {
 
     private double headingTarget;
-    private double nanoTime;
 
     private enum States {
         MANUAL,
@@ -61,8 +54,6 @@ public class AutomationTest extends LinearOpMode {
         ButtonDetector clawToggle = new ButtonDetector();
         ButtonDetector wristToggle = new ButtonDetector();
 
-        ElapsedTime hzTimer = new ElapsedTime();
-
         Gamepad current1 = new Gamepad();
         Gamepad previous1 = new Gamepad();
 
@@ -85,14 +76,14 @@ public class AutomationTest extends LinearOpMode {
 
             double rotation;
             if (headingPIDtoggle.toggle(gamepad1.right_bumper)) {
-                rotation = headingPID.pidAngleOut(headingTarget, swerve.getHeading());
+                rotation = headingPID.pidAngleOut(headingTarget, swerve.getHeadingInDegrees());
             }
             else {
                 rotation = 0;
             }
 
             if (current1.left_bumper && !previous1.left_bumper) {
-                headingTarget = swerve.getHeading();
+                headingTarget = swerve.getHeadingInDegrees();
             }
 
             if (gamepad1.options) {
@@ -249,10 +240,6 @@ public class AutomationTest extends LinearOpMode {
             }
 
             slide.update();
-
-            telemetry.addData("hz", 1000000000 / (System.nanoTime() - nanoTime));
-            nanoTime = System.nanoTime();
-
             telemetry.update();
         }
     }

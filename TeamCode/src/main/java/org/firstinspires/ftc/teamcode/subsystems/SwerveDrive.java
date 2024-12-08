@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import android.provider.MediaStore;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -9,27 +11,31 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.maths.MedianFilter;
 import org.firstinspires.ftc.teamcode.maths.PID;
 import org.firstinspires.ftc.teamcode.maths.Maths;
 import org.firstinspires.ftc.teamcode.maths.swerveKinematics;
 import org.firstinspires.ftc.teamcode.utility.DcMotorExW;
+import org.firstinspires.ftc.teamcode.utility.GoBildaPinpointDriver;
 
 public class SwerveDrive {
 
-    final private IMU imu;
     final private DcMotorExW mod1m1,mod1m2,mod2m1,mod2m2;
     final private AnalogInput module1Encoder, module2Encoder;
+    private final PinPoint pinPoint;
     final private MedianFilter module1Filter = new MedianFilter(7);
     final private MedianFilter module2Filter = new MedianFilter(7);
     final private Telemetry telemetry;
-    private double module1Offset = -80, module2Offset = 32;
+    private double module1Offset = -8, module2Offset = -8;
     private final PID module1PID = new PID(0.1,0.00188,0.1,0.05, 1);
     private final PID module2PID = new PID(0.1,0.00188,0.1,0.05, 1);
     private final swerveKinematics swavemath = new swerveKinematics();
 
     double mod1reference;
     double mod2reference;
+    private Pose2d pose;
 
     public SwerveDrive(Telemetry telemetry, HardwareMap hardwareMap){
         mod1m1 = new DcMotorExW(hardwareMap.get(DcMotorEx.class,"mod1m1"));
@@ -44,12 +50,12 @@ public class SwerveDrive {
         mod2m1.setPowerThresholds(0.05,0.01);
         mod2m2.setPowerThresholds(0.05,0.01);
 
-        imu = new IMU(hardwareMap);
+        pinPoint = new PinPoint(hardwareMap);
 
         this.telemetry = telemetry;
     }
 
-    public void drive(double x, double y, double rot){
+    public void drive(double x, double y, double rot) {
 
         //Turn our MA3 absolute encoder signals from volts to degrees
         double mod1P = module1Encoder.getVoltage() * 72;
@@ -66,13 +72,8 @@ public class SwerveDrive {
         //mod1P = module1Filter.getFilteredValue(mod1P);
         //mod2P = module2Filter.getFilteredValue(mod2P);
 
-        //Update heading of robot
-        imu.updateHeading(2);
-
-        double heading = -imu.getHeadingInDegrees();
-
         //Retrieve the angle and power for each module
-        double[] output = swavemath.calculate(x,y,rot, heading,true);
+        double[] output = swavemath.calculate(x,y,rot, Math.toRadians(pose.getHeading()), true);
         double mod1power = -output[0];
         double mod2power = -output[1];
 
@@ -110,8 +111,33 @@ public class SwerveDrive {
         telemetry.addData("mod2P",mod2P);
     }
 
+    public Pose2d getPose() {
+        pose = pinPoint.getPoseIn(DistanceUnit.INCH, AngleUnit.DEGREES);
+        return pose;
+    }
+
+    public Vector2d getVec() {
+        return new Vector2d(pose.getX(), pose.getY());
+    }
+
+    public double getHeadingInDegrees() {
+        return AngleUnit.normalizeDegrees(pose.getHeading());
+    }
+
+    public void setPosition(Pose2d pose) {
+        pinPoint.setPosition(pose);
+    }
+
+    public double getJustHeadingInRadians() {
+        return pinPoint.getJustHeadingInRadians();
+    }
+
+    public void resetPoseAndHeading() {
+        pinPoint.resetPoseAndHeading();
+    }
+
     public void resetIMU() {
-        imu.resetIMU();
+        pinPoint.resetHeading();
     }
 
     //tune module PIDs
@@ -125,7 +151,4 @@ public class SwerveDrive {
         this.module2Offset = module2Adjust;
     }
 
-    public double getHeading() {
-        return imu.getHeadingInDegrees();
-    }
 }

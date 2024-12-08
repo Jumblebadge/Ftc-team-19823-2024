@@ -23,7 +23,7 @@ public class swerveKinematics {
 
         if (fieldCentricActive) {
             //rotates input vector by heading (i am aware it is scuffed)
-            joystickVec = new Vector2d(joystickVec.getX(), joystickVec.getY() + currentHeading * Math.PI / 180);
+            joystickVec = new Vector2d(joystickVec.getX(), joystickVec.getY() + currentHeading);
         }
 
         //back to cartesian for maths!

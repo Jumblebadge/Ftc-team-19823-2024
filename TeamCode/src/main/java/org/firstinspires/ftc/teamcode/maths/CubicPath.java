@@ -32,6 +32,21 @@ public class CubicPath {
         calculateTotalArcLength();
     }
 
+    /**
+     * Converts vector values into 3 seperate bezier curves. The end of each bezier is connected to the start of the next,
+     * and the two control points opposite the joining points are exact mirrors of the point before.
+     * This ensures C1 continuity throughout the entire bezier curve.
+     * @param controlPoints list of vectors which are all 8 points used to control the bezier.
+     */
+    public CubicPath(Vector2d[] controlPoints) {
+        this.controlPoints = controlPoints;
+        beziers[0] = new Bezier(controlPoints[0], controlPoints[1], controlPoints[2], controlPoints[3]);
+        beziers[1] = new Bezier(controlPoints[3], controlPoints[3].times(2).minus(controlPoints[2]), controlPoints[4], controlPoints[5]);
+        beziers[2] = new Bezier(controlPoints[5], controlPoints[5].times(2).minus(controlPoints[4]), controlPoints[6], controlPoints[7]);
+
+        calculateTotalArcLength();
+    }
+
     public void setControlPointCoordinates(double[] controlPointCoordinates) {
         controlPoints = Maths.pointListToVectorList(controlPointCoordinates);
         beziers[0].setControlPoints(controlPoints[0], controlPoints[1], controlPoints[2], controlPoints[3]);
@@ -41,6 +56,10 @@ public class CubicPath {
         guessT = 0;
         arcLength = 0;
         calculateTotalArcLength();
+    }
+
+    public Vector2d[] getControlPointList() {
+        return controlPoints;
     }
 
     /**

@@ -1,27 +1,33 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.opmodes.tele;
 
 //Import EVERYTHING we need
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.hardware.lynx.*;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.maths.PID;
+import org.firstinspires.ftc.teamcode.subsystems.PinPoint;
 import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 
 @Config
-@TeleOp(name="Drivetrain", group="Linear Opmode")
-public class Drivetrain extends LinearOpMode {
+@TeleOp(name="test", group="Linear Opmode")
+public class Test extends LinearOpMode {
 
-    public static double module1Offset = 78, module2Offset = 45;
-    private double rotation, heading;
+    public static double heading = 0, refX = 0, refY = 0, Kp = 0, Kd = 0, Ki = 0, Kf = 0, Kl = 0;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
+
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
 
         //Bulk sensor reads
         LynxModule controlHub = hardwareMap.get(LynxModule.class, "Control Hub");
@@ -33,6 +39,9 @@ public class Drivetrain extends LinearOpMode {
 
         PID headingPID = new PID(0.1,0.00188,0,0.05,1);
         ButtonDetector headingPIDtoggle  = new ButtonDetector();
+
+        PID xPID = new PID(0,0,0,0, 1);
+        PID yPID = new PID(0,0,0,0, 1);
 
         Gamepad current1 = new Gamepad();
         Gamepad previous1 = new Gamepad();
@@ -46,16 +55,22 @@ public class Drivetrain extends LinearOpMode {
             previous1.copy(current1);
             current1.copy(gamepad1);
 
+            xPID.setPIDgains(Kp, Kd, Ki, Kf, Kl);
+            yPID.setPIDgains(Kp, Kd, Ki, Kf, Kl);
+
+            //swerve.setModuleAdjustments(module1Offset, module2Offset);
+
             //Clear the cache for better loop times (bulk sensor reads)
             controlHub.clearBulkCache();
 
+            double rotation;
             if (headingPIDtoggle.toggle(gamepad1.a)) {
-                rotation = headingPID.pidAngleOut(heading, swerve.getHeading());
+                rotation = headingPID.pidAngleOut(heading, swerve.getHeadingInDegrees());
             }
-            else { rotation = 0; }
+            else { rotation = -gamepad1.right_stick_x; }
 
             if (current1.x && !previous1.x) {
-                heading = swerve.getHeading();
+                heading = swerve.getHeadingInDegrees();
             }
 
             if (current1.dpad_up && !previous1.dpad_up) {
@@ -75,16 +90,20 @@ public class Drivetrain extends LinearOpMode {
                 headingPIDtoggle.toTrue();
             }
 
-
-            swerve.drive(gamepad1.left_stick_x, gamepad1.left_stick_y, rotation + gamepad1.right_stick_x);
+            Pose2d pose = swerve.getPose();
+            swerve.drive(-xPID.pidOut(refY, pose.getY()), -yPID.pidOut(refX, pose.getX()), rotation);
 
             if (gamepad1.b) {
                 swerve.resetIMU();
             }
 
 
-            telemetry.addData("hz",1/hztimer.seconds());
-            telemetry.addData("heading",swerve.getHeading());
+            telemetry.addData("refx", refX);
+            telemetry.addData("refy",refY);
+            telemetry.addData("x",pose.getX());
+            telemetry.addData("y",pose.getY());
+            telemetry.addData("millis",hztimer.milliseconds());
+            telemetry.addData("pose", pose.toString());
             hztimer.reset();
             telemetry.update();
         }

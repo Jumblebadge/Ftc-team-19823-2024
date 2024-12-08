@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.opmodes.tele;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -82,16 +82,16 @@ public class GoodLuck extends LinearOpMode {
 
             double rotation;
             if (headingPIDtoggle.toggle(gamepad1.right_bumper)) {
-                rotation = headingPID.pidAngleOut(headingTarget, swerve.getHeading());
+                rotation = headingPID.pidAngleOut(headingTarget, swerve.getHeadingInDegrees());
                 gamepad1.setLedColor(1,0,0,Gamepad.LED_DURATION_CONTINUOUS);
             }
             else {
-                rotation = 0;
+                rotation = gamepad1.right_stick_x;
                 gamepad1.setLedColor(0,1,0,Gamepad.LED_DURATION_CONTINUOUS);
             }
 
             if (current1.left_bumper && !previous1.left_bumper) {
-                headingTarget = swerve.getHeading();
+                headingTarget = swerve.getHeadingInDegrees();
             }
 
             if (gamepad1.options) {
