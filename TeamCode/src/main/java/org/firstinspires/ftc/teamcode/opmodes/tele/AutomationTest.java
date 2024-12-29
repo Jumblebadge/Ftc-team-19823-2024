@@ -7,7 +7,6 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.maths.Maths;
 import org.firstinspires.ftc.teamcode.maths.PID;
@@ -222,17 +221,17 @@ public class AutomationTest extends LinearOpMode {
                 gamepad2.setLedColor(0,0,0,Gamepad.LED_DURATION_CONTINUOUS);
             }
 
-            if (clawToggle.getState()) {
+            if (clawToggle.isTrue()) {
                 claw.setClawClose();
             }
             else claw.setClawOpen();
 
-            if (wristToggle.getState()) {
+            if (wristToggle.isTrue()) {
                 claw.setWristDown();
             }
             else claw.setWristUp();
 
-            if (pivotToggle.getState()) {
+            if (pivotToggle.isTrue()) {
                 slide.movePivotTo(85);
             }
             else if (slide.getSlidePosition() < 50) {

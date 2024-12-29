@@ -8,6 +8,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.hardware.lynx.*;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -16,12 +17,13 @@ import org.firstinspires.ftc.teamcode.maths.PID;
 import org.firstinspires.ftc.teamcode.subsystems.PinPoint;
 import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
+import org.firstinspires.ftc.teamcode.utility.ServoImplExW;
 
 @Config
 @TeleOp(name="test", group="Linear Opmode")
 public class Test extends LinearOpMode {
 
-    public static double heading = 0, refX = 0, refY = 0, Kp = 0, Kd = 0, Ki = 0, Kf = 0, Kl = 0;
+    public static double heading = 0, refX = 0, refY = 0, Kp = 0, Kd = 0, Ki = 0, Kf = 0, Kl = 0, wrist = 0.7, rotator = 0.5;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -34,6 +36,8 @@ public class Test extends LinearOpMode {
 
         //class to swerve the swerve
         SwerveDrive swerve = new SwerveDrive(telemetry, hardwareMap);
+        ServoImplExW servo = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "wrist"));
+        ServoImplExW servo2 = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "rotator"));
 
         ElapsedTime hztimer = new ElapsedTime();
 
@@ -57,6 +61,8 @@ public class Test extends LinearOpMode {
 
             xPID.setPIDgains(Kp, Kd, Ki, Kf, Kl);
             yPID.setPIDgains(Kp, Kd, Ki, Kf, Kl);
+            servo.setPosition(wrist);
+            servo2.setPosition(rotator);
 
             //swerve.setModuleAdjustments(module1Offset, module2Offset);
 
@@ -91,7 +97,7 @@ public class Test extends LinearOpMode {
             }
 
             Pose2d pose = swerve.getPose();
-            swerve.drive(-xPID.pidOut(refY, pose.getY()), -yPID.pidOut(refX, pose.getX()), rotation);
+            //swerve.drive(-xPID.pidOut(refY, pose.getY()), -yPID.pidOut(refX, pose.getX()), rotation);
 
             if (gamepad1.b) {
                 swerve.resetIMU();

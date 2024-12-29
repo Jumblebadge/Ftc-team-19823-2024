@@ -10,13 +10,16 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.maths.PID;
+import org.firstinspires.ftc.teamcode.subsystems.PivotingSlide;
 import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
+import org.firstinspires.ftc.teamcode.subsystems.ThreeAxisClaw;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 
 @Config
-@Disabled
 @TeleOp(name="Slides", group="Linear Opmode")
 public class Slides extends LinearOpMode {
+
+    public static double targetClaw = 0, targetWrist = 0, targetRotator = 0;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -27,7 +30,8 @@ public class Slides extends LinearOpMode {
 
         ElapsedTime hztimer = new ElapsedTime();
 
-
+        ThreeAxisClaw claw = new ThreeAxisClaw(hardwareMap);
+        //PivotingSlide slide = new PivotingSlide(hardwareMap);
 
         //Bulk sensor reads
         controlHub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
@@ -39,10 +43,11 @@ public class Slides extends LinearOpMode {
             //Clear the cache for better loop times (bulk sensor reads)
             controlHub.clearBulkCache();
 
+            claw.setClawPosition(targetClaw);
+            claw.setWristPosition(targetWrist);
+            claw.setRotatorPosition(targetRotator);
 
-
-
-            telemetry.addData("hz",1/hztimer.seconds());
+            telemetry.addData("millis",hztimer.milliseconds());
             hztimer.reset();
             telemetry.update();
         }

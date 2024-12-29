@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes.tele;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -47,18 +48,19 @@ public class GoodLuck extends LinearOpMode {
         ButtonDetector pivotToggle = new ButtonDetector();
 
         double slideTarget = 0;
-        DcMotorExW liftLeft = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "Llift"));
-        DcMotorExW liftRight = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "Rlift"));
+        //DcMotorExW liftLeft = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "Llift"));
+        //DcMotorExW liftRight = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "Rlift"));
 
-        MotorGroup slideMotors = new MotorGroup(liftLeft, liftRight);
+        //MotorGroup slideMotors = new MotorGroup(liftLeft, liftRight);
 
         RunMotionProfile profile = new RunMotionProfile(37500,42500,42500,new ConstantsForPID(0.2,0,0.2,0.2,2,0));
 
-        slideMotors.resetEncoders();
+        //slideMotors.resetEncoders();
 
         ThreeAxisClaw claw = new ThreeAxisClaw(hardwareMap);
         ButtonDetector clawToggle = new ButtonDetector();
         ButtonDetector wristToggle = new ButtonDetector();
+        ButtonDetector rotatorToggle = new ButtonDetector();
 
         ElapsedTime hzTimer = new ElapsedTime();
 
@@ -67,6 +69,8 @@ public class GoodLuck extends LinearOpMode {
 
         Gamepad current2 = new Gamepad();
         Gamepad previous2 = new Gamepad();
+
+        claw.setRotatorTo0();
 
         for (LynxModule hub : allHubs) { hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL); }
 
@@ -80,13 +84,15 @@ public class GoodLuck extends LinearOpMode {
             //Clear the cache for better loop times (bulk sensor reads)
             for (LynxModule hub : allHubs) hub.clearBulkCache();
 
+            Pose2d pose = swerve.getPose();
+
             double rotation;
             if (headingPIDtoggle.toggle(gamepad1.right_bumper)) {
                 rotation = headingPID.pidAngleOut(headingTarget, swerve.getHeadingInDegrees());
                 gamepad1.setLedColor(1,0,0,Gamepad.LED_DURATION_CONTINUOUS);
             }
             else {
-                rotation = gamepad1.right_stick_x;
+                rotation = -gamepad1.right_stick_x;
                 gamepad1.setLedColor(0,1,0,Gamepad.LED_DURATION_CONTINUOUS);
             }
 
@@ -115,35 +121,43 @@ public class GoodLuck extends LinearOpMode {
                 headingPIDtoggle.toTrue();
             }
             if (Math.sqrt(Math.pow(gamepad1.right_stick_y, 2) + Math.pow(gamepad1.right_stick_x, 2)) > 0.175) {
-                headingTarget = Maths.peicewiseAtan2(-gamepad1.right_stick_y, gamepad1.right_stick_x);
+                headingTarget = Math.toDegrees(Maths.peicewiseAtan2(-gamepad1.right_stick_y, gamepad1.right_stick_x));
             }
 
-            swerve.drive(gamepad1.left_stick_x, gamepad1.left_stick_y, rotation);
+            swerve.drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, rotation);
 
             if (clawToggle.toggle(gamepad2.left_bumper)) {
                 claw.setClawClose();
             }
             else claw.setClawOpen();
 
+            if (rotatorToggle.toggle(gamepad2.right_trigger > 0.2)) {
+                if (slide.getSlidePosition() < 50) claw.setRotatorTo45();
+                else claw.setRotatorTo90();
+            }
+            else claw.setRotatorTo0();
+
             if (wristToggle.toggle(gamepad2.left_trigger > 0.2)) {
                 claw.setWristDown();
             }
-            else claw.setWristUp();
-
-            if (pivotToggle.toggle(gamepad2.right_bumper)) {
-                slide.movePivotTo(85);
-            }
-            else if (slideMotors.getPosition(0) < 50) {
-                slide.movePivotTo(0);
+            else {
+                claw.setWristUp();
             }
 
-            slideMotors.setPowers(profile.profiledMovement(slideTarget, slideMotors.getPosition(0)));
+            if (slide.getSlidePosition() < 50) {
+                if (pivotToggle.toggle(gamepad2.right_bumper)) {
+                    slide.movePivotTo(85);
+                }
+                else  {
+                    slide.movePivotTo(0);
+                }
+            }
 
             if (gamepad2.triangle && slide.getPivotAngle() > 20) {
-                slideTarget = 900;
+                slideTarget = 830;
             }
             if (gamepad2.circle) {
-                slideTarget = 600;
+                slideTarget = 550;
             }
             if (gamepad2.square) {
                 slideTarget = 300;
@@ -153,11 +167,12 @@ public class GoodLuck extends LinearOpMode {
                 pivotToggle.toFalse();
             }
 
+            slide.moveSlideTo(slideTarget);
             slide.update();
 
             telemetry.addData("hz", 1000000000 / (System.nanoTime() - nanoTime));
             telemetry.addData("motion",profile.getMotionTarget());
-            telemetry.addData("current", slideMotors.getPosition(0));
+            telemetry.addData("atan",headingTarget);
             nanoTime = System.nanoTime();
 
             telemetry.update();

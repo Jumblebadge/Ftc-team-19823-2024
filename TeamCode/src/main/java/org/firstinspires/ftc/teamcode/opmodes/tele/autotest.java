@@ -26,13 +26,14 @@ import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 import org.firstinspires.ftc.teamcode.utility.DashOperations;
 import org.firstinspires.ftc.teamcode.utility.GoBildaPinpointDriver;
+import org.firstinspires.ftc.teamcode.utility.PathList;
 
 @Config
 @TeleOp(name="autotest", group="Linear Opmode")
 public class autotest extends LinearOpMode {
 
-    public static double Kn = 0.7, Kf = 15, Ks = 0.75;
-    private double heading = 0;
+    public static double Kn = 0.7, Kf = 15, Ks = 0.75, negX = 1, negY = 1;
+    private double heading = 0, endingCount = 0;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -47,17 +48,15 @@ public class autotest extends LinearOpMode {
         SwerveDrive swerve = new SwerveDrive(telemetry, hardwareMap);
 
         CubicPath path = new CubicPath(new double[] {
-                -25,-48,37.7,-48.5,48,-60,48,-0.3,44.3,49,-12.7,48.8,-39.8,24.3,-47.4,-47.7
+                -24.3,-48,-0.8,-46,37,-60.5,47.6,-45.7,53,-13.6,50.5,-2.6,47.7,11.5,47.2,48.8
         });
 
-        GVF gvf = new GVF(path, Kn, Kf, Ks, telemetry);
-
-        PID headingPID = new PID(0.1,0.00188,0,0.05,1);
+        GVF gvf = new GVF(PathList.BlueSideToScore, 0.7, 15, 0.7, telemetry);
 
         double[] x = new double[60];
         double[] y = new double[x.length];
         for (int i = 0; i < x.length; i++) {
-            Vector2d point = path.getPoint(((double) i  / (x.length - 1)) * 2.9999);
+            Vector2d point = PathList.BlueSideToScore.getPoint(((double) i  / (x.length - 1)) * 2.9999);
             x[i] = point.getX();
             y[i] = point.getY();
         }
@@ -69,7 +68,7 @@ public class autotest extends LinearOpMode {
 
         waitForStart();
 
-        swerve.setPosition(new Pose2d(-25, -48));
+        swerve.setPosition(new Pose2d(36, 60, -90));
 
         while (opModeIsActive()) {
 
@@ -83,8 +82,10 @@ public class autotest extends LinearOpMode {
             Vector2d out = gvf.output(new Vector2d(pose.getX(), pose.getY()));
 
 
-            double rotation = headingPID.pidAngleOut(heading, swerve.getHeadingInDegrees());
-            swerve.drive(out.getX(), out.getY(), rotation);
+            double rotation = gvf.headingOut(heading,swerve.getHeadingInDegrees(), false, false);
+            swerve.drive(out.getX() * negX, out.getY() * negY, 0);
+
+            if (gvf.isEnding()) endingCount ++;
 
             TelemetryPacket packet = new TelemetryPacket();
             Canvas canvas = packet.fieldOverlay();
@@ -97,10 +98,12 @@ public class autotest extends LinearOpMode {
             dashboard.sendTelemetryPacket(packet);
 
             telemetry.addData("pose",pose.toString());
+            telemetry.addData("headin",pose.getHeading());
+            telemetry.addData("endingccount",endingCount);
             telemetry.addData("gamepadx", gamepad1.left_stick_x);
             telemetry.addData("gamey",gamepad1.left_stick_y);
-            telemetry.addData("outx",-out.getY());
-            telemetry.addData("outy",-out.getX());
+            telemetry.addData("outx",out.getX());
+            telemetry.addData("outy",out.getY());
             telemetry.addData("milis",hztimer.milliseconds());
             hztimer.reset();
             telemetry.update();

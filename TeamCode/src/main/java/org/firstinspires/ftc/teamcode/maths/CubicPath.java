@@ -24,7 +24,7 @@ public class CubicPath {
      * @param rawControlPoints list of doubles representing the x and y coordinates of all 8 points used to control the bezier.
      */
     public CubicPath(double[] rawControlPoints) {
-        this.controlPoints = Maths.pointListToVectorList(rawControlPoints);
+        controlPoints = Maths.pointListToVectorList(rawControlPoints);
         beziers[0] = new Bezier(controlPoints[0], controlPoints[1], controlPoints[2], controlPoints[3]);
         beziers[1] = new Bezier(controlPoints[3], controlPoints[3].times(2).minus(controlPoints[2]), controlPoints[4], controlPoints[5]);
         beziers[2] = new Bezier(controlPoints[5], controlPoints[5].times(2).minus(controlPoints[4]), controlPoints[6], controlPoints[7]);

@@ -14,7 +14,7 @@ public class GVF {
     private CubicPath path;
     private Vector2d R, closestPoint, out;
     private Vector2d tangent, normal;
-    private final PID headingPID = new PID(0.09,0.00188,0,0.025,1);
+    PID headingPID = new PID(0.1,0.00188,0,0.05,1);
     private final PID xPID = new PID(0.75,0.001,0.5,0.5, 1);
     private final PID yPID = new PID(0.75,0.001,0.5,0.5, 1);
     private double Kn, Kf, Ks;
@@ -43,6 +43,10 @@ public class GVF {
         this.Kf = Kf;
         this.Ks = Ks;
         calculateGVF(path.getControlPoint(0));
+    }
+
+    public CubicPath getPath() {
+        return path;
     }
 
     public void tuneValues(double Kn, double Kf, double Ks) {
@@ -97,33 +101,32 @@ public class GVF {
         out = tangent.minus(normal.times(Kn).times(error));
         telemetry.addData("error", error);
         double max = Math.max(Math.abs(out.getX()), Math.abs(out.getY()));
-        if (max > 1) {
-            out = new Vector2d(out.getX() / max, out.getY() / max);
-        }
+        if (max > 1) out = out.div(max);
         out = out.times(Math.min(1,(distanceFromEndPoint(robot)) / Kf));
         telemetry.addData("errer",(path.getTotalArcLength() - path.arcLength) / Kf);
-        out = new Vector2d(out.getY(), out.getX());
-        return out.times(-Ks);
+        out = new Vector2d(out.getX(), -out.getY());
+        return out.times(Ks);
     }
 
     public Vector2d calculatePID(Vector2d robot) {
-        double yOut = yPID.pidOut(path.getControlPoint(7).getX(), robot.getX());
-        double xOut = xPID.pidOut(path.getControlPoint(7).getY(), robot.getY());
+        double xOut = xPID.pidOut(path.getPoint(2.9999).getX(), robot.getX());
+        double yOut = yPID.pidOut(path.getPoint(2.9999).getY(), robot.getY());
         double max = Math.max(Math.abs(yOut), Math.abs(xOut));
         if (max > 1) {
-            return new Vector2d(xOut / max, yOut / max);
+            xOut /= max;
+            yOut /= max;
         }
-        return new Vector2d(-xOut, -yOut);
+        return new Vector2d(xOut, -yOut);
     }
 
-    public double headingOut(double heading, double targetHeading, boolean followTangent, boolean reversed) {
+    public double headingOut(double targetHeading, double currentHeading, boolean followTangent, boolean reversed) {
         double target = targetHeading;
         if (!isEnding() && followTangent) {
             if (reversed) target = AngleUnit.normalizeDegrees(180 + tangentHeading());
             else target = tangentHeading();
         }
-        headingDistance = Math.abs(AngleUnit.normalizeDegrees(target - heading));
-        return headingPID.pidAngleOut(target, heading);
+        headingDistance = Math.abs(AngleUnit.normalizeDegrees(target - currentHeading));
+        return headingPID.pidAngleOut(target, currentHeading);
     }
 
     public Vector2d output(Vector2d robot) {

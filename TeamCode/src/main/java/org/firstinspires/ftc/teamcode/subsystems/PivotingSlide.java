@@ -19,9 +19,9 @@ public class PivotingSlide {
     private final TouchSensor slideLimitSwitch;
     private final AnalogInput pivotEncoder;
     private final RunMotionProfile pivotProfile = new RunMotionProfile(30000,30000,30000,new ConstantsForPID(0.5,0,0.2,0,3,0));
-    private final RunMotionProfile slideProfile = new RunMotionProfile(37500,42500,42500,new ConstantsForPID(0.2,0,0.2,0.2,2,0));
+    private final RunMotionProfile slideProfile = new RunMotionProfile(70000,70000,70000,new ConstantsForPID(0.2,0,0.2,0.2,2,0));
 
-    public final double MIN = -15, SET_POINT_1 = 233, SET_POINT_2 = 350, SET_POINT_3 = 466, MAX = 700;
+    public final double MIN = -15, SET_POINT_1 = 233, SET_POINT_2 = 350, SET_POINT_3 = 466, MAX = 400;
     public enum States {
         MIN,
         SETPOINT_1,
@@ -54,7 +54,7 @@ public class PivotingSlide {
     }
 
     public void moveSlideTo(double target) {
-        slideTarget = target - getCableDifference();
+        slideTarget = target;// - getCableDifference();
     }
 
     public void movePivotTo(double target) { pivotTarget = target; }
@@ -90,7 +90,7 @@ public class PivotingSlide {
 
     public double getSlidePosition() { return slideMotors.getPosition(0) - slideOffset; }
 
-    public double getPivotAngle() { return  -pivotEncoder.getVoltage() * 74.16  + 139; }
+    public double getPivotAngle() { return  -pivotEncoder.getVoltage() * 72 + 203.5; }
 
     public boolean isTimeDone() { return slideProfile.getProfileDuration() < slideProfile.getCurrentTime(); }
 

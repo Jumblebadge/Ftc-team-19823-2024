@@ -35,7 +35,7 @@ public class SwerveDrive {
 
     double mod1reference;
     double mod2reference;
-    private Pose2d pose;
+    private static Pose2d pose;
 
     public SwerveDrive(Telemetry telemetry, HardwareMap hardwareMap){
         mod1m1 = new DcMotorExW(hardwareMap.get(DcMotorEx.class,"mod1m1"));
@@ -73,7 +73,7 @@ public class SwerveDrive {
         //mod2P = module2Filter.getFilteredValue(mod2P);
 
         //Retrieve the angle and power for each module
-        double[] output = swavemath.calculate(x,y,rot, Math.toRadians(pose.getHeading()), true);
+        double[] output = swavemath.calculate(x,y,rot, Math.toRadians(pose.getHeading() + 90), true);
         double mod1power = -output[0];
         double mod2power = -output[1];
 
