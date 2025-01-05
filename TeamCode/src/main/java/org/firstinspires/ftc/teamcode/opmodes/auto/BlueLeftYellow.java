@@ -14,7 +14,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.maths.GVF;
-import org.firstinspires.ftc.teamcode.maths.PID;
 import org.firstinspires.ftc.teamcode.subsystems.PivotingSlide;
 import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
 import org.firstinspires.ftc.teamcode.subsystems.ThreeAxisClaw;
@@ -32,7 +31,7 @@ public class BlueLeftYellow extends LinearOpMode {
 
     private double headingTarget = 0;
     private int cycleCount = 0;
-    private int taskNumber = 0;
+    private int taskNumber = 0, lastTaskNumber = 0;
     ElapsedTimeW timer = new ElapsedTimeW();
 
     private enum ApexStates {
@@ -81,13 +80,6 @@ public class BlueLeftYellow extends LinearOpMode {
             Pose2d pose = swerve.getPose();
             Vector2d out = gvf.output(new Vector2d(pose.getX(), pose.getY()));
 
-            TelemetryPacket packet = new TelemetryPacket();
-            Canvas canvas = packet.fieldOverlay();
-            canvas.setStroke("#FF0000");
-            DashOperations.drawRobot(canvas, pose);
-            canvas.strokeLine(pose.getX(),pose.getY(),pose.getX() + out.getX() * 5,pose.getY() + out.getY() * 5);
-            dashboard.sendTelemetryPacket(packet);
-
             double rotation = gvf.headingOut(headingTarget,swerve.getHeadingInDegrees(), false, false);
             swerve.drive(out.getX(), out.getY(), rotation);
 
@@ -113,11 +105,11 @@ public class BlueLeftYellow extends LinearOpMode {
                         taskNumber++;
                     }
                     if (taskNumber == 4 && slide.isTimeDone()) {
-                        //taskNumber = 0;
-                        //headingTarget = 0;
+                        taskNumber = 0;
+                        headingTarget = -90;
                         wristToggle.toTrue();
-                        //state = ApexStates.CYCLE;
-                        //gvf.setPath(PathList.BlueBasketToLeftYellow, 0.7, 10, 0.75);
+                        state = ApexStates.CYCLE;
+                        gvf.setPath(PathList.BlueBasketToLeftYellow, 0.7, 15, 0.7);
                     }
                     break;
                 case CYCLE:
@@ -130,9 +122,9 @@ public class BlueLeftYellow extends LinearOpMode {
                         if (taskNumber == 1 && timer.seconds() > 0.2) {
                             wristToggle.toFalse();
                             pivotToggle.toTrue();
-                            gvf.setPath(PathList.LeftYellowToBlueBasket, 0.7, 10, 0.75);
+                            gvf.setPath(PathList.LeftYellowToBlueBasket, 0.7, 5, 0.7);
                             headingTarget = -135;
-                            taskNumber++;
+                            //taskNumber++;
                         }
                         if (taskNumber == 2 && gvf.isDone(5, 7)) {
                             slide.toMax();
@@ -150,10 +142,10 @@ public class BlueLeftYellow extends LinearOpMode {
                             taskNumber++;
                         }
                         if (taskNumber == 5 && slide.isTimeDone()) {
-                            taskNumber = 0;
-                            headingTarget = 0;
-                            cycleCount = 1;
-                            gvf.setPath(PathList.BlueBasketToMidYellow, 0.7, 10, 0.75);
+                            //taskNumber = 0;
+                            //headingTarget = -90;
+                            //cycleCount = 1;
+                            //gvf.setPath(PathList.BlueBasketToMidYellow, 0.7, 15, 0.7);
                         }
                     }
                     if (cycleCount == 1) {
@@ -165,7 +157,7 @@ public class BlueLeftYellow extends LinearOpMode {
                         if (taskNumber == 1 && timer.seconds() > 0.2) {
                             wristToggle.toFalse();
                             pivotToggle.toTrue();
-                            gvf.setPath(PathList.MidYellowToBlueBasket, 0.7, 10, 0.75);
+                            gvf.setPath(PathList.MidYellowToBlueBasket, 0.7, 15, 0.7);
                             headingTarget = -135;
                             taskNumber++;
                         }
@@ -186,9 +178,9 @@ public class BlueLeftYellow extends LinearOpMode {
                         }
                         if (taskNumber == 5 && slide.isTimeDone()) {
                             taskNumber = 0;
-                            headingTarget = 0;
+                            headingTarget = -90;
                             cycleCount = 2;
-                            gvf.setPath(PathList.BlueBasketToRightYellow, 0.7, 10, 0.75);
+                            gvf.setPath(PathList.BlueBasketToRightYellow, 0.7, 15, 0.7);
                         }
                     }
                     if (cycleCount == 2) {
@@ -200,7 +192,7 @@ public class BlueLeftYellow extends LinearOpMode {
                         if (taskNumber == 1 && timer.seconds() > 0.2) {
                             wristToggle.toFalse();
                             pivotToggle.toTrue();
-                            gvf.setPath(PathList.RightYellowToBlueBasket, 0.7, 10, 0.75);
+                            gvf.setPath(PathList.RightYellowToBlueBasket, 0.7, 15, 0.7);
                             headingTarget = -135;
                             taskNumber++;
                         }
@@ -221,7 +213,7 @@ public class BlueLeftYellow extends LinearOpMode {
                         }
                         if (taskNumber == 5 && slide.isTimeDone()) {
                             taskNumber = 0;
-                            headingTarget = 0;
+                            headingTarget = -90;
                             cycleCount = 3;
                             state = ApexStates.STANDBY;
 
@@ -254,12 +246,21 @@ public class BlueLeftYellow extends LinearOpMode {
                 slide.movePivotTo(0);
             }
 
-
+            //executes at end of every task
+            if (lastTaskNumber != taskNumber) {
+                timer.reset();
+                lastTaskNumber = taskNumber;
+            }
 
             slide.update();
 
             telemetry.addData("pose",pose.toString());
+            telemetry.addData("current arc", gvf.temp2);
+            telemetry.addData("total arc", gvf.temp3);
+            telemetry.addData("poseError",gvf.poseError);
+            telemetry.addData("headingError", gvf.headingError);
             telemetry.addData("tasknum",taskNumber);
+            telemetry.addData("arc",gvf.arcLengthRemaining());
             telemetry.addData("state",state);
             telemetry.addData("path", Arrays.toString(gvf.getPath().getControlPointList()));
             telemetry.update();

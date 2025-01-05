@@ -21,7 +21,7 @@ public class PivotingSlide {
     private final RunMotionProfile pivotProfile = new RunMotionProfile(30000,30000,30000,new ConstantsForPID(0.5,0,0.2,0,3,0));
     private final RunMotionProfile slideProfile = new RunMotionProfile(70000,70000,70000,new ConstantsForPID(0.2,0,0.2,0.2,2,0));
 
-    public final double MIN = -15, SET_POINT_1 = 233, SET_POINT_2 = 350, SET_POINT_3 = 466, MAX = 400;
+    public final double MIN = -15, SET_POINT_1 = 300, SET_POINT_2 = 550, SET_POINT_3 = 700, MAX = 830;
     public enum States {
         MIN,
         SETPOINT_1,
@@ -70,7 +70,7 @@ public class PivotingSlide {
         if (getSlidePosition() < 0) {
             resetEncoders();
         }
-        slideMotors.setPowers(slideProfile.profiledMovement(slideTarget, getSlidePosition()));
+        //slideMotors.setPowers(slideProfile.profiledMovement(slideTarget, getSlidePosition()));
         pivotMotors.setPowers(pivotProfile.profiledPivotMovement(pivotTarget, getPivotAngle()));
     }
 
@@ -92,9 +92,9 @@ public class PivotingSlide {
 
     public double getPivotAngle() { return  -pivotEncoder.getVoltage() * 72 + 203.5; }
 
-    public boolean isTimeDone() { return slideProfile.getProfileDuration() < slideProfile.getCurrentTime(); }
+    public boolean isTimeDone() { return slideProfile.getProfileDuration() + 2 < slideProfile.getCurrentTime(); }
 
-    public boolean isPositionDone() { return Math.abs(getSlideError()) < 10; }
+    public boolean isPositionDone() { return Math.abs(getSlideError()) < 22; }
 
     public void setMotionConstraints(double maxVel, double maxAccel, double maxJerk){
         slideProfile.setMotionConstraints(maxVel, maxAccel, maxJerk);

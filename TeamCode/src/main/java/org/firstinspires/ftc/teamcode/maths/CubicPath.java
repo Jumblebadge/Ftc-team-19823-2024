@@ -15,6 +15,7 @@ public class CubicPath {
     public double guessT = 0, arcLength = 0;
     private double totalArcLength;
     private Vector2d[] controlPoints;
+    public Vector2d[] temp;
     double[] arcLengths = new double[3];
 
     /**
@@ -25,6 +26,7 @@ public class CubicPath {
      */
     public CubicPath(double[] rawControlPoints) {
         controlPoints = Maths.pointListToVectorList(rawControlPoints);
+        temp = controlPoints;
         beziers[0] = new Bezier(controlPoints[0], controlPoints[1], controlPoints[2], controlPoints[3]);
         beziers[1] = new Bezier(controlPoints[3], controlPoints[3].times(2).minus(controlPoints[2]), controlPoints[4], controlPoints[5]);
         beziers[2] = new Bezier(controlPoints[5], controlPoints[5].times(2).minus(controlPoints[4]), controlPoints[6], controlPoints[7]);
@@ -59,7 +61,13 @@ public class CubicPath {
     }
 
     public Vector2d[] getControlPointList() {
-        return controlPoints;
+        Vector2d[] out = new Vector2d[8];
+        int i = 0;
+        for (Vector2d v : controlPoints) {
+            out[i] = v.times(1);
+            i++;
+        }
+        return out;
     }
 
     /**
@@ -89,6 +97,8 @@ public class CubicPath {
         return beziers[(int) T].getPoint(T - Math.floor(T));
     }
 
+    //DOES NOT WORK
+    //TODO FIX
     public Vector2d getControlPoint(int index) {
         return controlPoints[index];
     }

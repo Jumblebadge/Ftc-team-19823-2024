@@ -28,6 +28,8 @@ import org.firstinspires.ftc.teamcode.utility.DashOperations;
 import org.firstinspires.ftc.teamcode.utility.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.utility.PathList;
 
+import java.util.Arrays;
+
 @Config
 @TeleOp(name="autotest", group="Linear Opmode")
 public class autotest extends LinearOpMode {
@@ -83,7 +85,7 @@ public class autotest extends LinearOpMode {
 
 
             double rotation = gvf.headingOut(heading,swerve.getHeadingInDegrees(), false, false);
-            swerve.drive(out.getX() * negX, out.getY() * negY, 0);
+            //swerve.drive(out.getX() * negX, out.getY() * negY, 0);
 
             if (gvf.isEnding()) endingCount ++;
 
@@ -98,14 +100,12 @@ public class autotest extends LinearOpMode {
             dashboard.sendTelemetryPacket(packet);
 
             telemetry.addData("pose",pose.toString());
-            telemetry.addData("headin",pose.getHeading());
-            telemetry.addData("endingccount",endingCount);
-            telemetry.addData("gamepadx", gamepad1.left_stick_x);
-            telemetry.addData("gamey",gamepad1.left_stick_y);
-            telemetry.addData("outx",out.getX());
-            telemetry.addData("outy",out.getY());
-            telemetry.addData("milis",hztimer.milliseconds());
-            hztimer.reset();
+            telemetry.addData("poseError",gvf.poseError);
+            telemetry.addData("headingError", gvf.headingError);
+            telemetry.addData("path", Arrays.toString(PathList.LeftYellowToBlueBasket.getControlPointList()));
+            telemetry.addData("path8", PathList.BlueSideToScore.getControlPoint(7));
+            telemetry.addData("path0", PathList.BlueSideToScore.getControlPoint(0));
+            telemetry.addData("raw", Arrays.toString(PathList.BlueSideToScore.temp));
             telemetry.update();
         }
     }

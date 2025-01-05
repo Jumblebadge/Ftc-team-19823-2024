@@ -31,6 +31,8 @@ public class GoodLuck extends LinearOpMode {
     private double headingTarget;
     private double nanoTime;
 
+    public static double maxVel = 1, maxAccel = 1, maxJerk = 1;
+
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
 
@@ -168,11 +170,13 @@ public class GoodLuck extends LinearOpMode {
             }
 
             slide.moveSlideTo(slideTarget);
+            slide.setMotionConstraints(maxVel, maxAccel, maxJerk);
             slide.update();
 
             telemetry.addData("hz", 1000000000 / (System.nanoTime() - nanoTime));
-            telemetry.addData("motion",profile.getMotionTarget());
-            telemetry.addData("atan",headingTarget);
+            telemetry.addData("motion",slide.getMotionTarget());
+            telemetry.addData("slidetarget",slideTarget);
+            telemetry.addData("slied",slide.getSlidePosition());
             nanoTime = System.nanoTime();
 
             telemetry.update();
