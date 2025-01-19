@@ -70,7 +70,7 @@ public class PivotingSlide {
         if (getSlidePosition() < 0) {
             resetEncoders();
         }
-        //slideMotors.setPowers(slideProfile.profiledMovement(slideTarget, getSlidePosition()));
+        slideMotors.setPowers(slideProfile.profiledMovement(slideTarget, getSlidePosition()));
         pivotMotors.setPowers(pivotProfile.profiledPivotMovement(pivotTarget, getPivotAngle()));
     }
 
@@ -92,7 +92,7 @@ public class PivotingSlide {
 
     public double getPivotAngle() { return  -pivotEncoder.getVoltage() * 72 + 203.5; }
 
-    public boolean isTimeDone() { return slideProfile.getProfileDuration() + 2 < slideProfile.getCurrentTime(); }
+    public boolean isTimeDone() { return slideProfile.getProfileDuration() + 0.5 < slideProfile.getCurrentTime(); }
 
     public boolean isPositionDone() { return Math.abs(getSlideError()) < 22; }
 

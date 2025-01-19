@@ -28,14 +28,14 @@ public class SwerveDrive {
     final private MedianFilter module1Filter = new MedianFilter(7);
     final private MedianFilter module2Filter = new MedianFilter(7);
     final private Telemetry telemetry;
-    private double module1Offset = -8, module2Offset = -8;
+    private double module1Offset = 37, module2Offset = -6;
     private final PID module1PID = new PID(0.1,0.00188,0.1,0.05, 1);
     private final PID module2PID = new PID(0.1,0.00188,0.1,0.05, 1);
     private final swerveKinematics swavemath = new swerveKinematics();
 
     double mod1reference;
     double mod2reference;
-    private static Pose2d pose;
+    private static Pose2d pose = new Pose2d(0, 0, 0);
 
     public SwerveDrive(Telemetry telemetry, HardwareMap hardwareMap){
         mod1m1 = new DcMotorExW(hardwareMap.get(DcMotorEx.class,"mod1m1"));
@@ -73,9 +73,9 @@ public class SwerveDrive {
         //mod2P = module2Filter.getFilteredValue(mod2P);
 
         //Retrieve the angle and power for each module
-        double[] output = swavemath.calculate(x,y,rot, Math.toRadians(pose.getHeading() + 90), true);
+        double[] output = swavemath.calculate(-x,-y,-rot, pose.getHeading(), true);
         double mod1power = -output[0];
-        double mod2power = -output[1];
+        double mod2power = output[1];
 
         //keep previous module heading if joystick not being used
         if (y != 0 || x != 0 || rot != 0){
@@ -112,7 +112,7 @@ public class SwerveDrive {
     }
 
     public Pose2d getPose() {
-        pose = pinPoint.getPoseIn(DistanceUnit.INCH, AngleUnit.DEGREES);
+        pose = pinPoint.getPoseIn(DistanceUnit.INCH, AngleUnit.RADIANS);
         return pose;
     }
 
@@ -121,7 +121,11 @@ public class SwerveDrive {
     }
 
     public double getHeadingInDegrees() {
-        return AngleUnit.normalizeDegrees(pose.getHeading());
+        return Math.toDegrees(getHeadingInRadians());
+    }
+
+    public double getHeadingInRadians() {
+        return AngleUnit.normalizeRadians(pose.getHeading());
     }
 
     public void setPosition(Pose2d pose) {
@@ -129,8 +133,11 @@ public class SwerveDrive {
     }
 
     public double getJustHeadingInRadians() {
-        return pinPoint.getJustHeadingInRadians();
+        pose = new Pose2d(pose.getX(), pose.getY(), pinPoint.getJustHeadingInRadians());
+        return pose.getHeading();
     }
+
+    public double getJustHeadingInDegrees() { return Math.toDegrees(getJustHeadingInRadians()); }
 
     public void resetPoseAndHeading() {
         pinPoint.resetPoseAndHeading();

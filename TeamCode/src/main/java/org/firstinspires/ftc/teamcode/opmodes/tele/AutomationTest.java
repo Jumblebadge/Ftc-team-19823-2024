@@ -7,6 +7,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.maths.Maths;
 import org.firstinspires.ftc.teamcode.maths.PID;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.teamcode.subsystems.PivotingSlide;
 import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
 import org.firstinspires.ftc.teamcode.subsystems.ThreeAxisClaw;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
+import org.firstinspires.ftc.teamcode.utility.ElapsedTimeW;
 
 import java.util.List;
 
@@ -52,6 +54,9 @@ public class AutomationTest extends LinearOpMode {
         ThreeAxisClaw claw = new ThreeAxisClaw(hardwareMap);
         ButtonDetector clawToggle = new ButtonDetector();
         ButtonDetector wristToggle = new ButtonDetector();
+        ButtonDetector rotatorToggle = new ButtonDetector();
+        boolean lastRotatorToggle = false;
+        ElapsedTimeW rotatorTimer = new ElapsedTimeW();
 
         Gamepad current1 = new Gamepad();
         Gamepad previous1 = new Gamepad();
@@ -73,16 +78,20 @@ public class AutomationTest extends LinearOpMode {
             //Clear the cache for better loop times (bulk sensor reads)
             for (LynxModule hub : allHubs) hub.clearBulkCache();
 
+            double heading = swerve.getJustHeadingInDegrees();
+
             double rotation;
             if (headingPIDtoggle.toggle(gamepad1.right_bumper)) {
-                rotation = headingPID.pidAngleOut(headingTarget, swerve.getHeadingInDegrees());
+                rotation = headingPID.pidAngleOut(headingTarget, heading);
+                gamepad1.setLedColor(1,0,0,Gamepad.LED_DURATION_CONTINUOUS);
             }
             else {
-                rotation = 0;
+                rotation = -gamepad1.right_stick_x;
+                gamepad1.setLedColor(0,1,0,Gamepad.LED_DURATION_CONTINUOUS);
             }
 
             if (current1.left_bumper && !previous1.left_bumper) {
-                headingTarget = swerve.getHeadingInDegrees();
+                headingTarget = heading;
             }
 
             if (gamepad1.options) {
@@ -106,10 +115,10 @@ public class AutomationTest extends LinearOpMode {
                 headingPIDtoggle.toTrue();
             }
             if (Math.sqrt(Math.pow(gamepad1.right_stick_y, 2) + Math.pow(gamepad1.right_stick_x, 2)) > 0.175) {
-                headingTarget = Maths.peicewiseAtan2(-gamepad1.right_stick_y, gamepad1.right_stick_x);
+                headingTarget = Math.toDegrees(Maths.peicewiseAtan2(-gamepad1.right_stick_y, gamepad1.right_stick_x)) - 90;
             }
 
-            swerve.drive(gamepad1.left_stick_x, gamepad1.left_stick_y, rotation);
+            swerve.drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, rotation);
 
             if (current1.share) state = States.MANUAL;
 
@@ -226,19 +235,43 @@ public class AutomationTest extends LinearOpMode {
             }
             else claw.setClawOpen();
 
-            if (wristToggle.isTrue()) {
-                claw.setWristDown();
+            if (wristToggle.toggle(gamepad2.left_trigger > 0.2)) {
+                if (rotatorToggle.toggle(gamepad2.right_trigger > 0.2)) {
+                    claw.setRotatorTo90();
+                }
+                else {
+                    claw.setRotatorTo0();
+                }
+                if (rotatorTimer.seconds() < 0.2 && slide.getSlidePosition() < 50) {
+                    claw.setWristClear();
+                }
+                else {
+                    claw.setWristDown();
+                }
             }
-            else claw.setWristUp();
+            else {
+                claw.setWristUp();
+                claw.setRotatorTo0();
+                rotatorToggle.toFalse();
+            }
 
-            if (pivotToggle.isTrue()) {
-                slide.movePivotTo(85);
+            if (rotatorToggle.isTrue() != lastRotatorToggle) {
+                lastRotatorToggle = rotatorToggle.isTrue();
+                rotatorTimer.reset();
             }
-            else if (slide.getSlidePosition() < 50) {
-                slide.movePivotTo(0);
+
+            if (slide.getSlidePosition() < 50) {
+                if (pivotToggle.isTrue()) {
+                    slide.movePivotTo(85);
+                }
+                else  {
+                    slide.movePivotTo(0);
+                }
             }
 
             slide.update();
+
+            telemetry.addData("state", state);
             telemetry.update();
         }
     }

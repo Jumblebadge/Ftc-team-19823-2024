@@ -53,12 +53,12 @@ public class autotest extends LinearOpMode {
                 -24.3,-48,-0.8,-46,37,-60.5,47.6,-45.7,53,-13.6,50.5,-2.6,47.7,11.5,47.2,48.8
         });
 
-        GVF gvf = new GVF(PathList.BlueSideToScore, 0.7, 15, 0.7, telemetry);
+        GVF gvf = new GVF(path, 0.7, 15, 0.7, telemetry);
 
         double[] x = new double[60];
         double[] y = new double[x.length];
         for (int i = 0; i < x.length; i++) {
-            Vector2d point = PathList.BlueSideToScore.getPoint(((double) i  / (x.length - 1)) * 2.9999);
+            Vector2d point = PathList.MidYellowToBlueBasket.getPoint(((double) i  / (x.length - 1)) * 2.9999);
             x[i] = point.getX();
             y[i] = point.getY();
         }
@@ -70,7 +70,7 @@ public class autotest extends LinearOpMode {
 
         waitForStart();
 
-        swerve.setPosition(new Pose2d(36, 60, -90));
+        swerve.setPosition(new Pose2d(-25, -48));
 
         while (opModeIsActive()) {
 
@@ -84,8 +84,8 @@ public class autotest extends LinearOpMode {
             Vector2d out = gvf.output(new Vector2d(pose.getX(), pose.getY()));
 
 
-            double rotation = gvf.headingOut(heading,swerve.getHeadingInDegrees(), false, false);
-            //swerve.drive(out.getX() * negX, out.getY() * negY, 0);
+            double rotation = gvf.headingOut(heading,swerve.getHeadingInDegrees());
+            //swerve.drive(out.getX() * negX, out.getY() * negY, rotation);
 
             if (gvf.isEnding()) endingCount ++;
 
@@ -106,6 +106,10 @@ public class autotest extends LinearOpMode {
             telemetry.addData("path8", PathList.BlueSideToScore.getControlPoint(7));
             telemetry.addData("path0", PathList.BlueSideToScore.getControlPoint(0));
             telemetry.addData("raw", Arrays.toString(PathList.BlueSideToScore.temp));
+            telemetry.addData("outx",out.getX());
+            telemetry.addData("outY", out.getY());
+            telemetry.addData("gamex", gamepad1.left_stick_x);
+            telemetry.addData("gamey", gamepad1.left_stick_y);
             telemetry.update();
         }
     }

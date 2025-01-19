@@ -167,7 +167,7 @@ public class CubicPath {
             //This only works with fast loop times, and this was an arbitrary number. Not the best solution
             dotProduct = Maths.tanhErrorMap(dotProduct);
             arcLength += dotProduct;
-            arcLength = Range.clip(arcLength, 0.01, getTotalArcLength() - 0.01);
+            arcLength = Range.clip(arcLength, 0.0001, getTotalArcLength() - 0.0001);
             guessT = distanceToT(arcLength);
         }
         return getPoint(guessT);

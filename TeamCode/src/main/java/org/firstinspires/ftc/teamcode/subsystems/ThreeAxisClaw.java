@@ -9,9 +9,9 @@ public class ThreeAxisClaw {
 
     private final ServoImplExW claw, wrist, rotator;
 
-    public final double CLAW_OPEN = 0.9, CLAW_CLOSE = 0.27;
-    public final double WRIST_UP = 0.45, WRIST_MIDDLE = 0.7, WRIST_DOWN = 0.91; //0.95 with fixed rotator
-    public final double ROTATOR_0 = 0, ROTATOR_45 = 0.15, ROTATOR_90 = 0.3; //TODO TUNE
+    public final double CLAW_OPEN = 0.42, CLAW_CLOSE = 0.985;
+    public final double WRIST_UP = 0.325, WRIST_CLEAR = 0.875, WRIST_DOWN = 0.98;
+    public final double ROTATOR_0 = 0.925, ROTATOR_45 = 0.65, ROTATOR_90 = 0.375;
 
     public ThreeAxisClaw(HardwareMap hardwareMap) {
         claw = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "claw"));
@@ -45,8 +45,8 @@ public class ThreeAxisClaw {
     public void setWristUp() {
         setWristPosition(WRIST_UP);
     }
-    public void setWristMiddle() {
-        setWristPosition(WRIST_MIDDLE);
+    public void setWristClear() {
+        setWristPosition(WRIST_CLEAR);
     }
     public void setWristDown() {
         setWristPosition(WRIST_DOWN);

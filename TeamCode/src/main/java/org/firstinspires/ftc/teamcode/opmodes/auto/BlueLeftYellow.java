@@ -61,6 +61,7 @@ public class BlueLeftYellow extends LinearOpMode {
         ButtonDetector clawToggle = new ButtonDetector();
         clawToggle.toTrue();
         claw.setClawClose();
+        claw.setRotatorTo0();
         ButtonDetector wristToggle = new ButtonDetector();
 
         ApexStates state = ApexStates.PRELOAD;
@@ -70,7 +71,7 @@ public class BlueLeftYellow extends LinearOpMode {
 
         waitForStart();
 
-        swerve.setPosition(new Pose2d(36, 60, -90));
+        swerve.setPosition(new Pose2d(36, 60));
 
         while (opModeIsActive()) {
 
@@ -78,9 +79,18 @@ public class BlueLeftYellow extends LinearOpMode {
             for (LynxModule hub : allHubs) hub.clearBulkCache();
 
             Pose2d pose = swerve.getPose();
+
+
+            TelemetryPacket packet = new TelemetryPacket();
+            Canvas canvas = packet.fieldOverlay();
+
+            DashOperations.drawRobot(canvas, pose);
+            dashboard.sendTelemetryPacket(packet);
+
+
             Vector2d out = gvf.output(new Vector2d(pose.getX(), pose.getY()));
 
-            double rotation = gvf.headingOut(headingTarget,swerve.getHeadingInDegrees(), false, false);
+            double rotation = gvf.headingOut(headingTarget,swerve.getHeadingInDegrees());
             swerve.drive(out.getX(), out.getY(), rotation);
 
             switch(state) {
@@ -90,9 +100,10 @@ public class BlueLeftYellow extends LinearOpMode {
                         headingTarget = -135;
                         taskNumber++;
                     }
-                    if (taskNumber == 1 && gvf.isDone(5, 7)) {
+                    if (taskNumber == 1 && gvf.isDone(4, 7)) {
                         slide.toMax();
                         taskNumber++;
+                        break;
                     }
                     if (taskNumber == 2 && slide.isTimeDone()) {
                         clawToggle.toFalse();
@@ -103,13 +114,14 @@ public class BlueLeftYellow extends LinearOpMode {
                         slide.toMin();
                         pivotToggle.toFalse();
                         taskNumber++;
+                        break;
                     }
                     if (taskNumber == 4 && slide.isTimeDone()) {
                         taskNumber = 0;
                         headingTarget = -90;
                         wristToggle.toTrue();
                         state = ApexStates.CYCLE;
-                        gvf.setPath(PathList.BlueBasketToLeftYellow, 0.7, 15, 0.7);
+                        gvf.setPath(PathList.BlueBasketToRightYellow, 0.7, 15, 0.7, pose);
                     }
                     break;
                 case CYCLE:
@@ -122,13 +134,15 @@ public class BlueLeftYellow extends LinearOpMode {
                         if (taskNumber == 1 && timer.seconds() > 0.2) {
                             wristToggle.toFalse();
                             pivotToggle.toTrue();
-                            gvf.setPath(PathList.LeftYellowToBlueBasket, 0.7, 5, 0.7);
+                            gvf.setPath(PathList.MidYellowToBlueBasket, 0.7, 5, 0.7, pose);
                             headingTarget = -135;
-                            //taskNumber++;
+                            timer.reset();
+                            taskNumber++;
                         }
-                        if (taskNumber == 2 && gvf.isDone(5, 7)) {
+                        if (taskNumber == 2 && gvf.isDone(4, 7)) {
                             slide.toMax();
                             taskNumber++;
+                            break;
                         }
                         if (taskNumber == 3 && slide.isTimeDone()) {
                             clawToggle.toFalse();
@@ -140,12 +154,13 @@ public class BlueLeftYellow extends LinearOpMode {
                             wristToggle.toTrue();
                             pivotToggle.toFalse();
                             taskNumber++;
+                            break;
                         }
                         if (taskNumber == 5 && slide.isTimeDone()) {
-                            //taskNumber = 0;
-                            //headingTarget = -90;
-                            //cycleCount = 1;
-                            //gvf.setPath(PathList.BlueBasketToMidYellow, 0.7, 15, 0.7);
+                            taskNumber = 0;
+                            headingTarget = -90;
+                            cycleCount = 1;
+                            gvf.setPath(PathList.BlueBasketToMidYellow, 0.7, 15, 0.7, pose);
                         }
                     }
                     if (cycleCount == 1) {
@@ -157,13 +172,15 @@ public class BlueLeftYellow extends LinearOpMode {
                         if (taskNumber == 1 && timer.seconds() > 0.2) {
                             wristToggle.toFalse();
                             pivotToggle.toTrue();
-                            gvf.setPath(PathList.MidYellowToBlueBasket, 0.7, 15, 0.7);
+                            gvf.setPath(PathList.MidYellowToBlueBasket, 0.7, 15, 0.7, pose);
                             headingTarget = -135;
+                            timer.reset();
                             taskNumber++;
                         }
-                        if (taskNumber == 2 && gvf.isDone(5, 7)) {
+                        if (taskNumber == 2 && gvf.isDone(4, 7) && timer.seconds() > 1) {
                             slide.toMax();
                             taskNumber++;
+                            break;
                         }
                         if (taskNumber == 3 && slide.isTimeDone()) {
                             clawToggle.toFalse();
@@ -175,12 +192,13 @@ public class BlueLeftYellow extends LinearOpMode {
                             wristToggle.toTrue();
                             pivotToggle.toFalse();
                             taskNumber++;
+                            break;
                         }
                         if (taskNumber == 5 && slide.isTimeDone()) {
                             taskNumber = 0;
                             headingTarget = -90;
                             cycleCount = 2;
-                            gvf.setPath(PathList.BlueBasketToRightYellow, 0.7, 15, 0.7);
+                            gvf.setPath(PathList.BlueBasketToMidYellow, 0.7, 15, 0.7, pose);
                         }
                     }
                     if (cycleCount == 2) {
@@ -192,13 +210,15 @@ public class BlueLeftYellow extends LinearOpMode {
                         if (taskNumber == 1 && timer.seconds() > 0.2) {
                             wristToggle.toFalse();
                             pivotToggle.toTrue();
-                            gvf.setPath(PathList.RightYellowToBlueBasket, 0.7, 15, 0.7);
+                            gvf.setPath(PathList.MidYellowToBlueBasket, 0.7, 15, 0.7, pose);
                             headingTarget = -135;
+                            timer.reset();
                             taskNumber++;
                         }
-                        if (taskNumber == 2 && gvf.isDone(5, 7)) {
+                        if (taskNumber == 2 && gvf.isDone(4, 7) && timer.seconds() > 1) {
                             slide.toMax();
                             taskNumber++;
+                            break;
                         }
                         if (taskNumber == 3 && slide.isTimeDone()) {
                             clawToggle.toFalse();
@@ -210,6 +230,7 @@ public class BlueLeftYellow extends LinearOpMode {
                             wristToggle.toTrue();
                             pivotToggle.toFalse();
                             taskNumber++;
+                            break;
                         }
                         if (taskNumber == 5 && slide.isTimeDone()) {
                             taskNumber = 0;
@@ -248,8 +269,8 @@ public class BlueLeftYellow extends LinearOpMode {
 
             //executes at end of every task
             if (lastTaskNumber != taskNumber) {
-                timer.reset();
                 lastTaskNumber = taskNumber;
+
             }
 
             slide.update();
@@ -260,6 +281,7 @@ public class BlueLeftYellow extends LinearOpMode {
             telemetry.addData("poseError",gvf.poseError);
             telemetry.addData("headingError", gvf.headingError);
             telemetry.addData("tasknum",taskNumber);
+            telemetry.addData("time",timer.seconds());
             telemetry.addData("arc",gvf.arcLengthRemaining());
             telemetry.addData("state",state);
             telemetry.addData("path", Arrays.toString(gvf.getPath().getControlPointList()));

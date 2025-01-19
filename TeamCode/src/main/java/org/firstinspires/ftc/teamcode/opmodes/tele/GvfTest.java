@@ -61,7 +61,7 @@ public class GvfTest extends LinearOpMode {
 
             path.setControlPointCoordinates(new double[] {AX, AY, BX, BY, CX, CY, DX, DY, FX, FY, GX, GY, IX, IY, JX, JY});
 
-            gvf.setPath(path, Kn, Kf, Ks);
+            gvf.setPath(path, Kn, Kf, Ks, new Pose2d(0,0,0));
 
             double[] x = new double[points.length];
             double[] y = new double[points.length];

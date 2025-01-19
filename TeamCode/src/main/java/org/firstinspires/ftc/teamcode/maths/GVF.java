@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.maths;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -30,15 +31,15 @@ public class GVF {
         this.Kf = Kf;
         this.Ks = Ks;
         this.telemetry = telemetry;
-        calculateGVF(path.getControlPoint(0));
+        //calculateGVF(path.getPoint(0));
     }
 
-    public void setPath(CubicPath path, double Kn, double Kf, double Ks) {
+    public void setPath(CubicPath path, double Kn, double Kf, double Ks, Pose2d robot) {
         this.path = path;
         this.Kn = Kn;
         this.Kf = Kf;
         this.Ks = Ks;
-        calculateGVF(path.getControlPoint(0));
+        calculateEverything(new Vector2d(robot.getX(), robot.getY()));
     }
 
     public CubicPath getPath() {
@@ -69,11 +70,12 @@ public class GVF {
         return verticalStretch * (internal * sign) / (1 + internal);
     }
 
-    public void calculateEverything(Vector2d Robot) {
-        closestPoint = path.findClosestPointOnPath(Robot);
+    public void calculateEverything(Vector2d robot) {
+        poseError = distanceFromEndPoint(robot);
+        closestPoint = path.findClosestPointOnPath(robot);
         tangent = path.getNormalizedTangent(path.guessT);
         normal = path.getNormalizedNormal(path.guessT);
-        R = Robot.minus(closestPoint);
+        R = robot.minus(closestPoint);
         telemetry.addData("closestPoint",closestPoint);
     }
 
@@ -87,17 +89,18 @@ public class GVF {
 
     public boolean isDone(double positionTolerance, double headingTolerance) { return poseError < positionTolerance && headingError < headingTolerance; }
 
+    public boolean isDone(Vector2d robot) { return distanceFromEndPoint(robot) < Kf; }
+
     public Vector2d calculateGVF(Vector2d robot) {
         count++;
-        calculateEverything(robot);
         double error = calculateSinusoidalError();
         out = tangent.minus(normal.times(Kn).times(error));
         telemetry.addData("error", error);
         double max = Math.max(Math.abs(out.getX()), Math.abs(out.getY()));
         if (max > 1) out = out.div(max);
         out = out.times(Math.min(1,(distanceFromEndPoint(robot)) / Kf));
-        telemetry.addData("errer",(path.getTotalArcLength() - path.arcLength) / Kf);
-        out = new Vector2d(out.getX(), -out.getY());
+        telemetry.addData("errer",(path.getTotalArcLength() - path.arcLength));
+        out = new Vector2d(out.getY(), out.getX());
         return out.times(Ks);
     }
 
@@ -109,12 +112,17 @@ public class GVF {
             xOut /= max;
             yOut /= max;
         }
-        return new Vector2d(xOut, -yOut);
+        return new Vector2d(yOut, xOut);
     }
 
-    public double headingOut(double targetHeading, double currentHeading, boolean followTangent, boolean reversed) {
-        double target = targetHeading;
-        if (!isEnding() && followTangent) {
+    public double headingOut(double targetHeading, double currentHeading) {
+        headingError = Math.abs(AngleUnit.normalizeDegrees(targetHeading - currentHeading));
+        return headingPID.pidAngleOut(targetHeading, currentHeading);
+    }
+
+    public double headingOut(double currentHeading, double endTangent, boolean reversed) {
+        double target = endTangent;
+        if (!isEnding()) {
             if (reversed) target = AngleUnit.normalizeDegrees(180 + tangentHeading());
             else target = tangentHeading();
         }
@@ -123,7 +131,7 @@ public class GVF {
     }
 
     public Vector2d output(Vector2d robot) {
-        poseError = Maths.distanceBetween(path.getPoint(2.9999), robot);
+        calculateEverything(robot);
         temp3 = path.getTotalArcLength();
         temp2 = path.arcLength;
         telemetry.addData("count",count);
