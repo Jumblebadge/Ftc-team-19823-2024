@@ -95,18 +95,21 @@ public class GVF {
         count++;
         double error = calculateSinusoidalError();
         out = tangent.minus(normal.times(Kn).times(error));
-        telemetry.addData("error", error);
+        telemetry.addData("sin error: ", error);
         double max = Math.max(Math.abs(out.getX()), Math.abs(out.getY()));
         if (max > 1) out = out.div(max);
         out = out.times(Math.min(1,(distanceFromEndPoint(robot)) / Kf));
-        telemetry.addData("errer",(path.getTotalArcLength() - path.arcLength));
         out = new Vector2d(out.getY(), out.getX());
         return out.times(Ks);
     }
 
     public Vector2d calculatePID(Vector2d robot) {
-        double xOut = xPID.pidOut(path.getPoint(2.9999).getX(), robot.getX());
-        double yOut = yPID.pidOut(path.getPoint(2.9999).getY(), robot.getY());
+        return calculatePID(path.getPoint(2.9999), robot);
+    }
+
+    public Vector2d calculatePID(Vector2d target, Vector2d robot) {
+        double xOut = xPID.pidOut(target.getX(), robot.getX());
+        double yOut = yPID.pidOut(target.getY(), robot.getY());
         double max = Math.max(Math.abs(yOut), Math.abs(xOut));
         if (max > 1) {
             xOut /= max;
@@ -134,13 +137,12 @@ public class GVF {
         calculateEverything(robot);
         temp3 = path.getTotalArcLength();
         temp2 = path.arcLength;
-        telemetry.addData("count",count);
         telemetry.addData("robot",robot);
-        if (isEnding()) telemetry.addData("IS ENDING", arcLengthRemaining());
-        else telemetry.addData("NOT ENDING",arcLengthRemaining());
-        //drawPath(dashboard, path, new Pose2d(robot.getX(), robot.getY(), 0));
+        telemetry.addData("PATH ENDING?", isEnding());
+        telemetry.addData("arc length remaining: ",arcLengthRemaining());
         telemetry.addData("tep",temp.toString());
         if (isEnding()) return calculatePID(robot);
+        else if (path.guessT <= 0.0001) return calculatePID(path.getPoint(0).plus(normal.times(3)), robot);
         else return calculateGVF(robot);
     }
 

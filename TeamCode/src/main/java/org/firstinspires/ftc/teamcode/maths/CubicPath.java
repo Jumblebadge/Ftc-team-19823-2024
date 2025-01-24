@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.maths;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.util.Range;
 
-import java.util.ArrayList;
-
 /**
  * Path comprised of 3 bezier curves. C1 continuous. Using 3 seperate curves allows for local control over the curve.
  * @see Bezier

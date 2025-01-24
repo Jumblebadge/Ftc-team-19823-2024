@@ -124,8 +124,9 @@ public class Bezier {
      * @return the estimated T value at which this arc length is located
      */
     public double distanceToT(double distance) {
-        //throws error if point is not found
-        int index = - (int) distance;
+        if (distance <= 0) return 0;
+        if (distance >= totalArcLength) return totalArcLength;
+        int index = 0;
         for (int i = 0; i < accuracy; i++) {
             if (lookup[i].getY() <= distance && lookup[i + 1].getY() >= distance) {
                 index = i;
