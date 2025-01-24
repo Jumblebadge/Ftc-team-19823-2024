@@ -55,7 +55,7 @@ public class BlueLeftYellow extends LinearOpMode {
 
         GVF gvf = new GVF(PathList.BlueSideToScore, 0.5, 5, 0.7, telemetry);
 
-        PivotingSlide slide = new PivotingSlide(hardwareMap);
+        PivotingSlide slide = new PivotingSlide(hardwareMap, true);
         ButtonDetector pivotToggle = new ButtonDetector();
 
         ThreeAxisClaw claw = new ThreeAxisClaw(hardwareMap);

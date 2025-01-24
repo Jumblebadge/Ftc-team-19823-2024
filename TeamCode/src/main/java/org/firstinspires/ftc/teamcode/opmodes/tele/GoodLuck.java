@@ -40,7 +40,7 @@ public class GoodLuck extends LinearOpMode {
 
         ButtonDetector startToggle = new ButtonDetector();
 
-        PivotingSlide slide = new PivotingSlide(hardwareMap);
+        PivotingSlide slide = new PivotingSlide(hardwareMap, false);
         ButtonDetector pivotToggle = new ButtonDetector();
 
         ThreeAxisClaw claw = new ThreeAxisClaw(hardwareMap);

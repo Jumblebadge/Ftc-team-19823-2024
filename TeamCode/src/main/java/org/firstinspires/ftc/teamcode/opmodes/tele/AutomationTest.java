@@ -48,7 +48,7 @@ public class AutomationTest extends LinearOpMode {
         PID headingPID = new PID(0.09,0.00188,0,0.025,1);
         ButtonDetector headingPIDtoggle  = new ButtonDetector();
 
-        PivotingSlide slide = new PivotingSlide(hardwareMap);
+        PivotingSlide slide = new PivotingSlide(hardwareMap, false);
         ButtonDetector pivotToggle = new ButtonDetector();
 
         ThreeAxisClaw claw = new ThreeAxisClaw(hardwareMap);

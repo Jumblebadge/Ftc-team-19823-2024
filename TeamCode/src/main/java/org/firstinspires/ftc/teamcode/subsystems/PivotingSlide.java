@@ -18,8 +18,10 @@ public class PivotingSlide {
     private double slideTarget = 0, pivotTarget = 0, slideOffset = 0;
     private final TouchSensor slideLimitSwitch;
     private final AnalogInput pivotEncoder;
-    private final RunMotionProfile pivotProfile = new RunMotionProfile(30000,30000,30000,new ConstantsForPID(0.5,0,0.2,0,3,0));
+    private final RunMotionProfile fastPivotProfile = new RunMotionProfile(30000,30000,30000,new ConstantsForPID(0.5,0,0.2,0,3,0));
+    private final RunMotionProfile slowPivotProfile = new RunMotionProfile(10000,10000,10000,new ConstantsForPID(0.5,0,0.2,0,3,0));
     private final RunMotionProfile slideProfile = new RunMotionProfile(70000,70000,70000,new ConstantsForPID(0.2,0,0.2,0.2,2,0));
+    private RunMotionProfile pivotProfile = fastPivotProfile;
 
     public final double MIN = -15, SET_POINT_1 = 300, SET_POINT_2 = 550, SET_POINT_3 = 700, MAX = 830;
     public enum States {
@@ -31,7 +33,7 @@ public class PivotingSlide {
     }
     private States state = States.MIN;
 
-    public PivotingSlide(HardwareMap hardwareMap) {
+    public PivotingSlide(HardwareMap hardwareMap, boolean slowPivot) {
         DcMotorExW liftLeft = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "Llift"));
         DcMotorExW liftRight = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "Rlift"));
         DcMotorExW pivotLeft = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "Lpivot"));
@@ -51,6 +53,7 @@ public class PivotingSlide {
         resetEncoders();
 
         pivotEncoder = hardwareMap.get(AnalogInput.class, "pivotEncoder");
+        if (slowPivot) pivotProfile = slowPivotProfile;
     }
 
     public void moveSlideTo(double target) {
