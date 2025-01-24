@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.maths;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -11,6 +13,7 @@ public class GVF {
     private CubicPath path;
     private Vector2d R, closestPoint, out;
     private Vector2d tangent, normal;
+    ElapsedTime time = new ElapsedTime();
     PID headingPID = new PID(0.1,0.00188,0,0.05,1);
     private final PID xPID = new PID(0.75,0.001,0.5,0.5, 1);
     private final PID yPID = new PID(0.75,0.001,0.5,0.5, 1);
@@ -31,6 +34,7 @@ public class GVF {
         this.Kf = Kf;
         this.Ks = Ks;
         this.telemetry = telemetry;
+        time.reset();
         //calculateGVF(path.getPoint(0));
     }
 
@@ -40,6 +44,7 @@ public class GVF {
         this.Kf = Kf;
         this.Ks = Ks;
         calculateEverything(new Vector2d(robot.getX(), robot.getY()));
+        time.reset();
     }
 
     public CubicPath getPath() {
@@ -133,7 +138,10 @@ public class GVF {
         return headingPID.pidAngleOut(target, currentHeading);
     }
 
+
     public Vector2d output(Vector2d robot) {
+        Vector2d out;
+        double magnitude;
         calculateEverything(robot);
         temp3 = path.getTotalArcLength();
         temp2 = path.arcLength;
@@ -141,9 +149,11 @@ public class GVF {
         telemetry.addData("PATH ENDING?", isEnding());
         telemetry.addData("arc length remaining: ",arcLengthRemaining());
         telemetry.addData("tep",temp.toString());
-        if (isEnding()) return calculatePID(robot);
-        else if (path.guessT <= 0.0001) return calculatePID(path.getPoint(0).plus(normal.times(3)), robot);
-        else return calculateGVF(robot);
+        if (isEnding()) out = calculatePID(robot);
+        else if (Maths.epsilonEquals(path.guessT, 0)) out = calculatePID(path.getPoint(path.distanceToT(5)), robot);
+        else out = calculateGVF(robot);
+        magnitude = Range.clip(time.seconds() * 3, 0, 1);
+        return out.times(magnitude);
     }
 
 }

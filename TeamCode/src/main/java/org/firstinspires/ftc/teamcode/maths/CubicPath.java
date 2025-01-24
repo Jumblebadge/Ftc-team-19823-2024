@@ -3,6 +3,10 @@ package org.firstinspires.ftc.teamcode.maths;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.util.Range;
 
+import org.ejml.simple.UnsupportedOperation;
+
+import java.util.ArrayList;
+
 /**
  * Path comprised of 3 bezier curves. C1 continuous. Using 3 seperate curves allows for local control over the curve.
  * @see Bezier
@@ -13,7 +17,7 @@ public class CubicPath {
     public double guessT = 0, arcLength = 0;
     private double totalArcLength;
     private Vector2d[] controlPoints;
-    public Vector2d[] temp;
+    public double temp, temp2;
     double[] arcLengths = new double[3];
 
     /**
@@ -24,7 +28,6 @@ public class CubicPath {
      */
     public CubicPath(double[] rawControlPoints) {
         controlPoints = Maths.pointListToVectorList(rawControlPoints);
-        temp = controlPoints;
         beziers[0] = new Bezier(controlPoints[0], controlPoints[1], controlPoints[2], controlPoints[3]);
         beziers[1] = new Bezier(controlPoints[3], controlPoints[3].times(2).minus(controlPoints[2]), controlPoints[4], controlPoints[5]);
         beziers[2] = new Bezier(controlPoints[5], controlPoints[5].times(2).minus(controlPoints[4]), controlPoints[6], controlPoints[7]);
@@ -90,8 +93,8 @@ public class CubicPath {
      */
     public Vector2d getPoint(double T) {
         // bounds may be off? check
-        //if (T < 0) { T = 0; }
-        //if (T >= 3) { T = 2.9999; }
+        if (T < 0) { T = 0; }
+        if (T >= 3) { T = 2.9999; }
         return beziers[(int) T].getPoint(T - Math.floor(T));
     }
 
@@ -130,9 +133,8 @@ public class CubicPath {
         else if (/*arcLengths[0] + arcLengths[1] <= arcLength && */arcLength <= arcLengths[0] + arcLengths[1] + arcLengths[2]) {
             return 2;
         }
+        else throw new UnsupportedOperation("which bezier from distance not found");
         //throws error if the given arclength is not within any of the beziers
-        return -(int) arcLength;
-        //return 2;
     }
 
     /**
@@ -141,10 +143,15 @@ public class CubicPath {
      * @return T value along entire path at which the given arc length lies
      */
     public double distanceToT(double arcLength) {
+        if (arcLength > totalArcLength) {
+            throw new UnsupportedOperation("arc length greater than total");
+        }
         int bezier = whichBezierFromDistance(arcLength);
         double minus = 0;
         if (bezier == 1) { minus = arcLengths[0]; }
         if (bezier == 2) { minus = arcLengths[0] + arcLengths[1]; }
+        temp = bezier;
+        temp2 = arcLength - minus;
         return (beziers[bezier].distanceToT(arcLength - minus)) + bezier;
     }
 
@@ -165,8 +172,9 @@ public class CubicPath {
             //This only works with fast loop times, and this was an arbitrary number. Not the best solution
             dotProduct = Maths.tanhErrorMap(dotProduct);
             arcLength += dotProduct;
-            arcLength = Range.clip(arcLength, 0.0001, getTotalArcLength() - 0.0001);
+            arcLength = Range.clip(arcLength, 0, getTotalArcLength() - 0.0001);
             guessT = distanceToT(arcLength);
+            guessT = Range.clip(guessT, 0, 2.9999);
         }
         return getPoint(guessT);
     }

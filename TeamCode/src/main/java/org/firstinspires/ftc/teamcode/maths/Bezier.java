@@ -125,7 +125,7 @@ public class Bezier {
      */
     public double distanceToT(double distance) {
         if (distance <= 0) return 0;
-        if (distance >= totalArcLength) return totalArcLength;
+        if (distance >= totalArcLength) return 0.9999;
         int index = 0;
         for (int i = 0; i < accuracy; i++) {
             if (lookup[i].getY() <= distance && lookup[i + 1].getY() >= distance) {

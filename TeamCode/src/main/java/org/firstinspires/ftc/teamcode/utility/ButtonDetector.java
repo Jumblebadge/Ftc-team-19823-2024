@@ -5,6 +5,12 @@ public class ButtonDetector {
     private boolean current = false;
     private boolean last = false;
 
+    public ButtonDetector() {}
+
+    public ButtonDetector(boolean initial) {
+        current = initial;
+    }
+
     public boolean toggle(boolean currentState) {
         if (currentState && !last) {
             current = !current;

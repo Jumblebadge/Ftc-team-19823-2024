@@ -81,7 +81,12 @@ public class autotest extends LinearOpMode {
 
 
             gvf.tuneValues(Kn, Kf, Ks);
-            Vector2d out = gvf.output(new Vector2d(pose.getX(), pose.getY()));
+            Vector2d out = null;
+            try {
+                out = gvf.output(new Vector2d(pose.getX(), pose.getY()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
 
             double rotation = gvf.headingOut(heading,swerve.getHeadingInDegrees());
@@ -102,10 +107,9 @@ public class autotest extends LinearOpMode {
             telemetry.addData("pose",pose.toString());
             telemetry.addData("poseError",gvf.poseError);
             telemetry.addData("headingError", gvf.headingError);
-            telemetry.addData("path", Arrays.toString(PathList.LeftYellowToBlueBasket.getControlPointList()));
             telemetry.addData("path8", PathList.BlueSideToScore.getControlPoint(7));
             telemetry.addData("path0", PathList.BlueSideToScore.getControlPoint(0));
-            telemetry.addData("raw", Arrays.toString(PathList.BlueSideToScore.temp));
+            telemetry.addData("raw", PathList.BlueSideToScore.temp);
             telemetry.addData("outx",out.getX());
             telemetry.addData("outY", out.getY());
             telemetry.addData("gamex", gamepad1.left_stick_x);

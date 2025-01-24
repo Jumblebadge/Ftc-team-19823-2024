@@ -27,24 +27,21 @@ public class PathList {
 
 
     public static final CubicPath BlueSideToScore = new CubicPath(new double[] {
-            -55.4,40,-31,40,-31.3,40,-22.2,40,-8,40,11.3,40,38.6,33.7,60,60
+            -60,60,-27,60,-33,60,-18.8,60,2.8,60,17,60,38,57.5,53.5,57.5
     });
     public static final CubicPath RedSideToScore = toRed(BlueSideToScore);
 
 
 
     public static final CubicPath BlueBasketToLeftYellow = new CubicPath(new double[] {
-            60,60,61.5,56.7,64,53.3,67.5,48.3,68,43.6,69.7,38.8,69.5,35.6,70,30
+            53.5,57.5,53.7,45.4,58.4,42.6,58.7,39.2,58.5,35.2,58.5,32.3,58.5,29.2,58.5,27
     });
     public static final CubicPath RedBasketToLeftYellow = toRed(BlueBasketToLeftYellow);
-
-    public static final CubicPath LeftYellowToBlueBasket = reversePath(BlueBasketToLeftYellow);
-    public static final CubicPath LeftYellowToRedBasket = reversePath(LeftYellowToBlueBasket);
 
 
 
     public static final CubicPath BlueBasketToMidYellow = new CubicPath(new double[] {
-            60,60,60,56.4,60,52.7,60,48.3,60,44.5,60,39.4,60,35,60,30
+            53.5,57.5,53.4,55,53.2,52.7,53.2,49,59,39,59,35.4,59,33.5,59,33
     });
     public static final CubicPath RedBasketToMidYellow = toRed(BlueBasketToMidYellow);
 
@@ -54,7 +51,7 @@ public class PathList {
 
 
     public static final CubicPath BlueBasketToRightYellow = new CubicPath(new double[] {
-            60,60,58.8,56.7,57,54,55,50.8,52.7,46.3,51.5,42.2,49.5,37,49,30
+            53.5,57.5,52.7,56.5,52,55.5,51.3,51,50.5,46.6,49.7,42.2,49,38,49,33
     });
     public static final CubicPath RedBasketToRightYellow = toRed(BlueBasketToRightYellow);
 
