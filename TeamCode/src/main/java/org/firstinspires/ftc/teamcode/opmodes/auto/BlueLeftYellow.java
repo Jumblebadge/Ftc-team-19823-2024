@@ -185,12 +185,12 @@ public class BlueLeftYellow extends LinearOpMode {
                         }
                         else if (taskNumber == 5 && timer.seconds() > 0.3) {
                             slide.toMin();
-                            claw.setRotatorTo90();
                             pivotToggle.toFalse();
                             taskNumber++;
                         }
                         else if (taskNumber == 6 && slide.isTimeDone()) {
                             taskNumber = 0;
+                            claw.setRotatorTo90();
                             headingTarget = 0;
                             cycleCount = 2;
                             wristToggle.toTrue();
@@ -215,6 +215,7 @@ public class BlueLeftYellow extends LinearOpMode {
                         }
                         else if (taskNumber == 3 && slide.isTimeDone()) {
                             wristToggle.toFalse();
+                            claw.setWristUp();
                             taskNumber++;
                         }
                         else if (taskNumber == 4 && timer.seconds() > 0.3) {
