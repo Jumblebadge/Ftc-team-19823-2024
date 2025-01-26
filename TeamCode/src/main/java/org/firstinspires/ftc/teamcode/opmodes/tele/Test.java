@@ -35,7 +35,7 @@ public class Test extends LinearOpMode {
         LynxModule controlHub = hardwareMap.get(LynxModule.class, "Control Hub");
 
         //class to swerve the swerve
-        ServoImplExW servo = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "claw"));
+        ServoImplExW servo = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "rotator"));
         ElapsedTime hztimer = new ElapsedTime();
 
         //Bulk sensor reads

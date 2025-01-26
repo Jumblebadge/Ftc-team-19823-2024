@@ -9,7 +9,7 @@ public class ThreeAxisClaw {
 
     private final ServoImplExW claw, wrist, rotator;
 
-    public final double CLAW_OPEN = 0.45, CLAW_CLOSE = 0.935;
+    public final double CLAW_OPEN = 0.125, CLAW_CLOSE = 0.625;
     public final double WRIST_UP = 0, WRIST_CLEAR = 0.8, WRIST_DOWN = 0.9;
     public final double ROTATOR_0 = 0.925, ROTATOR_45 = 0.65, ROTATOR_90 = 0.375;
 
