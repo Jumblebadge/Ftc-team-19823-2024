@@ -23,7 +23,7 @@ import java.util.List;
 public class GoodLuck extends LinearOpMode {
 
     private double headingTarget;
-    private double slideTarget;
+    private boolean startAction;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -37,8 +37,6 @@ public class GoodLuck extends LinearOpMode {
         SwerveDrive swerve = new SwerveDrive(telemetry, hardwareMap);
         PID headingPID = new PID(0.09,0.00188,0,0.025,1);
         ButtonDetector headingPIDtoggle  = new ButtonDetector();
-
-        ButtonDetector startToggle = new ButtonDetector();
 
         PivotingSlide slide = new PivotingSlide(hardwareMap, false);
         ButtonDetector pivotToggle = new ButtonDetector();
@@ -87,6 +85,7 @@ public class GoodLuck extends LinearOpMode {
 
             if (current1.left_bumper && !previous1.left_bumper) {
                 headingTarget = heading;
+                headingPIDtoggle.toTrue();
             }
 
             if (gamepad1.options) {
@@ -113,20 +112,24 @@ public class GoodLuck extends LinearOpMode {
                 headingTarget = Math.toDegrees(Maths.peicewiseAtan2(-gamepad1.right_stick_y, gamepad1.right_stick_x)) - 90;
             }
 
-            /**
-            if (startToggle.toggle(gamepad2.start)) {
-                if (slide.getSlidePosition() < 50 && slide.getPivotAngle() < 20) ;
-            }
-            if (slide.getSlidePosition() < 50 && slide.getPivotAngle() < 20 && startToggle.toggle(gamepad2.start)) {
-                if (slide.getPivotAngle() > 75) {
-                    slide.toMax();
-                }
-                wristToggle.toFalse();
-                pivotToggle.toTrue();
-            }
-             */
-
             swerve.drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, rotation);
+
+            if (gamepad2.start) {
+                wristToggle.toFalse();
+                slide.toMin();
+            }
+
+            if (gamepad2.back && slide.getPivotAngle() < 50 && slide.getSlidePosition() < 50) {
+                pivotToggle.toTrue();
+                startAction = true;
+            }
+            else if (startAction && slide.getPivotAngle() > 72.5) {
+                slide.toMax();
+            }
+            if (startAction && slide.getSlidePosition() > 750) {
+                wristToggle.toFalse();
+                startAction = false;
+            }
 
             if (clawToggle.toggle(gamepad2.left_bumper)) {
                 claw.setClawClose();
@@ -134,23 +137,22 @@ public class GoodLuck extends LinearOpMode {
             else claw.setClawOpen();
 
             if (wristToggle.toggle(gamepad2.left_trigger > 0.2)) {
+                if (rotatorTimer.seconds() < 0.2) {
+                    claw.setWristClear();
+                }
+                else claw.setWristDown();
+            }
+            else {
+                claw.setWristUp();
+            }
+
+            if (slide.getPivotAngle() < 50) {
                 if (rotatorToggle.toggle(gamepad2.right_trigger > 0.2)) {
                     claw.setRotatorTo90();
                 }
                 else {
                     claw.setRotatorTo0();
                 }
-                if (rotatorTimer.seconds() < 0.2 && slide.getSlidePosition() < 50) {
-                    claw.setWristClear();
-                }
-                else {
-                    claw.setWristDown();
-                }
-            }
-            else {
-                claw.setWristUp();
-                claw.setRotatorTo0();
-                rotatorToggle.toFalse();
             }
 
             if (rotatorToggle.isTrue() != lastRotatorToggle) {
@@ -161,6 +163,8 @@ public class GoodLuck extends LinearOpMode {
             if (slide.getSlidePosition() < 50) {
                 if (pivotToggle.toggle(gamepad2.right_bumper)) {
                     slide.movePivotTo(85);
+                    rotatorToggle.toFalse();
+                    claw.setRotatorTo0();
                 }
                 else  {
                     slide.movePivotTo(0);
@@ -168,26 +172,29 @@ public class GoodLuck extends LinearOpMode {
             }
 
             if (gamepad2.triangle && slide.getPivotAngle() > 20) {
-                slideTarget = 830;
+                slide.toMax();
             }
             if (gamepad2.circle) {
-                slideTarget = 550;
+                slide.toSetPoint2();
             }
             if (gamepad2.square) {
-                slideTarget = 300;
+                slide.toSetPoint1();
             }
             if (gamepad2.cross) {
-                slideTarget = 0;
+                slide.toMin();
                 pivotToggle.toFalse();
             }
 
-            slide.moveSlideTo(slideTarget);
             slide.update();
 
             telemetry.addData("hz", hzTimer.milliseconds());
             telemetry.addData("peice",Math.toDegrees(Maths.peicewiseAtan2(-gamepad1.right_stick_y, gamepad1.right_stick_x)) - 90);
-            telemetry.addData("slidetarget",slideTarget);
+            telemetry.addData("wrist", wristToggle.isTrue());
+            telemetry.addData("rotator",rotatorToggle.isTrue());
+            telemetry.addData("rotator time",rotatorTimer.seconds());
             telemetry.addData("slied",slide.getSlidePosition());
+            telemetry.addData("pivot",slide.getPivotAngle());
+            telemetry.addData("start action",startAction);
 
             hzTimer.reset();
             telemetry.update();

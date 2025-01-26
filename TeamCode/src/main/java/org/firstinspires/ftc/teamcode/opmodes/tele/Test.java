@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.utility.ServoImplExW;
 @TeleOp(name="test", group="Linear Opmode")
 public class Test extends LinearOpMode {
 
-    public static double wrist = 0.7;
+    public static double wrist = 0.5;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -35,7 +35,7 @@ public class Test extends LinearOpMode {
         LynxModule controlHub = hardwareMap.get(LynxModule.class, "Control Hub");
 
         //class to swerve the swerve
-        ServoImplExW servo = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "rotator"));
+        ServoImplExW servo = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "claw"));
         ElapsedTime hztimer = new ElapsedTime();
 
         //Bulk sensor reads

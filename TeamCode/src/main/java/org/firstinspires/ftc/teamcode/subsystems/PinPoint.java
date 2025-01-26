@@ -33,7 +33,7 @@ public class PinPoint {
 
     public double getJustHeadingInRadians() {
         pinpoint.update(GoBildaPinpointDriver.readData.ONLY_UPDATE_HEADING);
-        return pinpoint.getHeading();
+        return pinpoint.getHeading() - offset;
     }
 
     public GoBildaPinpointDriver.DeviceStatus getStatus() {
@@ -49,6 +49,6 @@ public class PinPoint {
     }
 
     public void resetHeading() {
-        offset += pinpoint.getHeading();
+        offset = pinpoint.getHeading();
     }
 }

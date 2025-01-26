@@ -29,7 +29,6 @@ import java.util.List;
 @Autonomous(name="Blue Left Yellow", group="Linear Opmode")
 public class BlueLeftYellow extends LinearOpMode {
 
-    public static double slew = 0;
     private double headingTarget = 0;
     private int cycleCount = 0;
     private int taskNumber = 0, lastTaskNumber = 0;
@@ -125,7 +124,7 @@ public class BlueLeftYellow extends LinearOpMode {
                     break;
                 case CYCLE:
                     if (cycleCount == 0) {
-                        if (taskNumber == 0 && gvf.isDone(4, 7)) {
+                        if (taskNumber == 0 && gvf.isDone(3.75, 7)) {
                             clawToggle.toTrue();
                             taskNumber++;
                         }
@@ -161,7 +160,7 @@ public class BlueLeftYellow extends LinearOpMode {
                         }
                     }
                     else if (cycleCount == 1) {
-                        if (taskNumber == 0 && gvf.isDone(4, 7)) {
+                        if (taskNumber == 0 && gvf.isDone(3.75, 7)) {
                             clawToggle.toTrue();
                             taskNumber++;
                         }
@@ -190,7 +189,6 @@ public class BlueLeftYellow extends LinearOpMode {
                         }
                         else if (taskNumber == 6 && slide.isTimeDone()) {
                             taskNumber = 0;
-                            claw.setRotatorTo90();
                             headingTarget = 0;
                             cycleCount = 2;
                             wristToggle.toTrue();
@@ -198,36 +196,40 @@ public class BlueLeftYellow extends LinearOpMode {
                         }
                     }
                     else if (cycleCount == 2) {
-                        if (taskNumber == 0 && gvf.isDone(4, 7)) {
+                        if (taskNumber == 0 && timer.seconds() < 0.5) {
+                            claw.setRotatorTo90();
+                            taskNumber++;
+                        }
+                        else if (taskNumber == 1 && gvf.isDone(3.75, 7)) {
                             clawToggle.toTrue();
                             taskNumber++;
                         }
-                        else if (taskNumber == 1 && timer.seconds() > 0.3) {
+                        else if (taskNumber == 2 && timer.seconds() > 0.3) {
                             claw.setRotatorTo0();
                             pivotToggle.toTrue();
                             gvf.setPath(PathList.MidYellowToBlueBasket, 0.7, 15, 0.7, pose);
                             headingTarget = -135;
                             taskNumber++;
                         }
-                        else if (taskNumber == 2 && gvf.isDone(4, 7) && timer.seconds() > 1) {
+                        else if (taskNumber == 3 && gvf.isDone(4, 7) && timer.seconds() > 1) {
                             slide.toMax();
                             taskNumber++;
                         }
-                        else if (taskNumber == 3 && slide.isTimeDone()) {
+                        else if (taskNumber == 4 && slide.isTimeDone()) {
                             wristToggle.toFalse();
                             claw.setWristUp();
                             taskNumber++;
                         }
-                        else if (taskNumber == 4 && timer.seconds() > 0.3) {
+                        else if (taskNumber == 5 && timer.seconds() > 0.3) {
                             clawToggle.toFalse();
                             taskNumber++;
                         }
-                        else if (taskNumber == 5 && timer.seconds() > 0.3) {
+                        else if (taskNumber == 6 && timer.seconds() > 0.3) {
                             slide.toMin();
                             pivotToggle.toFalse();
                             taskNumber++;
                         }
-                        else if (taskNumber == 6 && slide.isTimeDone()) {
+                        else if (taskNumber == 7 && slide.isTimeDone()) {
                             taskNumber = 0;
                             headingTarget = -90;
                             cycleCount = 3;

@@ -21,7 +21,7 @@ public class PivotingSlide {
     private RunMotionProfile pivotProfile = new RunMotionProfile(30000,30000,30000,new ConstantsForPID(0.5,0,0.2,0,3,0));
     private final RunMotionProfile slideProfile = new RunMotionProfile(70000,70000,70000,new ConstantsForPID(0.2,0,0.2,0.2,2,0));
 
-    public final double MIN = -15, SET_POINT_1 = 300, SET_POINT_2 = 550, SET_POINT_3 = 700, MAX = 830;
+    public final double MIN = -15, SET_POINT_1 = 300, SET_POINT_2 = 550, SET_POINT_3 = 700, MAX = 820;
     public enum States {
         MIN,
         SETPOINT_1,
@@ -52,7 +52,7 @@ public class PivotingSlide {
 
         pivotEncoder = hardwareMap.get(AnalogInput.class, "pivotEncoder");
         if (slowPivot) {
-            pivotProfile = new RunMotionProfile(3000, 3000, 3000, new ConstantsForPID(0.5, 0, 0.2, 0, 3, 0));;
+            pivotProfile = new RunMotionProfile(3000, 3000, 3000, new ConstantsForPID(0.5, 0, 0.2, 0, 3, 0));
         }
     }
 

@@ -149,10 +149,10 @@ public class GVF {
         telemetry.addData("PATH ENDING?", isEnding());
         telemetry.addData("arc length remaining: ",arcLengthRemaining());
         telemetry.addData("tep",temp.toString());
-        if (isEnding()) out = calculatePID(robot);
-        else if (Maths.epsilonEquals(path.guessT, 0)) out = calculatePID(path.getPoint(path.distanceToT(5)), robot);
-        else out = calculateGVF(robot);
         magnitude = Range.clip(time.seconds() * 3, 0, 1);
+        if (isEnding()) out = calculatePID(robot);
+        else if (Maths.epsilonEquals(path.guessT, 0)) out = calculatePID(path.getPoint(path.distanceToT(7.5)), robot);
+        else out = calculateGVF(robot);
         return out.times(magnitude);
     }
 
