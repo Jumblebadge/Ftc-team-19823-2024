@@ -121,7 +121,7 @@ public class Maths {
     public static Vector2d interpolateBetweenVectors(Vector2d start, Vector2d end, double interpolator){
         double m = (start.getY() - end.getY()) / (start.getX() - end.getX());
         double b = -(m * start.getX()) + start.getY();
-
+        if (Double.isNaN(m)) m = 0.0000001;
         return new Vector2d((interpolator - b) / m, interpolator);
     }
     

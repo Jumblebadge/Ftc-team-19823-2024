@@ -19,9 +19,9 @@ public class PivotingSlide {
     private final TouchSensor slideLimitSwitch;
     private final AnalogInput pivotEncoder;
     private RunMotionProfile pivotProfile = new RunMotionProfile(30000,30000,30000,new ConstantsForPID(0.5,0,0.2,0,3,0));
-    private final RunMotionProfile slideProfile = new RunMotionProfile(70000,70000,70000,new ConstantsForPID(0.2,0,0.2,0.2,2,0));
+    private final RunMotionProfile slideProfile = new RunMotionProfile(70000,70000,70000,new ConstantsForPID(0.3,0,0.2,0.3,2,0));
 
-    public final double MIN = -15, SET_POINT_1 = 300, SET_POINT_2 = 550, SET_POINT_3 = 700, MAX = 820;
+    public final double MIN = -15, SET_POINT_1 = 100, SET_POINT_2 = 200, SET_POINT_3 = 300, MAX = 350;
     public enum States {
         MIN,
         SETPOINT_1,

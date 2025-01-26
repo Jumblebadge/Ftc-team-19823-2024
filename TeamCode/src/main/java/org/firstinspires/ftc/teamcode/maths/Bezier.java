@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.maths;
 
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.qualcomm.robotcore.util.Range;
+
+import org.ejml.simple.UnsupportedOperation;
 
 /**
  * Bezier curve defined by 4 discrete control points. The curve is parameterized by a T value [0, 1].
@@ -106,6 +109,9 @@ public class Bezier {
      */
     public Vector2d getNormalizedTangent(double T) {
         Vector2d firstDerivative = firstDerivative(T);
+        if (Double.isNaN(Maths.magnitudeOf(firstDerivative))) {
+            return new Vector2d(Math.cos(firstDerivative.angle()), Math.sin(firstDerivative.angle()));
+        }
         return firstDerivative.div(Maths.magnitudeOf(firstDerivative));
     }
 

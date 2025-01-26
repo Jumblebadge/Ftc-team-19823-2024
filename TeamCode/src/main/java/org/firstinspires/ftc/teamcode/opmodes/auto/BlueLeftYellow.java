@@ -32,6 +32,7 @@ public class BlueLeftYellow extends LinearOpMode {
     private double headingTarget = 0;
     private int cycleCount = 0;
     private int taskNumber = 0, lastTaskNumber = 0;
+    boolean pivotClear = false;
     ElapsedTimeW timer = new ElapsedTimeW();
 
     private enum ApexStates {
@@ -109,12 +110,16 @@ public class BlueLeftYellow extends LinearOpMode {
                         clawToggle.toFalse();
                         taskNumber++;
                     }
-                    else if (taskNumber == 4 && timer.seconds() > 0.3) {
+                    else if (taskNumber == 4 && timer.seconds() > 0.2) {
+                        pivotClear = true;
+                        taskNumber++;
+                    }
+                    else if (taskNumber == 5 && timer.seconds() > 0.3) {
                         slide.toMin();
                         pivotToggle.toFalse();
                         taskNumber++;
                     }
-                    else if (taskNumber == 5 && slide.isTimeDone()) {
+                    else if (taskNumber == 6 && slide.isTimeDone()) {
                         taskNumber = 0;
                         headingTarget = -90;
                         state = ApexStates.CYCLE;
@@ -146,12 +151,16 @@ public class BlueLeftYellow extends LinearOpMode {
                             clawToggle.toFalse();
                             taskNumber++;
                         }
-                        else if (taskNumber == 5 && timer.seconds() > 0.3) {
+                        else if (taskNumber == 5 && timer.seconds() > 0.2) {
+                            pivotClear = true;
+                            taskNumber++;
+                        }
+                        else if (taskNumber == 6 && timer.seconds() > 0.3) {
                             slide.toMin();
                             pivotToggle.toFalse();
                             taskNumber++;
                         }
-                        else if (taskNumber == 6 && slide.isTimeDone()) {
+                        else if (taskNumber == 7 && slide.isTimeDone()) {
                             taskNumber = 0;
                             headingTarget = -90;
                             cycleCount = 1;
@@ -182,12 +191,16 @@ public class BlueLeftYellow extends LinearOpMode {
                             clawToggle.toFalse();
                             taskNumber++;
                         }
-                        else if (taskNumber == 5 && timer.seconds() > 0.3) {
+                        else if (taskNumber == 5 && timer.seconds() > 0.2) {
+                            pivotClear = true;
+                            taskNumber++;
+                        }
+                        else if (taskNumber == 6 && timer.seconds() > 0.3) {
                             slide.toMin();
                             pivotToggle.toFalse();
                             taskNumber++;
                         }
-                        else if (taskNumber == 6 && slide.isTimeDone()) {
+                        else if (taskNumber == 7 && slide.isTimeDone()) {
                             taskNumber = 0;
                             headingTarget = 0;
                             cycleCount = 2;
@@ -224,12 +237,16 @@ public class BlueLeftYellow extends LinearOpMode {
                             clawToggle.toFalse();
                             taskNumber++;
                         }
-                        else if (taskNumber == 6 && timer.seconds() > 0.3) {
+                        else if (taskNumber == 6 && timer.seconds() > 0.2) {
+                            pivotClear = true;
+                            taskNumber++;
+                        }
+                        else if (taskNumber == 7 && timer.seconds() > 0.3) {
                             slide.toMin();
                             pivotToggle.toFalse();
                             taskNumber++;
                         }
-                        else if (taskNumber == 7 && slide.isTimeDone()) {
+                        else if (taskNumber == 8 && slide.isTimeDone()) {
                             taskNumber = 0;
                             headingTarget = -90;
                             cycleCount = 3;
@@ -258,11 +275,16 @@ public class BlueLeftYellow extends LinearOpMode {
             else claw.setWristUp();
 
             if (pivotToggle.isTrue()) {
-                slide.movePivotTo(85);
+                if (pivotClear) {
+                    slide.movePivotTo(80);
+                }
+                else slide.movePivotTo(85);
             }
             else if (slide.getSlidePosition() < 50) {
                 slide.movePivotTo(0);
+                pivotClear = false;
             }
+
 
             //executes at end of every task
             if (lastTaskNumber != taskNumber) {

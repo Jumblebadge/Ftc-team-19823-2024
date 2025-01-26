@@ -171,7 +171,7 @@ public class GoodLuck extends LinearOpMode {
                 }
             }
 
-            if (gamepad2.triangle && slide.getPivotAngle() > 20) {
+            if (gamepad2.triangle) {// && slide.getPivotAngle() > 20) {
                 slide.toMax();
             }
             if (gamepad2.circle) {

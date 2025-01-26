@@ -27,7 +27,7 @@ public class PathList {
 
 
     public static final CubicPath BlueSideToScore = new CubicPath(new double[] {
-            -60,60,-27,60,-33,60,-18.8,60,2.8,60,17,60,38,59.7,55.5,59.5
+            -60,60,-27,60,-33,60,-18.8,60,2.8,60,17,60,38,59.7,55,59
     });
     public static final CubicPath BluePark = reversePath(BlueSideToScore);
 
@@ -37,7 +37,7 @@ public class PathList {
 
 
     public static final CubicPath BlueBasketToLeftYellow = new CubicPath(new double[] {
-            57,60.5,53.7,45.4,58.4,42.6,58.7,39.2,58.5,35.2,58.5,32.3,58.5,29.2,58.5,26
+            56.5,60,56.5,46.6,57,42.6,57,39.2,57,35.2,57,32.3,57,29.2,57,25
     });
     public static final CubicPath RedBasketToLeftYellow = toRed(BlueBasketToLeftYellow);
 

@@ -130,10 +130,11 @@ public class CubicPath {
         else if (arcLength <= arcLengths[0] + arcLengths[1]) {
             return 1;
         }
-        else if (/*arcLengths[0] + arcLengths[1] <= arcLength && */arcLength <= arcLengths[0] + arcLengths[1] + arcLengths[2]) {
+        else if (/*arcLengths[0] + arcLengths[1] <= arcLength && */arcLength <= totalArcLength) {
             return 2;
         }
-        else throw new UnsupportedOperation("which bezier from distance not found");
+        return 2;
+        //else throw new UnsupportedOperation("which bezier from distance not found");
         //throws error if the given arclength is not within any of the beziers
     }
 
@@ -143,9 +144,6 @@ public class CubicPath {
      * @return T value along entire path at which the given arc length lies
      */
     public double distanceToT(double arcLength) {
-        if (arcLength > totalArcLength) {
-            throw new UnsupportedOperation("arc length greater than total");
-        }
         int bezier = whichBezierFromDistance(arcLength);
         double minus = 0;
         if (bezier == 1) { minus = arcLengths[0]; }
