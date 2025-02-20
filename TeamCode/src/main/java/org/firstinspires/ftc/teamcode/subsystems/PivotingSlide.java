@@ -14,12 +14,13 @@ import org.firstinspires.ftc.teamcode.utility.RunMotionProfile;
 //TODO fix slides
 public class PivotingSlide {
 
-    private final MotorGroup slideMotors, pivotMotors;
+    private final MotorGroup slideMotors;
+    private final DcMotorExW pivot;
     private double slideTarget = 0, pivotTarget = 0, slideOffset = 0;
     private final TouchSensor slideLimitSwitch;
     private final AnalogInput pivotEncoder;
     private RunMotionProfile pivotProfile = new RunMotionProfile(30000,30000,30000,new ConstantsForPID(0.5,0,0.2,0,3,0));
-    private final RunMotionProfile slideProfile = new RunMotionProfile(70000,70000,70000,new ConstantsForPID(0.3,0,0.2,0.3,2,0));
+    private final RunMotionProfile slideProfile = new RunMotionProfile(125000,100000,100000,new ConstantsForPID(0.3,0,0.2,0.3,2,0));
 
     public final double MIN = -15, SET_POINT_1 = 100, SET_POINT_2 = 200, SET_POINT_3 = 300, MAX = 350;
     public enum States {
@@ -32,21 +33,18 @@ public class PivotingSlide {
     private States state = States.MIN;
 
     public PivotingSlide(HardwareMap hardwareMap, boolean slowPivot) {
-        DcMotorExW liftLeft = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "Llift"));
-        DcMotorExW liftRight = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "Rlift"));
-        DcMotorExW pivotLeft = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "Lpivot"));
-        DcMotorExW pivotRight = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "Rpivot"));
-        liftRight.setPowerThresholds(0.05,0.05);
-        liftLeft.setPowerThresholds(0.05,0.05);
-        pivotRight.setPowerThresholds(0.05,0.05);
-        pivotLeft.setPowerThresholds(0.05,0.05);
-
-        pivotRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        DcMotorExW lift1 = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "lift1"));
+        DcMotorExW lift2 = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "lift2"));
+        DcMotorExW lift3 = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "lift3"));
+        pivot = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "pivot"));
+        lift1.setPowerThresholds(0.05,0.05);
+        lift2.setPowerThresholds(0.05,0.05);
+        lift3.setPowerThresholds(0.05,0.05);
+        pivot.setPowerThresholds(0.05,0.05);
 
         slideLimitSwitch = hardwareMap.get(TouchSensor.class, "slideLimit");
 
-        slideMotors = new MotorGroup(liftLeft, liftRight);
-        pivotMotors = new MotorGroup(pivotLeft, pivotRight);
+        slideMotors = new MotorGroup(lift1, lift2, lift3);
 
         resetEncoders();
 
@@ -57,14 +55,10 @@ public class PivotingSlide {
     }
 
     public void moveSlideTo(double target) {
-        slideTarget = target;// - getCableDifference();
+        slideTarget = target;
     }
 
     public void movePivotTo(double target) { pivotTarget = target; }
-
-    public double getCableDifference() {
-        return getPivotAngle() > 45 ? 30 : 0;
-    }
 
     public void update() {
         if (slideLimitSwitch.isPressed()) {
@@ -74,7 +68,7 @@ public class PivotingSlide {
             resetEncoders();
         }
         slideMotors.setPowers(slideProfile.profiledMovement(slideTarget, getSlidePosition()));
-        pivotMotors.setPowers(pivotProfile.profiledPivotMovement(pivotTarget, getPivotAngle()));
+        pivot.setPower(pivotProfile.profiledPivotMovement(pivotTarget, getPivotAngle()));
     }
 
     public void resetEncoders() {
@@ -101,6 +95,10 @@ public class PivotingSlide {
 
     public void setMotionConstraints(double maxVel, double maxAccel, double maxJerk){
         slideProfile.setMotionConstraints(maxVel, maxAccel, maxJerk);
+    }
+
+    public void setPidConstants(ConstantsForPID constants) {
+        slideProfile.setPidConstants(constants);
     }
 
     public double getMotionTarget(){

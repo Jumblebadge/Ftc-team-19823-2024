@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.maths.Maths;
 import org.firstinspires.ftc.teamcode.utility.GoBildaPinpointDriver;
 
 public class PinPoint {
@@ -26,9 +27,9 @@ public class PinPoint {
         pinpoint.update();
         Pose2D pose = pinpoint.getPosition();
         if (angleUnit == AngleUnit.RADIANS) {
-            return new Pose2d(pose.getX(distanceUnit), pose.getY(distanceUnit), AngleUnit.normalizeRadians(pose.getHeading(angleUnit) - offset));
+            return new Pose2d(pose.getX(distanceUnit), pose.getY(distanceUnit), Maths.angleWrapRadians(pose.getHeading(angleUnit) - offset));
         }
-        return new Pose2d(pose.getX(distanceUnit), pose.getY(distanceUnit), AngleUnit.normalizeDegrees(pose.getHeading(angleUnit) - Math.toDegrees(offset)));
+        return new Pose2d(pose.getX(distanceUnit), pose.getY(distanceUnit), Maths.angleWrapDegrees(pose.getHeading(angleUnit) - Math.toDegrees(offset)));
     }
 
     public double getJustHeadingInRadians() {

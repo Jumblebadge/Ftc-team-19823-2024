@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.maths.Maths;
 import org.firstinspires.ftc.teamcode.maths.PID;
 import org.firstinspires.ftc.teamcode.maths.SlewRateLimiter;
 
@@ -25,11 +26,11 @@ public class EncoderServo {
     }
 
     public double getPosition() {
-        return -AngleUnit.normalizeDegrees(encoder.getVoltage() / 3.3 * 360);
+        return -Maths.angleWrapDegrees(encoder.getVoltage() / 3.3 * 360);
     }
 
     public double getError(){
-        return AngleUnit.normalizeDegrees(target - getPosition());
+        return Maths.angleWrapDegrees(target - getPosition());
     }
 
     public void PWMrelease() {

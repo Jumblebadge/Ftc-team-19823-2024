@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class GVF {
 
@@ -88,7 +87,7 @@ public class GVF {
         telemetry.addData("closestPoint",closestPoint);
     }
 
-    public double tangentHeading() { return AngleUnit.normalizeDegrees(90 + (360 - (Maths.angleOf(tangent) * (180 / Math.PI)))); }
+    public double tangentHeading() { return Maths.angleWrapDegrees(90 + (360 - (Maths.angleOf(tangent) * (180 / Math.PI)))); }
 
     public double arcLengthRemaining() { return path.getTotalArcLength() - path.arcLength; }
 
@@ -128,17 +127,17 @@ public class GVF {
     }
 
     public double headingOut(double targetHeading, double currentHeading) {
-        headingError = Math.abs(AngleUnit.normalizeDegrees(targetHeading - currentHeading));
+        headingError = Math.abs(Maths.angleWrapDegrees(targetHeading - currentHeading));
         return headingPID.pidAngleOut(targetHeading, currentHeading);
     }
 
     public double headingOut(double currentHeading, double endTangent, boolean reversed) {
         double target = endTangent;
         if (!isEnding()) {
-            if (reversed) target = AngleUnit.normalizeDegrees(180 + tangentHeading());
+            if (reversed) target = Maths.angleWrapDegrees(180 + tangentHeading());
             else target = tangentHeading();
         }
-        headingError = Math.abs(AngleUnit.normalizeDegrees(target - currentHeading));
+        headingError = Math.abs(Maths.angleWrapDegrees(target - currentHeading));
         return headingPID.pidAngleOut(target, currentHeading);
     }
 

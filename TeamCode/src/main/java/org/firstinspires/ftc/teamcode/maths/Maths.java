@@ -10,15 +10,18 @@ import java.util.List;
 public class Maths {
 
     //normalizes the angle given
-    public static double angleWrap(double wrap) {
-        double output = wrap;
-        if(wrap <= -180) {
-            output = wrap + 360;
-        }
-        if(wrap > 180) {
-            output = wrap - 360;
-        }
-        return output;
+    public static double angleWrapDegrees(double deg) {
+        double degrees = deg % 360;
+        if (degrees >= 180.0) degrees -= 360.0;
+        if (degrees < -180.0) degrees += 360.0;
+        return degrees;
+    }
+
+    public static double angleWrapRadians(double rad) {
+        double radians = rad % 2 * Math.PI;
+        while (radians >= Math.PI) radians -= 2 * Math.PI;
+        while (radians < -Math.PI) radians += 2 * Math.PI;
+        return radians;
     }
 
     //replaces turning a module by 180 degrees with reversing motor power.
@@ -119,7 +122,7 @@ public class Maths {
         return new Vector2d(vec.getX(), vec.getY() + radians);
     }
 
-    public static double angleOf(Vector2d vec) { return AngleUnit.normalizeRadians(Math.atan2(vec.getY(),vec.getX())); }
+    public static double angleOf(Vector2d vec) { return Maths.angleWrapRadians(Math.atan2(vec.getY(),vec.getX())); }
 
     public static Vector2d interpolateBetweenVectors(Vector2d start, Vector2d end, double interpolator){
         double m = (start.getY() - end.getY()) / (start.getX() - end.getX());

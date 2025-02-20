@@ -49,7 +49,7 @@ public class PID {
 
         if (!Maths.epsilonEquals(lastReference, reference, 0.01)) integralSum = 0;
 
-        double error = AngleUnit.normalizeDegrees(reference - state);
+        double error = Maths.angleWrapDegrees(reference - state);
         //integral and derivative values
         double derivative = (error - lastError) / timer.seconds();
         integralSum += (error * timer.seconds());
@@ -70,7 +70,7 @@ public class PID {
 
         if (!Maths.epsilonEquals(lastReference, reference, 0.01)) integralSum = 0;
 
-        double error = AngleUnit.normalizeDegrees(reference - state);
+        double error = Maths.angleWrapDegrees(reference - state);
         //integral and derivative values
         double derivative = (error - lastError) / timer.seconds();
         integralSum += (error * timer.seconds());
@@ -89,7 +89,7 @@ public class PID {
 
     public double[] inDepthOutput(double reference, double state) {
 
-        double error = AngleUnit.normalizeDegrees(reference - state);
+        double error = Maths.angleWrapDegrees(reference - state);
         //integral and derivative values
         double derivative = (error - lastError) / timer.seconds();
 

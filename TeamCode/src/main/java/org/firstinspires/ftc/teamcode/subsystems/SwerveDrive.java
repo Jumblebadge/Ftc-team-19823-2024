@@ -1,24 +1,19 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import android.provider.MediaStore;
-
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.maths.MedianFilter;
 import org.firstinspires.ftc.teamcode.maths.PID;
 import org.firstinspires.ftc.teamcode.maths.Maths;
 import org.firstinspires.ftc.teamcode.maths.swerveKinematics;
 import org.firstinspires.ftc.teamcode.utility.DcMotorExW;
-import org.firstinspires.ftc.teamcode.utility.GoBildaPinpointDriver;
 
 public class SwerveDrive {
 
@@ -65,8 +60,8 @@ public class SwerveDrive {
         mod2P -= module2Offset;
         mod1P -= module1Offset;
 
-        mod1P = AngleUnit.normalizeDegrees(mod1P);
-        mod2P = AngleUnit.normalizeDegrees(mod2P);
+        mod1P = Maths.angleWrapDegrees(mod1P);
+        mod2P = Maths.angleWrapDegrees(mod2P);
 
         //TODO fix the filter
         //mod1P = module1Filter.getFilteredValue(mod1P);
@@ -83,8 +78,8 @@ public class SwerveDrive {
             mod2reference = -output[3];
         }
 
-        mod1reference = Maths.angleWrap(mod1reference);
-        mod2reference = Maths.angleWrap(mod2reference);
+        mod1reference = Maths.angleWrapDegrees(mod1reference);
+        mod2reference = Maths.angleWrapDegrees(mod2reference);
 
         //Make sure that a module never turns more than 90 degrees
         double[] mod1efvalues = Maths.efficientTurn(mod1reference,mod1P,mod1power);
@@ -125,7 +120,7 @@ public class SwerveDrive {
     }
 
     public double getHeadingInRadians() {
-        return AngleUnit.normalizeRadians(pose.getHeading());
+        return Maths.angleWrapRadians(pose.getHeading());
     }
 
     public void setPosition(Pose2d pose) {

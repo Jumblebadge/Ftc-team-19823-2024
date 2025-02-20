@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+import org.firstinspires.ftc.teamcode.maths.Maths;
 
 public class IMU {
 
@@ -32,11 +33,11 @@ public class IMU {
     }
 
     public double getHeadingInDegrees() {
-        return AngleUnit.normalizeDegrees(angle.firstAngle * -1 - imuOffset);
+        return Maths.angleWrapDegrees(angle.firstAngle * -1 - imuOffset);
     }
 
     public double getHeadingInRadians() {
-        return AngleUnit.normalizeRadians(AngleUnit.DEGREES.toRadians(getHeadingInDegrees()));
+        return Maths.angleWrapRadians(AngleUnit.DEGREES.toRadians(getHeadingInDegrees()));
     }
 
     public void updateHeading(int interval) {

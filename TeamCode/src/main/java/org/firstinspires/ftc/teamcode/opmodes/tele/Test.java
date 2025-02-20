@@ -13,8 +13,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.maths.ConstantsForPID;
 import org.firstinspires.ftc.teamcode.maths.PID;
 import org.firstinspires.ftc.teamcode.subsystems.PinPoint;
+import org.firstinspires.ftc.teamcode.subsystems.PivotingSlide;
 import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 import org.firstinspires.ftc.teamcode.utility.ServoImplExW;
@@ -23,7 +25,7 @@ import org.firstinspires.ftc.teamcode.utility.ServoImplExW;
 @TeleOp(name="test", group="Linear Opmode")
 public class Test extends LinearOpMode {
 
-    public static double wrist = 0.5;
+    public static double target = 0, Kp = 0, Kd = 0, Ki = 0, Kf = 0, Kl = 0, maxVel = 1, maxAccel = 1, maxJerk = 1;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -34,8 +36,8 @@ public class Test extends LinearOpMode {
         //Bulk sensor reads
         LynxModule controlHub = hardwareMap.get(LynxModule.class, "Control Hub");
 
-        //class to swerve the swerve
-        ServoImplExW servo = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "rotator"));
+        PivotingSlide slide = new PivotingSlide(hardwareMap, false);
+
         ElapsedTime hztimer = new ElapsedTime();
 
         //Bulk sensor reads
@@ -44,14 +46,17 @@ public class Test extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
 
-            servo.setPosition(wrist);
+            slide.setMotionConstraints(maxVel, maxAccel, maxJerk);
+            slide.setPidConstants(new ConstantsForPID(Kp, Kd, Ki, Kf, Kl, 0));
 
-            //swerve.setModuleAdjustments(module1Offset, module2Offset);
-
+            slide.moveSlideTo(target);
+            slide.update();
             //Clear the cache for better loop times (bulk sensor reads)
             controlHub.clearBulkCache();
 
             telemetry.addData("millis",hztimer.milliseconds());
+            telemetry.addData("slidepos", slide.getSlidePosition());
+            telemetry.addData("motiontarget", slide.getMotionTarget());
             hztimer.reset();
             telemetry.update();
         }
