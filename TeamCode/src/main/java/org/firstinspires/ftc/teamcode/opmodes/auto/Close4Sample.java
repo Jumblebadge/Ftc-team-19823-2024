@@ -26,8 +26,8 @@ import java.util.Arrays;
 import java.util.List;
 
 @Config
-@Autonomous(name="Blue Left Yellow", group="Linear Opmode")
-public class BlueLeftYellow extends LinearOpMode {
+@Autonomous(name="Close 4 Sample", group="Linear Opmode")
+public class Close4Sample extends LinearOpMode {
 
     private double headingTarget = 0;
     private int cycleCount = 0;

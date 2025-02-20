@@ -57,6 +57,10 @@ public class GVF {
         this.Ks = Ks;
     }
 
+    public void setKs(double Ks) {
+        this.Ks = Ks;
+    }
+
     public double calculateExponentialError() {
         double magnitudeOfR = Maths.magnitudeOf(R);
         magnitudeOfR = Math.pow(1.3, magnitudeOfR - 10) - 0.073;

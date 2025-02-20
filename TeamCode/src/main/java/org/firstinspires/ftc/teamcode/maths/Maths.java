@@ -23,20 +23,20 @@ public class Maths {
 
     //replaces turning a module by 180 degrees with reversing motor power.
     public static double[] efficientTurn(double reference,double state,double power) {
-        double error = reference-state;
+        double error = reference - state;
 
         while(error > 90) {
             power *= -1;
             reference -= 180;
             error = reference - state;
         }
-        while(error<-90) {
+        while(error < -90) {
             power *= -1;
             reference += 180;
             error = reference - state;
         }
 
-        return new double[] {reference,power};
+        return new double[] {reference, power};
     }
 
     //converts two degrees of freedom into a differential
@@ -112,6 +112,9 @@ public class Maths {
         return new Vector2d(x, y);
     }
 
+    /**
+     * Rotates a polar vector counterclockwise in radians
+     */
     public static Vector2d rotatePolarVectorBy(Vector2d vec, double radians) {
         return new Vector2d(vec.getX(), vec.getY() + radians);
     }

@@ -19,15 +19,14 @@ import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
 import org.firstinspires.ftc.teamcode.subsystems.ThreeAxisClaw;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 import org.firstinspires.ftc.teamcode.utility.DashOperations;
-import org.firstinspires.ftc.teamcode.utility.ElapsedTimeW;
 import org.firstinspires.ftc.teamcode.utility.PathList;
 
 import java.util.Arrays;
 import java.util.List;
 
 @Config
-@Autonomous(name="Blue Park", group="Linear Opmode")
-public class BluePark extends LinearOpMode {
+@Autonomous(name="Just Park", group="Linear Opmode")
+public class JustPark extends LinearOpMode {
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
