@@ -91,6 +91,11 @@ public class Maths {
         return realSolutions;
     }
 
+    public static double calculateQuadratic(double A, double B, double C, double x) {
+        return A * Math.pow(x, 2) + B * x + C;
+    }
+
+
 
     public static Vector2d[] pointListToVectorList(double[] coordinateList) {
         return new Vector2d[]{
@@ -205,4 +210,22 @@ public class Maths {
         }
         return Math.PI;
     }
+
+    /**
+     * Although simple, this is the crown jewel of our vision code. Uses law of cosines to change distance between camera and sample to
+     * distance between center of bot to sample, and angle difference from that of pointing straight forward.
+     * @param distance Y distance to sample in inches
+     * @return [angle from 0 to sample, distance from center to sample]
+     */
+    public static double[] crownJewel(double distance) {
+        double xOffset = 4.5;
+        double hypot = Math.hypot(distance, xOffset);
+
+        //literally just law of cosines
+        double theta = Math.acos((Math.pow(distance, 2) + Math.pow(hypot, 2) - Math.pow(xOffset, 2)) / (2 * distance * hypot));
+
+        return new double[] {theta, hypot};
+    }
+
+
 }

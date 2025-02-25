@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.teamcode.maths;
 
 import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.qualcomm.robotcore.util.Range;
-
-import org.ejml.simple.UnsupportedOperation;
 
 /**
  * Bezier curve defined by 4 discrete control points. The curve is parameterized by a T value [0, 1].
@@ -101,6 +98,37 @@ public class Bezier {
 
         return A.times(weightA).plus(B.times(weightB)).plus(C.times(weightC)).plus(D.times(weightD));
     }
+
+    /**
+     * Returns a point in cartesian coordinates along this bezier curve's 2st derivative, which is a bezier curve with 2 control points (line)
+     * @param T value which desired point is at
+     * @return (x,y) point on the curve's second derivative at specified T value
+     */
+    public Vector2d secondDerivative(double T) {
+        double weightA = -6 * T + 6;
+        double weightB = 18 * T - 12;
+        double weightC = -18 * T + 6;
+        double weightD = 6 * T;
+
+        return A.times(weightA).plus(B.times(weightB)).plus(C.times(weightC)).plus(D.times(weightD));
+    }
+
+    /**
+     * calculates radius of the osculating circle at a point on the bezier
+     * @return radius at point T
+     */
+    public double radiusOfOsculatingCircle(double T) {
+        Vector2d first = firstDerivative(T);
+        Vector2d second = secondDerivative(T);
+
+        double determinant = first.getX() * second.getY() - second.getX() * first.getY();
+
+        double norm = first.norm();
+
+        if (determinant == 0) return 0;
+        return Math.pow(norm, 3) / determinant;
+    }
+
 
     /**
      * Returns the normalized tangent vector to the curve at specified point

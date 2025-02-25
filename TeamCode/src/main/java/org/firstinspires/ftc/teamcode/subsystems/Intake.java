@@ -1,30 +1,48 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.hardware.CRServoImplEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
-import org.firstinspires.ftc.teamcode.utility.ServoImplExW;
+import org.firstinspires.ftc.teamcode.utility.wrappers.CRServoImplExW;
+import org.firstinspires.ftc.teamcode.utility.wrappers.ServoImplExW;
 
-public class ThreeAxisClaw {
+public class Intake {
 
-    private final ServoImplExW claw, wrist, rotator;
+    private final ServoImplExW wrist, rotator, latch;
+    private final CRServoImplExW spin;
 
-    public final double CLAW_OPEN = 0.125, CLAW_CLOSE = 0.625;
+    //private final AnalogInput color;
+
+    public final double SPIN_IN = 0.5, SPIN_OUT = -0.5;
+    public final double LATCH_CLOSED = 0.5, LATCH_OPEN = 0.5;
     public final double WRIST_UP = 0, WRIST_CLEAR = 0.8, WRIST_DOWN = 0.9;
     public final double ROTATOR_0 = 0.925, ROTATOR_45 = 0.65, ROTATOR_90 = 0.375;
 
-    public ThreeAxisClaw(HardwareMap hardwareMap) {
-        claw = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "claw"));
+    public Intake(HardwareMap hardwareMap) {
+        spin = new CRServoImplExW(hardwareMap.get(CRServoImplEx.class, "spin"));
+
+        latch = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "latch"));
         wrist = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "wrist"));
         rotator = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "rotator"));
 
-        claw.setPositionThreshold(0.002);
+        spin.setThresholds(0.01, 0.05);
+
+        latch.setPositionThreshold(0.002);
         wrist.setPositionThreshold(0.002);
         rotator.setPositionThreshold(0.002);
+
+        //color = hardwareMap.get(AnalogInput.class, "color");
     }
 
-    public void setClawPosition(double position) {
-        claw.setPosition(position);
+    public double getRawColor() {
+        //return color.getVoltage() / 3.3 * 360;
+        return 0;
+    }
+
+    public void setLatchPosition(double position) {
+        latch.setPosition(position);
     }
 
     public void setWristPosition(double position) {
@@ -35,11 +53,11 @@ public class ThreeAxisClaw {
         rotator.setPosition(position);
     }
 
-    public void setClawOpen() {
-        setClawPosition(CLAW_OPEN);
+    public void setLatchOpen() {
+        setLatchPosition(LATCH_OPEN);
     }
-    public void setClawClose() {
-        setClawPosition(CLAW_CLOSE);
+    public void setLatchClose() {
+        setLatchPosition(LATCH_CLOSED);
     }
 
     public void setWristUp() {

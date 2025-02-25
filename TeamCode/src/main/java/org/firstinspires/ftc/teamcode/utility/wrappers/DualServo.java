@@ -1,6 +1,7 @@
-package org.firstinspires.ftc.teamcode.utility;
+package org.firstinspires.ftc.teamcode.utility.wrappers;
 
 import org.firstinspires.ftc.teamcode.maths.ConstantsForPID;
+import org.firstinspires.ftc.teamcode.utility.RunMotionProfile;
 
 public class DualServo {
 

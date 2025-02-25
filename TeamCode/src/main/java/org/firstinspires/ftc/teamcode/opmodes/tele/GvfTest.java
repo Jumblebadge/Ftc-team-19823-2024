@@ -15,16 +15,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.teamcode.utility.GoBildaPinpointDriver;
+import org.firstinspires.ftc.teamcode.utility.wrappers.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.maths.CubicPath;
 import org.firstinspires.ftc.teamcode.maths.GVF;
-import org.firstinspires.ftc.teamcode.maths.Maths;
-import org.firstinspires.ftc.teamcode.utility.GoBildaPinpointDriver;
 
 import java.util.Locale;
 
 @Config
-@TeleOp(name="gvf test", group="Linear Opmode")
+@Disabled
+@TeleOp(name="Gvf test", group="Linear Opmode")
 public class GvfTest extends LinearOpMode {
 
     public static double AX = -40, AY = 0, BX = -40, BY = 30, CX = -10, CY = 30, DX = -10, DY = 0, FX = 10, FY = -30, GX = 10, GY = 0, IX = 40, IY = 30, JX = 40, JY = 0;
@@ -56,7 +55,7 @@ public class GvfTest extends LinearOpMode {
         controlHub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
 
         waitForStart();
-        while (opModeIsActive()) {
+        while (opModeIsActive() && !isStopRequested()) {
 
             path.setControlPointCoordinates(new double[] {AX, AY, BX, BY, CX, CY, DX, DY, FX, FY, GX, GY, IX, IY, JX, JY});
 

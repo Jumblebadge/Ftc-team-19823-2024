@@ -1,30 +1,38 @@
 package org.firstinspires.ftc.teamcode.utility.camera;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 
-import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
-import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
+import org.openftc.easyopencv.OpenCvPipeline;
 
-public class TestPipeline implements VisionProcessor {
+public class TestPipeline extends OpenCvPipeline {
 
-    Mat grey = new Mat();
+    Mat hsv = new Mat();
 
-    @Override
-    public void init(int width, int height, CameraCalibration calibration) {
+    Paint paint;
 
+    public TestPipeline() {
+        paint = new Paint();
+        paint.setColor(Color.WHITE); // you may want to change this
+        paint.setAntiAlias(true);
+        paint.setStrokeWidth(10); // or this
+        paint.setStrokeCap(Paint.Cap.ROUND);
+        paint.setStrokeJoin(Paint.Join.ROUND);
     }
 
-    @Override
-    public Object processFrame(Mat frame, long captureTimeNanos) {
-        Imgproc.cvtColor(frame, grey, Imgproc.COLOR_RGB2GRAY);
 
-        return grey;
+    @Override
+    public Mat processFrame(Mat input) {
+        Imgproc.cvtColor(input, hsv, Imgproc.COLOR_RGB2HSV);
+
+        return hsv;
     }
 
     @Override
     public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight, float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
-
+        canvas.drawLine(0,0, 500, 500, paint);
     }
 }

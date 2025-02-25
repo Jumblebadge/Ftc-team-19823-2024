@@ -8,14 +8,11 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.maths.ConstantsForPID;
-import org.firstinspires.ftc.teamcode.subsystems.PivotingSlide;
-import org.firstinspires.ftc.teamcode.utility.DcMotorExW;
-import org.firstinspires.ftc.teamcode.utility.MotorGroup;
+import org.firstinspires.ftc.teamcode.utility.wrappers.DcMotorExW;
+import org.firstinspires.ftc.teamcode.utility.wrappers.MotorGroup;
 import org.firstinspires.ftc.teamcode.utility.RunMotionProfile;
 
 @Config
@@ -54,7 +51,7 @@ public class TuneSlidePid extends LinearOpMode {
         controlHub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
 
         waitForStart();
-        while (opModeIsActive()) {
+        while (opModeIsActive() && !isStopRequested()) {
             //Clear the cache for better loop times (bulk sensor reads)
             controlHub.clearBulkCache();
 

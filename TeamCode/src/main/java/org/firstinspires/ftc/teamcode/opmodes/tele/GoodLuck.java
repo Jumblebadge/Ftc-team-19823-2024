@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.maths.Maths;
 import org.firstinspires.ftc.teamcode.maths.PID;
 import org.firstinspires.ftc.teamcode.subsystems.PivotingSlide;
 import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
-import org.firstinspires.ftc.teamcode.subsystems.ThreeAxisClaw;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 
 import java.util.List;
@@ -41,7 +41,7 @@ public class GoodLuck extends LinearOpMode {
         PivotingSlide slide = new PivotingSlide(hardwareMap, false);
         ButtonDetector pivotToggle = new ButtonDetector();
 
-        ThreeAxisClaw claw = new ThreeAxisClaw(hardwareMap);
+        Intake claw = new Intake(hardwareMap);
         ButtonDetector clawToggle = new ButtonDetector();
         ButtonDetector wristToggle = new ButtonDetector();
 
@@ -62,7 +62,7 @@ public class GoodLuck extends LinearOpMode {
         for (LynxModule hub : allHubs) { hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL); }
 
         waitForStart();
-        while (opModeIsActive()) {
+        while (opModeIsActive() && !isStopRequested()) {
             previous1.copy(current1);
             current1.copy(gamepad1);
             previous2.copy(current2);
@@ -132,9 +132,9 @@ public class GoodLuck extends LinearOpMode {
             }
 
             if (clawToggle.toggle(gamepad2.left_bumper)) {
-                claw.setClawClose();
+                //claw.setClawClose();
             }
-            else claw.setClawOpen();
+            else //claw.setClawOpen();
 
             if (wristToggle.toggle(gamepad2.left_trigger > 0.2)) {
                 if (rotatorTimer.seconds() < 0.2) {
@@ -162,7 +162,7 @@ public class GoodLuck extends LinearOpMode {
 
             if (slide.getSlidePosition() < 50) {
                 if (pivotToggle.toggle(gamepad2.right_bumper)) {
-                    slide.movePivotTo(85);
+                    slide.movePivotTo(100);
                     rotatorToggle.toFalse();
                     claw.setRotatorTo0();
                 }

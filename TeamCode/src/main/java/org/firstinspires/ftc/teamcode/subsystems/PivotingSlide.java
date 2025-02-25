@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.teamcode.maths.ConstantsForPID;
-import org.firstinspires.ftc.teamcode.utility.DcMotorExW;
-import org.firstinspires.ftc.teamcode.utility.MotorGroup;
+import org.firstinspires.ftc.teamcode.utility.wrappers.DcMotorExW;
+import org.firstinspires.ftc.teamcode.utility.wrappers.MotorGroup;
 import org.firstinspires.ftc.teamcode.utility.RunMotionProfile;
 
 //TODO fix slides
@@ -87,9 +87,9 @@ public class PivotingSlide {
         return slideTarget - getSlidePosition();
     }
 
-    public double getSlidePosition() { return slideMotors.getPosition(0) - slideOffset; }
+    public double getSlidePosition() { return slideMotors.getPosition(2) - slideOffset; }
 
-    public double getPivotAngle() { return  pivotEncoder.getVoltage() * -72 + 336.75; }
+    public double getPivotAngle() { return  pivotEncoder.getVoltage() * -72 + 244.25; }
 
     public boolean isTimeDone() { return slideProfile.getProfileDuration() + 0.5 < slideProfile.getCurrentTime(); }
 

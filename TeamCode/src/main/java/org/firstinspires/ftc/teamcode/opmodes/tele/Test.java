@@ -1,21 +1,25 @@
 package org.firstinspires.ftc.teamcode.opmodes.tele;
 
 //Import EVERYTHING we need
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.hardware.lynx.*;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DigitalChannelImpl;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.utility.camera.CameraShenanigans;
-import org.firstinspires.ftc.teamcode.utility.camera.TestPipeline;
+import org.firstinspires.ftc.teamcode.subsystems.PivotingSlide;
+import org.firstinspires.ftc.teamcode.utility.camera.BrushColor;
+import org.firstinspires.ftc.teamcode.utility.wrappers.DcMotorExW;
 
 @Config
-@TeleOp(name="test", group="Linear Opmode")
+@TeleOp(name="Test", group="Linear Opmode")
 public class Test extends LinearOpMode {
 
-    public static boolean on = true;
+    public static double slideTarget = 0, pivotTarget = 0;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -26,9 +30,7 @@ public class Test extends LinearOpMode {
         //Bulk sensor reads
         LynxModule controlHub = hardwareMap.get(LynxModule.class, "Control Hub");
 
-        TestPipeline pipe = new TestPipeline();
-
-        CameraShenanigans camera = new CameraShenanigans(hardwareMap, dashboard, pipe);
+        PivotingSlide slide = new PivotingSlide(hardwareMap, false);
 
         ElapsedTime hztimer = new ElapsedTime();
 
@@ -36,16 +38,24 @@ public class Test extends LinearOpMode {
         controlHub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
 
         waitForStart();
-        while (opModeIsActive()) {
+        while (opModeIsActive() && !isStopRequested()) {
 
             //Clear the cache for better loop times (bulk sensor reads)
             controlHub.clearBulkCache();
 
-            camera.enableProcessor(on);
+            telemetry.addData("millis: ",hztimer.milliseconds());
+            telemetry.addData("slide pos", slide.getSlidePosition());
+            telemetry.addData("motion", slide.getMotionTarget());
+            telemetry.addData("pvit", slide.getPivotAngle());
 
-            telemetry.addData("millis",hztimer.milliseconds());
+            slide.moveSlideTo(slideTarget);
+
+            slide.movePivotTo(pivotTarget);
+
+            slide.update();
             hztimer.reset();
             telemetry.update();
         }
+
     }
 }

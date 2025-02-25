@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.utility;
+package org.firstinspires.ftc.teamcode.utility.wrappers;
 
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -29,7 +29,7 @@ public class DcMotorExW implements DcMotorEx {
             lastPower = 0;
             motor.setPower(0);
         }
-        else if(Math.abs(power - lastPower) >= powerStep){
+        else if(Math.abs(power - lastPower) >= powerStep && Math.abs(power) > Math.abs(minimum_power)){
             isZero = false;
             motor.setPower(power);
             lastPower = power;

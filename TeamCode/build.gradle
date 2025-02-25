@@ -8,18 +8,22 @@
 // please think carefully as to whether such customizations are really necessary
 // before doing so.
 
-
 // Custom definitions may go here
 buildscript {
     repositories {
         mavenCentral()
         maven {
-            url = 'https://www.matthewo.tech/maven/'
+            url 'https://www.matthewo.tech/maven/'
+        }
+        maven {
             url = 'https://repo.dairy.foundation/snapshots'
+        }
+        maven {
+            url = 'https://repo.dairy.foundation/releases'
         }
     }
     dependencies {
-        classpath "dev.frozenmilk.sinister.sloth:Load:0.0.0"
+        classpath "dev.frozenmilk.sinister.sloth:Load:0.0.2"
     }
 }
 
@@ -39,14 +43,19 @@ android {
 
 repositories {
     maven {
-        url = 'https://maven.brott.dev/'
-        url = 'https://www.matthewo.tech/maven/'
+        url = "https://repo.dairy.foundation/releases"
+    }
+    maven {
+        url = 'https://repo.dairy.foundation/snapshots'
     }
 }
+
 
 dependencies {
     implementation project(':FtcRobotController')
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
     implementation 'com.acmerobotics.roadrunner:core:0.5.6'
     implementation "com.acmerobotics.dashboard:dashboard:0.4.16"
+    implementation "dev.frozenmilk.sinister:Sloth:0.0.1"
+    implementation "dev.frozenmilk.sinister.sloth:DashFix:0.0.0"
 }

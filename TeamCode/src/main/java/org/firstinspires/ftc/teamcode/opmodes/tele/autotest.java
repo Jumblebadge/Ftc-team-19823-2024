@@ -10,28 +10,19 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.maths.CubicPath;
 import org.firstinspires.ftc.teamcode.maths.GVF;
-import org.firstinspires.ftc.teamcode.maths.Maths;
-import org.firstinspires.ftc.teamcode.maths.PID;
-import org.firstinspires.ftc.teamcode.subsystems.PinPoint;
 import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
-import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 import org.firstinspires.ftc.teamcode.utility.DashOperations;
-import org.firstinspires.ftc.teamcode.utility.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.utility.PathList;
 
-import java.util.Arrays;
-
 @Config
-@TeleOp(name="autotest", group="Linear Opmode")
+@TeleOp(name="Autotest", group="Linear Opmode")
 public class autotest extends LinearOpMode {
 
     public static double Kn = 0.7, Kf = 15, Ks = 0.75, negX = 1, negY = 1;
@@ -72,7 +63,7 @@ public class autotest extends LinearOpMode {
 
         swerve.setPosition(new Pose2d(-25, -48));
 
-        while (opModeIsActive()) {
+        while (opModeIsActive() && !isStopRequested()) {
 
             //Clear the cache for better loop times (bulk sensor reads)
             controlHub.clearBulkCache();

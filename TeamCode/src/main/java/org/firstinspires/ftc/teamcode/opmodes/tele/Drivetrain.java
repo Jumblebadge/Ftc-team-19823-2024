@@ -16,10 +16,10 @@ import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 
 @Config
-@TeleOp(name="Drivetrain", group="Linear Opmode")
+@TeleOp(name="drivetrain", group="Linear Opmode")
 public class Drivetrain extends LinearOpMode {
 
-    public static double module1Offset = 37, module2Offset = -6;
+    public static double module1Offset = 0, module2Offset = 0;
     private double rotation, heading;
 
     public void runOpMode() {
@@ -43,7 +43,7 @@ public class Drivetrain extends LinearOpMode {
         controlHub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
 
         waitForStart();
-        while (opModeIsActive()) {
+        while (opModeIsActive() && !isStopRequested()) {
 
             Pose2d pose = swerve.getPose();
             previous1.copy(current1);

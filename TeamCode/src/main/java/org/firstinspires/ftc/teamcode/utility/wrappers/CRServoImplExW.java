@@ -30,29 +30,43 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.firstinspires.ftc.teamcode.utility;
+package org.firstinspires.ftc.teamcode.utility.wrappers;
 
+import com.qualcomm.robotcore.hardware.CRServoImplEx;
 import com.qualcomm.robotcore.hardware.PwmControl;
-import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 //copied from the sdk. wrapper to limit hardware calls
-public class ServoImplExW
+public class CRServoImplExW
 {
 
-    private double lastPosition = 0;
-    private double positionStep = 0.01;
-    private final ServoImplEx servo;
+    private double lastPower = 0;
+    private double powerStep = 0.01;
 
-    public ServoImplExW(ServoImplEx servo) {
+    private double minPower = 0.05;
+
+    private boolean isZero = false;
+
+    private final CRServoImplEx servo;
+
+    public CRServoImplExW(CRServoImplEx servo) {
         this.servo = servo;
     }
 
-    public void setPositionThreshold(double positionThreshold) { this.positionStep = positionThreshold; }
+    public void setThresholds(double powerThreshold, double minPower) {
+        this.powerStep = powerThreshold;
+        this.minPower = minPower;
+    }
 
-    public void setPosition(double position) {
-        if(Math.abs(position - lastPosition) >= positionStep){
-            servo.setPosition(position);
-            lastPosition = position;
+    public void setPower(double power) {
+        if(!isZero && Math.abs(power) <= Math.abs(minPower)){
+            isZero = true;
+            lastPower = 0;
+            servo.setPower(0);
+        }
+        else if(Math.abs(power - lastPower) >= powerStep && Math.abs(power) > Math.abs(minPower)){
+            isZero = false;
+            servo.setPower(power);
+            lastPower = power;
         }
     }
 
@@ -60,8 +74,8 @@ public class ServoImplExW
         servo.setPwmDisable();
     }
 
-    public double getPosition() {
-        return servo.getPosition();
+    public double getPower() {
+        return servo.getPower();
     }
 
     public void setPwmRange(PwmControl.PwmRange range) {

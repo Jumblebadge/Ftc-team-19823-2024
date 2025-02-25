@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.maths.GVF;
 import org.firstinspires.ftc.teamcode.subsystems.PivotingSlide;
 import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
-import org.firstinspires.ftc.teamcode.subsystems.ThreeAxisClaw;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 import org.firstinspires.ftc.teamcode.utility.DashOperations;
 import org.firstinspires.ftc.teamcode.utility.PathList;
@@ -45,9 +45,9 @@ public class JustPark extends LinearOpMode {
         PivotingSlide slide = new PivotingSlide(hardwareMap, true);
         ButtonDetector pivotToggle = new ButtonDetector();
 
-        ThreeAxisClaw claw = new ThreeAxisClaw(hardwareMap);
+        Intake claw = new Intake(hardwareMap);
         ButtonDetector clawToggle = new ButtonDetector(true);
-        claw.setClawClose();
+        //claw.setClawClose();
         claw.setRotatorTo0();
         ButtonDetector wristToggle = new ButtonDetector(true);
 
@@ -58,7 +58,7 @@ public class JustPark extends LinearOpMode {
 
         swerve.setPosition(new Pose2d(-16.5, 65));
 
-        while (opModeIsActive()) {
+        while (opModeIsActive() && !isStopRequested()) {
 
             //Clear the cache for better loop times (bulk sensor reads)
             for (LynxModule hub : allHubs) hub.clearBulkCache();
@@ -83,9 +83,9 @@ public class JustPark extends LinearOpMode {
             pivotToggle.toFalse();
 
             if (clawToggle.isTrue()) {
-                claw.setClawClose();
+                //claw.setClawClose();
             }
-            else claw.setClawOpen();
+            else //claw.setClawOpen();
 
             if (wristToggle.isTrue()) {
                 claw.setWristDown();

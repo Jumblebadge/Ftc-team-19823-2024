@@ -7,13 +7,12 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.maths.Maths;
 import org.firstinspires.ftc.teamcode.maths.PID;
 import org.firstinspires.ftc.teamcode.subsystems.PivotingSlide;
 import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
-import org.firstinspires.ftc.teamcode.subsystems.ThreeAxisClaw;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 import org.firstinspires.ftc.teamcode.utility.ElapsedTimeW;
 
@@ -51,7 +50,7 @@ public class AutomationTest extends LinearOpMode {
         PivotingSlide slide = new PivotingSlide(hardwareMap, false);
         ButtonDetector pivotToggle = new ButtonDetector();
 
-        ThreeAxisClaw claw = new ThreeAxisClaw(hardwareMap);
+        Intake claw = new Intake(hardwareMap);
         ButtonDetector clawToggle = new ButtonDetector();
         ButtonDetector wristToggle = new ButtonDetector();
         ButtonDetector rotatorToggle = new ButtonDetector();
@@ -69,7 +68,7 @@ public class AutomationTest extends LinearOpMode {
         for (LynxModule hub : allHubs) { hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL); }
 
         waitForStart();
-        while (opModeIsActive()) {
+        while (opModeIsActive() && !isStopRequested()) {
             previous1.copy(current1);
             current1.copy(gamepad1);
             previous2.copy(current2);
@@ -231,9 +230,9 @@ public class AutomationTest extends LinearOpMode {
             }
 
             if (clawToggle.isTrue()) {
-                claw.setClawClose();
+                //claw.setClawClose();
             }
-            else claw.setClawOpen();
+            else //claw.setClawOpen();
 
             if (wristToggle.toggle(gamepad2.left_trigger > 0.2)) {
                 if (rotatorToggle.toggle(gamepad2.right_trigger > 0.2)) {
