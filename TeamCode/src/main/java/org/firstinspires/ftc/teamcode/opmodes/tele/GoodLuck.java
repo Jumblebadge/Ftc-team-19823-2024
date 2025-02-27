@@ -35,7 +35,7 @@ public class GoodLuck extends LinearOpMode {
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
         SwerveDrive swerve = new SwerveDrive(telemetry, hardwareMap);
-        PID headingPID = new PID(0.09,0.00188,0,0.025,1);
+        PID headingPID = new PID(0.2,0.017,0,0.1,5);
         ButtonDetector headingPIDtoggle  = new ButtonDetector();
 
         PivotingSlide slide = new PivotingSlide(hardwareMap, false);

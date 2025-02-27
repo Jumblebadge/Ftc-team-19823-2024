@@ -18,9 +18,9 @@ public class Maths {
     }
 
     public static double angleWrapRadians(double rad) {
-        double radians = rad % 2 * Math.PI;
-        while (radians >= Math.PI) radians -= 2 * Math.PI;
-        while (radians < -Math.PI) radians += 2 * Math.PI;
+        double radians = rad % (2 * Math.PI);
+        if (radians >= Math.PI) radians -= 2 * Math.PI;
+        if (radians < -Math.PI) radians += 2 * Math.PI;
         return radians;
     }
 

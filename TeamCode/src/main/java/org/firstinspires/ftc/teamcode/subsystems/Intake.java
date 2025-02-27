@@ -1,10 +1,11 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServoImplEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
+import org.firstinspires.ftc.teamcode.utility.camera.BrushColor;
 import org.firstinspires.ftc.teamcode.utility.wrappers.CRServoImplExW;
 import org.firstinspires.ftc.teamcode.utility.wrappers.ServoImplExW;
 
@@ -13,12 +14,12 @@ public class Intake {
     private final ServoImplExW wrist, rotator, latch;
     private final CRServoImplExW spin;
 
-    //private final AnalogInput color;
+    private final BrushColor color;
 
     public final double SPIN_IN = 0.5, SPIN_OUT = -0.5;
     public final double LATCH_CLOSED = 0.5, LATCH_OPEN = 0.5;
-    public final double WRIST_UP = 0, WRIST_CLEAR = 0.8, WRIST_DOWN = 0.9;
-    public final double ROTATOR_0 = 0.925, ROTATOR_45 = 0.65, ROTATOR_90 = 0.375;
+    public final double WRIST_UP = 0.93, WRIST_CLEAR = 0.8, WRIST_DOWN = 0.21;
+    public final double ROTATOR_0 = 0.075, ROTATOR_90 = 0.45, ROTATOR_180 = 0.8;
 
     public Intake(HardwareMap hardwareMap) {
         spin = new CRServoImplExW(hardwareMap.get(CRServoImplEx.class, "spin"));
@@ -33,12 +34,13 @@ public class Intake {
         wrist.setPositionThreshold(0.002);
         rotator.setPositionThreshold(0.002);
 
-        //color = hardwareMap.get(AnalogInput.class, "color");
+        wrist.setPwmRange(new PwmControl.PwmRange(500, 2500));
+
+        color = new BrushColor(hardwareMap);
     }
 
-    public double getRawColor() {
-        //return color.getVoltage() / 3.3 * 360;
-        return 0;
+    public BrushColor.ColorDetection getColor() {
+        return color.getDetection();
     }
 
     public void setLatchPosition(double position) {
@@ -52,6 +54,8 @@ public class Intake {
     public void setRotatorPosition(double position) {
         rotator.setPosition(position);
     }
+
+    public void setSpinPower(double power) { spin.setPower(power); }
 
     public void setLatchOpen() {
         setLatchPosition(LATCH_OPEN);
@@ -74,9 +78,9 @@ public class Intake {
         setRotatorPosition(ROTATOR_0);
     }
     public void setRotatorTo90() {
-        setRotatorPosition(ROTATOR_90);
+        setRotatorPosition(ROTATOR_180);
     }
     public void setRotatorTo45() {
-        setRotatorPosition(ROTATOR_45);
+        setRotatorPosition(ROTATOR_90);
     }
 }

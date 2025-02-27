@@ -32,11 +32,11 @@ public class swerveKinematics {
         double forward = joystickVec.getY();
 
         //displacement vectors of wheel positions
-        double module1X = strafe - rotateX * 103d / 113d; // top left wheel x
-        double module2X = strafe - rotateX * -103d / 113d; // bottom right wheel y
+        double module1X = strafe - rotateX * 1; // top left wheel y
+        double module2X = strafe - rotateX * -1; // bottom right wheel y
 
-        double module1Y = forward + rotateX * -1; //top left wheel x
-        double module2Y = forward + rotateX * 1; // bottom right wheel x
+        double module1Y = forward + rotateX * -104d / 114d; //top left wheel x
+        double module2Y = forward + rotateX * 104d / 114d; // bottom right wheel x
 
         //extracting the magnitude of our wheel specific vectors (speed)
         double module1Speed = Math.sqrt((module1X * module1X) + (module1Y * module1Y));

@@ -8,7 +8,7 @@ public class BrushColor {
     private final DigitalChannelImpl pin0;
     private final DigitalChannelImpl pin1;
 
-    private enum ColorDetection {
+    public enum ColorDetection {
         BLUE,
         RED,
         YELLOW,

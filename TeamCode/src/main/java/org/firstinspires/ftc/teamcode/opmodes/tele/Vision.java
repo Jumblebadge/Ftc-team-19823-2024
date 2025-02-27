@@ -22,10 +22,12 @@ import org.firstinspires.ftc.teamcode.utility.camera.YellowECircle;
 import java.util.List;
 
 @Config
-@TeleOp(name="test ", group="Linear Opmode")
-public class Test extends LinearOpMode {
+@TeleOp(name="vision ", group="Linear Opmode")
+public class Vision extends LinearOpMode {
 
-    public static double spinPower = 0, rotator = 0.5, wrist = 0.5, latch = 0.5;
+    private double headingTarget = 0, lastY = -1;
+    public static boolean test = false;
+    public static double t1 = 0, t2 = 0, t3 = 0, t4 = 0, t5 = 0, t6 = 0;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -36,13 +38,21 @@ public class Test extends LinearOpMode {
         //Bulk sensor reads
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
-        Intake intake = new Intake(hardwareMap);
+        SwerveDrive swerve = new SwerveDrive(telemetry, hardwareMap);
+        PID headingPID = new PID(0.09,0.00188,0,0.025,1);
+        ButtonDetector adjustToggle  = new ButtonDetector();
+
+        YellowECircle pipe = new YellowECircle(telemetry);
+        TestPipeline pp = new TestPipeline();
+        CameraShenanigans cam = new CameraShenanigans(hardwareMap, dashboard, pipe);
 
         ElapsedTime hzTimer = new ElapsedTime();
         Gamepad current1 = new Gamepad();
         Gamepad previous1 = new Gamepad();
 
         for (LynxModule hub : allHubs) { hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL); }
+
+        cam.streamDash();
 
         waitForStart();
         while (opModeIsActive() && !isStopRequested()) {
@@ -52,18 +62,51 @@ public class Test extends LinearOpMode {
             //Clear the cache for better loop times (bulk sensor reads)
             for (LynxModule hub : allHubs) hub.clearBulkCache();
 
-            intake.setLatchPosition(latch);
-            intake.setWristPosition(wrist);
-            intake.setRotatorPosition(rotator);
-            intake.setSpinPower(spinPower);
+            ///*
+
+            double heading = pipe.getSampleXValue() / 10;
+
+            if (test) {
+                heading = swerve.getJustHeadingInDegrees();
+                headingTarget = Maths.crownJewel(lastY)[0];
+                gamepad1.setLedColor(1,0,0,Gamepad.LED_DURATION_CONTINUOUS);
+            }
+            else {
+                lastY = pipe.getSampleYValue();
+                headingTarget = 0;
+                gamepad1.setLedColor(0,1,0,Gamepad.LED_DURATION_CONTINUOUS);
+            }
+
+            if (current1.left_bumper && !previous1.left_bumper) {
+                headingTarget = heading;
+                adjustToggle.toTrue();
+            }
+
+            if (gamepad1.options) {
+                swerve.resetIMU();
+            }
 
 
-            telemetry.addData("hstimes", hzTimer.milliseconds());
-            telemetry.addData("color", intake.getColor());
+            swerve.drive(0, 0, headingPID.pidAngleOut(headingTarget, heading));
+
+
+            telemetry.addData("hz", hzTimer.milliseconds());
+            telemetry.addData("peice",Math.toDegrees(Maths.peicewiseAtan2(-gamepad1.right_stick_y, gamepad1.right_stick_x)) - 90);
+            telemetry.addData("y",pipe.getSampleYValue());
+            telemetry.addData("x",pipe.getSampleXValue());
+
+
+
+            //*/
+
+            //pp.changeThresh(t1, t2, t3, t4, t5, t6);
+
             hzTimer.reset();
             telemetry.update();
-
         }
+        cam.stopStreaming();
+        pipe.releaseMats();
+        pp.releaseMats();
     }
 }
 

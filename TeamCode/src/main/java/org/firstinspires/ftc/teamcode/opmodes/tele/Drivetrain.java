@@ -33,7 +33,7 @@ public class Drivetrain extends LinearOpMode {
 
         ElapsedTime hztimer = new ElapsedTime();
 
-        PID headingPID = new PID(0.1,0.00188,0,0.05,1);
+        PID headingPID = new PID(0.2,0.017,0,0.1,5);
         ButtonDetector headingPIDtoggle  = new ButtonDetector();
 
         Gamepad current1 = new Gamepad();
