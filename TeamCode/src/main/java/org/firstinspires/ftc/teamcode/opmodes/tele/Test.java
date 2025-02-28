@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.maths.ConstantsForPID;
 import org.firstinspires.ftc.teamcode.maths.Maths;
 import org.firstinspires.ftc.teamcode.maths.PID;
 import org.firstinspires.ftc.teamcode.subsystems.PivotingSlide;
@@ -25,7 +26,7 @@ import java.util.List;
 @TeleOp(name="test ", group="Linear Opmode")
 public class Test extends LinearOpMode {
 
-    public static double spinPower = 0, rotator = 0.5, wrist = 0.5, latch = 0.5;
+    public static double Kp = 0, Kd = 0, Ki = 0, Kf = 0, Kl = 1, maxVel = 1, maxAccel = 1, maxJerk = 1, target = 0;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -36,7 +37,7 @@ public class Test extends LinearOpMode {
         //Bulk sensor reads
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
-        Intake intake = new Intake(hardwareMap);
+        PivotingSlide slide = new PivotingSlide(hardwareMap, false);
 
         ElapsedTime hzTimer = new ElapsedTime();
         Gamepad current1 = new Gamepad();
@@ -52,14 +53,17 @@ public class Test extends LinearOpMode {
             //Clear the cache for better loop times (bulk sensor reads)
             for (LynxModule hub : allHubs) hub.clearBulkCache();
 
-            intake.setLatchPosition(latch);
-            intake.setWristPosition(wrist);
-            intake.setRotatorPosition(rotator);
-            intake.setSpinPower(spinPower);
+            slide.setPidConstants(new ConstantsForPID(Kp, Kd, Ki, Kf, Kl, 0));
+            slide.setMotionConstraints(maxVel, maxAccel, maxJerk);
 
+            slide.moveSlideTo(target);
+
+            slide.update();
 
             telemetry.addData("hstimes", hzTimer.milliseconds());
-            telemetry.addData("color", intake.getColor());
+            telemetry.addData("motionstate", slide.getMotionTarget());
+            telemetry.addData("tar", target);
+            telemetry.addData("pivot", slide.getSlidePosition());
             hzTimer.reset();
             telemetry.update();
 

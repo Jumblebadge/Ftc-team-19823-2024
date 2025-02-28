@@ -210,7 +210,7 @@ public class Close4Sample extends LinearOpMode {
                     }
                     else if (cycleCount == 2) {
                         if (taskNumber == 0 && timer.seconds() < 0.5) {
-                            claw.setRotatorTo90();
+                            claw.setRotatorTo180();
                             taskNumber++;
                         }
                         else if (taskNumber == 1 && gvf.isDone(3.75, 7)) {

@@ -236,7 +236,7 @@ public class AutomationTest extends LinearOpMode {
 
             if (wristToggle.toggle(gamepad2.left_trigger > 0.2)) {
                 if (rotatorToggle.toggle(gamepad2.right_trigger > 0.2)) {
-                    claw.setRotatorTo90();
+                    claw.setRotatorTo180();
                 }
                 else {
                     claw.setRotatorTo0();

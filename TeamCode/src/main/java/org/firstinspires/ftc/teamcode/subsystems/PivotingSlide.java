@@ -19,8 +19,8 @@ public class PivotingSlide {
     private double slideTarget = 0, pivotTarget = 0, slideOffset = 0;
     private final TouchSensor slideLimitSwitch;
     private final AnalogInput pivotEncoder;
-    private RunMotionProfile pivotProfile = new RunMotionProfile(20000,10000,10000,new ConstantsForPID(0.6,0,1.5,0.5,1,0));
-    private final RunMotionProfile slideProfile = new RunMotionProfile(125000,100000,100000,new ConstantsForPID(0.3,0,0.2,0.3,2,0));
+    private RunMotionProfile pivotProfile = new RunMotionProfile(1000,1000,1000,new ConstantsForPID(0.4,0,0.75,0.5,1,0));
+    private final RunMotionProfile slideProfile = new RunMotionProfile(20000,20000,20000,new ConstantsForPID(0.3,0,0,0.15,2,0));
 
     public final double MIN = -5, MAX = 675, SET_POINT_1 = MAX / 4, SET_POINT_2 = MAX / 2, SET_POINT_3 = 3 * MAX / 4;
     public enum States {
@@ -96,15 +96,15 @@ public class PivotingSlide {
     public boolean isPositionDone() { return Math.abs(getSlideError()) < 22; }
 
     public void setMotionConstraints(double maxVel, double maxAccel, double maxJerk){
-        pivotProfile.setMotionConstraints(maxVel, maxAccel, maxJerk);
+        slideProfile.setMotionConstraints(maxVel, maxAccel, maxJerk);
     }
 
     public void setPidConstants(ConstantsForPID constants) {
-        pivotProfile.setPidConstants(constants);
+        slideProfile.setPidConstants(constants);
     }
 
     public double getMotionTarget(){
-        return pivotProfile.getMotionTarget();
+        return slideProfile.getMotionTarget();
     }
 
     public double getSlideTarget() { return slideTarget; }

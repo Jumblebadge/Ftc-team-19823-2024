@@ -23,7 +23,6 @@ import java.util.List;
 public class GoodLuck extends LinearOpMode {
 
     private double headingTarget;
-    private boolean startAction;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -41,15 +40,13 @@ public class GoodLuck extends LinearOpMode {
         PivotingSlide slide = new PivotingSlide(hardwareMap, false);
         ButtonDetector pivotToggle = new ButtonDetector();
 
-        Intake claw = new Intake(hardwareMap);
-        ButtonDetector clawToggle = new ButtonDetector();
+        Intake intake = new Intake(hardwareMap);
+        ButtonDetector latchToggle = new ButtonDetector();
         ButtonDetector wristToggle = new ButtonDetector();
 
         ButtonDetector rotatorToggle = new ButtonDetector();
-        boolean lastRotatorToggle = false;
 
         ElapsedTime hzTimer = new ElapsedTime();
-        ElapsedTime rotatorTimer = new ElapsedTime();
 
         Gamepad current1 = new Gamepad();
         Gamepad previous1 = new Gamepad();
@@ -57,7 +54,7 @@ public class GoodLuck extends LinearOpMode {
         Gamepad current2 = new Gamepad();
         Gamepad previous2 = new Gamepad();
 
-        claw.setRotatorTo0();
+        intake.setRotatorTo0();
 
         for (LynxModule hub : allHubs) { hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL); }
 
@@ -114,6 +111,7 @@ public class GoodLuck extends LinearOpMode {
 
             swerve.drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, rotation);
 
+            /*
             if (gamepad2.start) {
                 wristToggle.toFalse();
                 slide.toMin();
@@ -131,47 +129,51 @@ public class GoodLuck extends LinearOpMode {
                 startAction = false;
             }
 
-            if (clawToggle.toggle(gamepad2.left_bumper)) {
-                //claw.setClawClose();
+             */
+
+            if (latchToggle.toggle(gamepad2.left_bumper)) {
+                intake.setLatchOpen();
             }
-            else //claw.setClawOpen();
+            else intake.setLatchClose();
+
+            if (gamepad2.dpad_down) {
+                intake.setSpinIn();
+            }
+            else if (gamepad2.dpad_up) {
+                intake.setSpinOut();
+            }
+            else intake.setSpin0();
 
             if (wristToggle.toggle(gamepad2.left_trigger > 0.2)) {
-                if (rotatorTimer.seconds() < 0.2) {
-                    claw.setWristClear();
-                }
-                else claw.setWristDown();
+                intake.setWristDown();
             }
             else {
-                claw.setWristUp();
+                intake.setWristUp();
             }
 
-            if (slide.getPivotAngle() < 50) {
-                if (rotatorToggle.toggle(gamepad2.right_trigger > 0.2)) {
-                    claw.setRotatorTo90();
-                }
-                else {
-                    claw.setRotatorTo0();
-                }
+            if (rotatorToggle.toggle(gamepad2.right_trigger > 0.2)) {
+                intake.setRotatorTo180();
             }
-
-            if (rotatorToggle.isTrue() != lastRotatorToggle) {
-                lastRotatorToggle = rotatorToggle.isTrue();
-                rotatorTimer.reset();
+            else {
+                intake.setRotatorTo0();
             }
 
             if (slide.getSlidePosition() < 50) {
                 if (pivotToggle.toggle(gamepad2.right_bumper)) {
                     slide.movePivotTo(100);
-                    rotatorToggle.toFalse();
-                    claw.setRotatorTo0();
+                    rotatorToggle.toTrue();
+                    wristToggle.toTrue();
+
                 }
                 else  {
                     slide.movePivotTo(0);
+                    //wristToggle.toFalse();
+                    rotatorToggle.toFalse();
+                    latchToggle.toFalse();
                 }
             }
 
-            if (gamepad2.triangle) {// && slide.getPivotAngle() > 20) {
+            if (gamepad2.triangle && slide.getPivotAngle() > 30) {
                 slide.toMax();
             }
             if (gamepad2.circle) {
@@ -189,12 +191,8 @@ public class GoodLuck extends LinearOpMode {
 
             telemetry.addData("hz", hzTimer.milliseconds());
             telemetry.addData("peice",Math.toDegrees(Maths.peicewiseAtan2(-gamepad1.right_stick_y, gamepad1.right_stick_x)) - 90);
-            telemetry.addData("wrist", wristToggle.isTrue());
-            telemetry.addData("rotator",rotatorToggle.isTrue());
-            telemetry.addData("rotator time",rotatorTimer.seconds());
             telemetry.addData("slied",slide.getSlidePosition());
             telemetry.addData("pivot",slide.getPivotAngle());
-            telemetry.addData("start action",startAction);
 
             hzTimer.reset();
             telemetry.update();

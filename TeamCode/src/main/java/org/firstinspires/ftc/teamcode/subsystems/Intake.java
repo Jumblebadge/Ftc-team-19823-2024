@@ -16,8 +16,8 @@ public class Intake {
 
     private final BrushColor color;
 
-    public final double SPIN_IN = 0.5, SPIN_OUT = -0.5;
-    public final double LATCH_CLOSED = 0.5, LATCH_OPEN = 0.5;
+    public final double SPIN_IN = 0.75, SPIN_OUT = -SPIN_IN;
+    public final double LATCH_CLOSED = 0.35, LATCH_OPEN = 0.575;
     public final double WRIST_UP = 0.93, WRIST_CLEAR = 0.8, WRIST_DOWN = 0.21;
     public final double ROTATOR_0 = 0.075, ROTATOR_90 = 0.45, ROTATOR_180 = 0.8;
 
@@ -77,10 +77,14 @@ public class Intake {
     public void setRotatorTo0() {
         setRotatorPosition(ROTATOR_0);
     }
-    public void setRotatorTo90() {
+    public void setRotatorTo180() {
         setRotatorPosition(ROTATOR_180);
     }
-    public void setRotatorTo45() {
+    public void setRotatorTo90() {
         setRotatorPosition(ROTATOR_90);
     }
+
+    public void setSpinIn() { setSpinPower(SPIN_IN); }
+    public void setSpinOut() { setSpinPower(SPIN_OUT); }
+    public void setSpin0() {setSpinPower(0); }
 }
