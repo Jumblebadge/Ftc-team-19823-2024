@@ -1,83 +1,66 @@
 package org.firstinspires.ftc.teamcode.opmodes.tele;
 
-//Import EVERYTHING we need
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.maths.ConstantsForPID;
-import org.firstinspires.ftc.teamcode.utility.wrappers.DcMotorExW;
-import org.firstinspires.ftc.teamcode.utility.wrappers.MotorGroup;
-import org.firstinspires.ftc.teamcode.utility.RunMotionProfile;
+import org.firstinspires.ftc.teamcode.subsystems.PivotingSlide;
+
+import java.util.List;
 
 @Config
-@TeleOp(name="tune slide pid", group="Linear Opmode")
+@TeleOp(name="tune slide ", group="Linear Opmode")
 public class TuneSlidePid extends LinearOpMode {
 
-    public static double maxVel = 1, maxAccel = 1, maxJerk = 1, Kp = 0, Kd = 0, Ki = 0, Kf = 0, Kl = 1;
-    public static double slideReference = 0, offset = 0;
-    private double hz = 0,nanoTime = 0;
+    public static double Kp = 0, Kd = 0, Ki = 0, Kf = 0, Kl = 1, maxVel = 1, maxAccel = 1, maxJerk = 1, slideTarget = 0, pivotTarget = 0;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
 
-        //Bulk sensor reads
-        LynxModule controlHub = hardwareMap.get(LynxModule.class, "Control Hub");
-
-        //PivotingSlide slide = new PivotingSlide(hardwareMap);
-
-        DcMotorExW liftLeft = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "Lpivot"));
-        DcMotorExW liftRight = new DcMotorExW(hardwareMap.get(DcMotorEx.class, "Rpivot"));
-
-        //liftRight.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        //AnalogInput ma3 = hardwareMap.get(AnalogInput.class, "pivotEncoder");
-
-        MotorGroup slideMotors = new MotorGroup(liftLeft, liftRight);
-
-        RunMotionProfile profile = new RunMotionProfile(3000,3000,3000,new ConstantsForPID(0.6,0,0.2,0.1,3,0));
-
         FtcDashboard dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
 
-        //slide.resetEncoders();
-
         //Bulk sensor reads
-        controlHub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
+
+        PivotingSlide slide = new PivotingSlide(hardwareMap, false);
+
+        ElapsedTime hzTimer = new ElapsedTime();
+        Gamepad current1 = new Gamepad();
+        Gamepad previous1 = new Gamepad();
+
+        for (LynxModule hub : allHubs) { hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL); }
 
         waitForStart();
         while (opModeIsActive() && !isStopRequested()) {
+            previous1.copy(current1);
+            current1.copy(gamepad1);
+
             //Clear the cache for better loop times (bulk sensor reads)
-            controlHub.clearBulkCache();
+            for (LynxModule hub : allHubs) hub.clearBulkCache();
 
-            slideMotors.setPowers(profile.profiledMovement(slideReference, slideMotors.getPosition(0)));
-            profile.setPidConstants(new ConstantsForPID(Kp, Kd, Ki, Kf, Kl, 0));
-            profile.setMotionConstraints(maxVel, maxAccel, maxJerk);
+            slide.setPidConstants(new ConstantsForPID(Kp, Kd, Ki, Kf, Kl, 0));
+            slide.setMotionConstraints(maxVel, maxAccel, maxJerk);
 
-            //slide.update();
-            //slide.moveSlideTo(slideReference);
-            //slide.movePivotTo(pivotReference);
+            slide.moveSlideTo(slideTarget);
+            slide.movePivotTo(pivotTarget);
 
+            slide.update();
 
-
-
-            double nano = System.nanoTime();
-            hz = (1000000000 / (nano - nanoTime));
-            telemetry.addData("hz", hz);
-            nanoTime = nano;
-
-            telemetry.addData("Reference", slideReference);
-            //telemetry.addData("motion",slide.getMotionTarget());
-            //telemetry.addData("state",slide.getSlidePosition());
-            //telemetry.addData("cable",slide.getCableDifference());
-            telemetry.addData("motion",profile.getMotionTarget());
-            telemetry.addData("state",slideMotors.getPosition(0));
+            telemetry.addData("hstimes", hzTimer.milliseconds());
+            telemetry.addData("motionstate", slide.getMotionTarget());
+            telemetry.addData("tar", slideTarget);
+            telemetry.addData("pivot", slide.getSlidePosition());
+            hzTimer.reset();
             telemetry.update();
+
         }
     }
 }
+

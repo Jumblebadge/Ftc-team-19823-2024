@@ -45,6 +45,26 @@ public class PID {
         return out;
     }
 
+    public double pidSinOut(double reference, double state, double angle) {
+
+        if (!Maths.epsilonEquals(lastReference, reference, 0.01)) integralSum = 0;
+
+        double error = reference - state;
+
+        //integral and derivative values
+        double derivative = (error - lastError) / timer.seconds();
+        integralSum += (error * timer.seconds());
+        integralSum = Range.clip(integralSum, -constants.Kl(), constants.Kl());
+        //weight each term so that tuning makes a difference
+        out = (constants.Kp() * error) + (constants.Kd() * derivative) + (constants.Ki() * integralSum) + (constants.Kf() * Math.sin(Math.toRadians(angle)) + constants.Kf() * 0.1 * Math.cos(Math.toRadians(angle)));
+        out /= 10;
+        lastError = error;
+        lastReference = reference;
+        timer.reset();
+
+        return out;
+    }
+
     public double pidAngleOut(double reference, double state) {
 
         if (!Maths.epsilonEquals(lastReference, reference, 0.01)) integralSum = 0;

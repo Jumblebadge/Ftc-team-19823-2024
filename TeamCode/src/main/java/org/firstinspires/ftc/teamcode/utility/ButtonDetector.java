@@ -9,6 +9,7 @@ public class ButtonDetector {
 
     public ButtonDetector(boolean initial) {
         current = initial;
+        last = initial;
     }
 
     public boolean toggle(boolean currentState) {

@@ -40,11 +40,13 @@ public class GoodLuck extends LinearOpMode {
         PivotingSlide slide = new PivotingSlide(hardwareMap, false);
         ButtonDetector pivotToggle = new ButtonDetector();
 
+        ButtonDetector hangToggle = new ButtonDetector();
+
         Intake intake = new Intake(hardwareMap);
         ButtonDetector latchToggle = new ButtonDetector();
         ButtonDetector wristToggle = new ButtonDetector();
-
         ButtonDetector rotatorToggle = new ButtonDetector();
+        ButtonDetector spinToggle = new ButtonDetector();
 
         ElapsedTime hzTimer = new ElapsedTime();
 
@@ -111,38 +113,39 @@ public class GoodLuck extends LinearOpMode {
 
             swerve.drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, rotation);
 
-            /*
-            if (gamepad2.start) {
+
+
+            if (gamepad2.back && slide.getPivotAngle() < 40) {
                 wristToggle.toFalse();
                 slide.toMin();
+                rotatorToggle.toFalse();
             }
 
-            if (gamepad2.back && slide.getPivotAngle() < 50 && slide.getSlidePosition() < 50) {
-                pivotToggle.toTrue();
-                startAction = true;
-            }
-            else if (startAction && slide.getPivotAngle() > 72.5) {
-                slide.toMax();
-            }
-            if (startAction && slide.getSlidePosition() > 750) {
-                wristToggle.toFalse();
-                startAction = false;
+            if (gamepad2.start && slide.getPivotAngle() < 40) {
+                spinToggle.toTrue();
+                wristToggle.toTrue();
+                slide.toSetPoint1();
+                rotatorToggle.toTrue();
             }
 
-             */
+
 
             if (latchToggle.toggle(gamepad2.left_bumper)) {
                 intake.setLatchOpen();
+                spinToggle.toTrue();
             }
             else intake.setLatchClose();
 
-            if (gamepad2.dpad_down) {
+            if (spinToggle.toggle(gamepad2.dpad_up)) {
                 intake.setSpinIn();
             }
-            else if (gamepad2.dpad_up) {
-                intake.setSpinOut();
+            else if (!gamepad2.dpad_down) {
+                intake.setSpin0();
             }
-            else intake.setSpin0();
+            if (gamepad2.dpad_down) {
+                intake.setSpinOut();
+                spinToggle.toFalse();
+            }
 
             if (wristToggle.toggle(gamepad2.left_trigger > 0.2)) {
                 intake.setWristDown();
@@ -158,21 +161,6 @@ public class GoodLuck extends LinearOpMode {
                 intake.setRotatorTo0();
             }
 
-            if (slide.getSlidePosition() < 50) {
-                if (pivotToggle.toggle(gamepad2.right_bumper)) {
-                    slide.movePivotTo(100);
-                    rotatorToggle.toTrue();
-                    wristToggle.toTrue();
-
-                }
-                else  {
-                    slide.movePivotTo(0);
-                    //wristToggle.toFalse();
-                    rotatorToggle.toFalse();
-                    latchToggle.toFalse();
-                }
-            }
-
             if (gamepad2.triangle && slide.getPivotAngle() > 30) {
                 slide.toMax();
             }
@@ -185,6 +173,26 @@ public class GoodLuck extends LinearOpMode {
             if (gamepad2.cross) {
                 slide.toMin();
                 pivotToggle.toFalse();
+            }
+
+            if (hangToggle.toggle(gamepad2.right_stick_button && gamepad2.left_stick_button)) {
+                slide.toMin();
+                slide.movePivotTo(0);
+            }
+            else {
+                if (slide.getSlidePosition() < 50) {
+                    if (pivotToggle.toggle(gamepad2.right_bumper)) {
+                        slide.movePivotTo(100);
+                        rotatorToggle.toTrue();
+                        wristToggle.toTrue();
+                        spinToggle.toFalse();
+                    }
+                    else  {
+                        slide.movePivotTo(0);
+                        rotatorToggle.toFalse();
+                        latchToggle.toFalse();
+                    }
+                }
             }
 
             slide.update();

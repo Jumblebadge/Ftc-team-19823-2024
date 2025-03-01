@@ -33,7 +33,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.firstinspires.ftc.teamcode.utility.wrappers;
 
 import com.qualcomm.robotcore.hardware.CRServoImplEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PwmControl;
+import com.qualcomm.robotcore.hardware.Servo;
 
 //copied from the sdk. wrapper to limit hardware calls
 public class CRServoImplExW
@@ -72,6 +74,10 @@ public class CRServoImplExW
 
     public void setPwmDisable() {
         servo.setPwmDisable();
+    }
+
+    public void setDirection(DcMotorSimple.Direction direction) {
+        servo.setDirection(direction);
     }
 
     public double getPower() {

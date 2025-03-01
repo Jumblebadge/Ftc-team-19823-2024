@@ -18,10 +18,10 @@ public class PinPoint {
 
     public PinPoint(HardwareMap hardwareMap) {
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
-        pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);
+        pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         pinpoint.resetPosAndIMU();
         pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
-        pinpoint.setOffsets(-87.27, -28.5);
+        pinpoint.setOffsets(76.2, 127);
     }
 
     //we have to do all of this bs because pinpoint gives faulty readings sometimes

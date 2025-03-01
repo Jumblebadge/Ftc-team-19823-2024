@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.CRServoImplEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
@@ -17,9 +18,9 @@ public class Intake {
     private final BrushColor color;
 
     public final double SPIN_IN = 0.75, SPIN_OUT = -SPIN_IN;
-    public final double LATCH_CLOSED = 0.35, LATCH_OPEN = 0.575;
+    public final double LATCH_CLOSED = 0.25, LATCH_OPEN = 0.5;
     public final double WRIST_UP = 0.93, WRIST_CLEAR = 0.8, WRIST_DOWN = 0.21;
-    public final double ROTATOR_0 = 0.075, ROTATOR_90 = 0.45, ROTATOR_180 = 0.8;
+    public final double ROTATOR_0 = 0.1, ROTATOR_90 = 0.45, ROTATOR_180 = 0.825;
 
     public Intake(HardwareMap hardwareMap) {
         spin = new CRServoImplExW(hardwareMap.get(CRServoImplEx.class, "spin"));
@@ -29,6 +30,7 @@ public class Intake {
         rotator = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "rotator"));
 
         spin.setThresholds(0.01, 0.05);
+        spin.setDirection(DcMotorSimple.Direction.REVERSE);
 
         latch.setPositionThreshold(0.002);
         wrist.setPositionThreshold(0.002);

@@ -41,8 +41,6 @@ public class SwerveDrive {
         module1Encoder = hardwareMap.get(AnalogInput.class, "mod1E");
         module2Encoder = hardwareMap.get(AnalogInput.class, "mod2E");
 
-        mod2m1.setDirection(DcMotorSimple.Direction.REVERSE);
-
         mod1m1.setPowerThresholds(0.05,0.01);
         mod1m2.setPowerThresholds(0.05,0.01);
         mod2m1.setPowerThresholds(0.05,0.01);

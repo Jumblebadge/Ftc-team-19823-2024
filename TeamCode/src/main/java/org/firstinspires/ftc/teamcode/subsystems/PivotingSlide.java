@@ -20,9 +20,9 @@ public class PivotingSlide {
     private final TouchSensor slideLimitSwitch;
     private final AnalogInput pivotEncoder;
     private RunMotionProfile pivotProfile = new RunMotionProfile(1000,1000,1000,new ConstantsForPID(0.4,0,0.75,0.5,1,0));
-    private final RunMotionProfile slideProfile = new RunMotionProfile(20000,20000,20000,new ConstantsForPID(0.3,0,0,0.15,2,0));
+    private final RunMotionProfile slideProfile = new RunMotionProfile(20000,20000,20000,new ConstantsForPID(0.2,0,0.4,1,4,0));
 
-    public final double MIN = -5, MAX = 675, SET_POINT_1 = MAX / 4, SET_POINT_2 = MAX / 2, SET_POINT_3 = 3 * MAX / 4;
+    public final double MIN = -5, MAX = 700, SET_POINT_1 = MAX / 4, SET_POINT_2 = MAX / 2, SET_POINT_3 = 3 * MAX / 4;
     public enum States {
         MIN,
         SETPOINT_1,
@@ -51,9 +51,6 @@ public class PivotingSlide {
         resetEncoders();
 
         pivotEncoder = hardwareMap.get(AnalogInput.class, "pivotEncoder");
-        if (slowPivot) {
-            pivotProfile = new RunMotionProfile(3000, 3000, 3000, new ConstantsForPID(0.5, 0, 0.2, 0, 3, 0));
-        }
     }
 
     public void moveSlideTo(double target) {
@@ -69,7 +66,7 @@ public class PivotingSlide {
         if (getSlidePosition() < 0) {
             resetEncoders();
         }
-        slideMotors.setPowers(slideProfile.profiledMovement(slideTarget, getSlidePosition()));
+        //slideMotors.setPowers(slideProfile.profiledSinMovement(slideTarget, getSlidePosition(), getPivotAngle()));
         pivot.setPower(pivotProfile.profiledPivotMovement(pivotTarget, getPivotAngle()));
     }
 
@@ -91,7 +88,7 @@ public class PivotingSlide {
 
     public double getPivotAngle() { return  pivotEncoder.getVoltage() * -72 + 244.25; }
 
-    public boolean isTimeDone() { return slideProfile.getProfileDuration() + 0.5 < slideProfile.getCurrentTime(); }
+    public boolean isTimeDone() { return slideProfile.getProfileDuration() + 1 < slideProfile.getCurrentTime(); }
 
     public boolean isPositionDone() { return Math.abs(getSlideError()) < 22; }
 
