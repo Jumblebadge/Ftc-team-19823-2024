@@ -7,10 +7,12 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.maths.ConstantsForPID;
 import org.firstinspires.ftc.teamcode.subsystems.PivotingSlide;
+import org.firstinspires.ftc.teamcode.utility.wrappers.ServoImplExW;
 
 import java.util.List;
 
@@ -18,7 +20,7 @@ import java.util.List;
 @TeleOp(name="tune slide ", group="Linear Opmode")
 public class TuneSlidePid extends LinearOpMode {
 
-    public static double Kp = 0, Kd = 0, Ki = 0, Kf = 0, Kl = 1, maxVel = 1, maxAccel = 1, maxJerk = 1, slideTarget = 0, pivotTarget = 0;
+    public static double Kp = 0, Kd = 0, Ki = 0, Kf = 0, Kl = 1, maxVel = 1, maxAccel = 1, maxJerk = 1, slideTarget = 0, pivotTarget = 0, wristTarget = 0.5;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -30,6 +32,8 @@ public class TuneSlidePid extends LinearOpMode {
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
         PivotingSlide slide = new PivotingSlide(hardwareMap, false);
+
+        ServoImplExW servo = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "wrist"));
 
         ElapsedTime hzTimer = new ElapsedTime();
         Gamepad current1 = new Gamepad();
@@ -53,10 +57,12 @@ public class TuneSlidePid extends LinearOpMode {
 
             slide.update();
 
+            servo.setPosition(wristTarget);
+
             telemetry.addData("hstimes", hzTimer.milliseconds());
             telemetry.addData("motionstate", slide.getMotionTarget());
-            telemetry.addData("tar", slideTarget);
-            telemetry.addData("pivot", slide.getSlidePosition());
+            telemetry.addData("tar", pivotTarget);
+            telemetry.addData("pivot", slide.getPivotAngle());
             hzTimer.reset();
             telemetry.update();
 

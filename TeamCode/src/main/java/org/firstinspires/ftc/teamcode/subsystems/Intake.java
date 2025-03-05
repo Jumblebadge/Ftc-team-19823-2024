@@ -19,7 +19,7 @@ public class Intake {
 
     public final double SPIN_IN = 0.75, SPIN_OUT = -SPIN_IN;
     public final double LATCH_CLOSED = 0.25, LATCH_OPEN = 0.5;
-    public final double WRIST_UP = 0.93, WRIST_CLEAR = 0.8, WRIST_DOWN = 0.21;
+    public final double WRIST_UP = 0.85, WRIST_CLEAR = 0.8, WRIST_DOWN = 0.21;
     public final double ROTATOR_0 = 0.1, ROTATOR_90 = 0.45, ROTATOR_180 = 0.825;
 
     public Intake(HardwareMap hardwareMap) {

@@ -19,7 +19,7 @@ public class PivotingSlide {
     private double slideTarget = 0, pivotTarget = 0, slideOffset = 0;
     private final TouchSensor slideLimitSwitch;
     private final AnalogInput pivotEncoder;
-    private RunMotionProfile pivotProfile = new RunMotionProfile(1000,1000,1000,new ConstantsForPID(0.4,0,0.75,0.5,1,0));
+    private RunMotionProfile pivotProfile = new RunMotionProfile(1000,1000,1000,new ConstantsForPID(0.6,0,1,2,1,0));
     private final RunMotionProfile slideProfile = new RunMotionProfile(20000,20000,20000,new ConstantsForPID(0.2,0,0.4,1,4,0));
 
     public final double MIN = -5, MAX = 700, SET_POINT_1 = MAX / 4, SET_POINT_2 = MAX / 2, SET_POINT_3 = 3 * MAX / 4;
@@ -66,7 +66,7 @@ public class PivotingSlide {
         if (getSlidePosition() < 0) {
             resetEncoders();
         }
-        //slideMotors.setPowers(slideProfile.profiledSinMovement(slideTarget, getSlidePosition(), getPivotAngle()));
+        slideMotors.setPowers(slideProfile.profiledSinMovement(slideTarget, getSlidePosition(), getPivotAngle()));
         pivot.setPower(pivotProfile.profiledPivotMovement(pivotTarget, getPivotAngle()));
     }
 
@@ -88,20 +88,20 @@ public class PivotingSlide {
 
     public double getPivotAngle() { return  pivotEncoder.getVoltage() * -72 + 244.25; }
 
-    public boolean isTimeDone() { return slideProfile.getProfileDuration() + 1 < slideProfile.getCurrentTime(); }
+    public boolean isTimeDone() { return slideProfile.getProfileDuration() + 0.5 < slideProfile.getCurrentTime(); }
 
     public boolean isPositionDone() { return Math.abs(getSlideError()) < 22; }
 
     public void setMotionConstraints(double maxVel, double maxAccel, double maxJerk){
-        slideProfile.setMotionConstraints(maxVel, maxAccel, maxJerk);
+        pivotProfile.setMotionConstraints(maxVel, maxAccel, maxJerk);
     }
 
     public void setPidConstants(ConstantsForPID constants) {
-        slideProfile.setPidConstants(constants);
+        pivotProfile.setPidConstants(constants);
     }
 
     public double getMotionTarget(){
-        return slideProfile.getMotionTarget();
+        return pivotProfile.getMotionTarget();
     }
 
     public double getSlideTarget() { return slideTarget; }

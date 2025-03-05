@@ -111,7 +111,7 @@ public class Close4Sample extends LinearOpMode {
                         //intake.setSpin0();
                         taskNumber++;
                     }
-                    else if (taskNumber == 3 && timer.seconds() > 0.3) {
+                    else if (taskNumber == 3 && timer.seconds() > 0.5) {
                         latchToggle.toFalse();
                         //intake.setSpinIn();
                         taskNumber++;
@@ -157,7 +157,7 @@ public class Close4Sample extends LinearOpMode {
                             rotatorToggle.toTrue();
                             taskNumber++;
                         }
-                        else if (taskNumber == 4 && timer.seconds() > 0.3) {
+                        else if (taskNumber == 4 && timer.seconds() > 0.5) {
                             latchToggle.toFalse();
                             //intake.setSpinIn();
                             taskNumber++;
@@ -202,7 +202,7 @@ public class Close4Sample extends LinearOpMode {
                             rotatorToggle.toTrue();
                             taskNumber++;
                         }
-                        else if (taskNumber == 4 && timer.seconds() > 0.3) {
+                        else if (taskNumber == 4 && timer.seconds() > 0.5) {
                             latchToggle.toFalse();
                             //intake.setSpinIn();
                             taskNumber++;
@@ -220,7 +220,7 @@ public class Close4Sample extends LinearOpMode {
                         }
                         else if (taskNumber == 7 && slide.isTimeDone() && timer.seconds() > 0.4) {
                             taskNumber = 0;
-                            headingTarget = -70;
+                            headingTarget = -60;
                             cycleCount = 2;
                             wristToggle.toTrue();
                             latchToggle.toTrue();
@@ -250,7 +250,7 @@ public class Close4Sample extends LinearOpMode {
                             rotatorToggle.toTrue();
                             taskNumber++;
                         }
-                        else if (taskNumber == 5 && timer.seconds() > 0.3) {
+                        else if (taskNumber == 5 && timer.seconds() > 0.5) {
                             latchToggle.toFalse();
                             //intake.setSpinIn();
                             taskNumber++;

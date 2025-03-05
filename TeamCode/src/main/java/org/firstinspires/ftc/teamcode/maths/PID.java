@@ -96,7 +96,7 @@ public class PID {
         integralSum += (error * timer.seconds());
         integralSum = Range.clip(integralSum, -constants.Kl(), constants.Kl());
         //weight each term so that tuning makes a difference
-        out = (constants.Kp() * error) + (constants.Kd() * derivative) + (constants.Ki() * integralSum) + (constants.Kf() * Math.signum(error) * Math.cos(Math.toRadians(state)));
+        out = (constants.Kp() * error) + (constants.Kd() * derivative) + (constants.Ki() * integralSum) + (constants.Kf() * Math.cos(Math.toRadians(state) + 0.25));
         out /= 10;
 
         lastError = error;
