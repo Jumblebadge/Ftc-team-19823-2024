@@ -4,7 +4,6 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -24,7 +23,7 @@ public class SwerveDrive {
     final private MedianFilter module1Filter = new MedianFilter(7);
     final private MedianFilter module2Filter = new MedianFilter(7);
     final private Telemetry telemetry;
-    private double module1Offset = 35, module2Offset = -10;
+    private double module1Offset = 70, module2Offset = -80;
     private final PID module1PID = new PID(0.1,0.00188,0.1,0.05, 1);
     private final PID module2PID = new PID(0.1,0.00188,0.1,0.05, 1);
     private final swerveKinematics swavemath = new swerveKinematics();
@@ -69,7 +68,7 @@ public class SwerveDrive {
         //mod2P = module2Filter.getFilteredValue(mod2P);
 
         //Retrieve the angle and power for each module
-        double[] output = swavemath.calculate(-x,-y,-rot, pose.getHeading(), true);
+        double[] output = swavemath.calculate(-x,-y,rot, pose.getHeading(), true);
         double mod1power = -output[0];
         double mod2power = output[1];
 

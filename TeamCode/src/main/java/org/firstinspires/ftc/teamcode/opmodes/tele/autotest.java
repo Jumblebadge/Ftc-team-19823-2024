@@ -22,6 +22,7 @@ import org.firstinspires.ftc.teamcode.utility.DashOperations;
 import org.firstinspires.ftc.teamcode.utility.PathList;
 
 @Config
+@Disabled
 @TeleOp(name="Autotest", group="Linear Opmode")
 public class autotest extends LinearOpMode {
 

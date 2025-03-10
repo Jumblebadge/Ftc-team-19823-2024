@@ -55,6 +55,17 @@ public class RunMotionProfile {
         return PID.pidOut(motionState.getX(), state);
     }
 
+    public double profiledSlideMovement(double target, double state){
+        if (!Maths.epsilonEquals(lastTarget, target, 0.1)) {
+            lastTarget = target;
+            profile = MotionProfileGenerator.generateSimpleMotionProfile(new MotionState(state, 0, 0), new MotionState(target, 0, 0), maxVel, maxAccel,maxJerk);
+            timer.reset();
+        }
+        else{ lastTarget = target; }
+        motionState = profile.get(timer.seconds());
+        return PID.pidSlideOut(motionState.getX(), state);
+    }
+
     public double profiledSinMovement(double target, double state, double angle){
         if (!Maths.epsilonEquals(lastTarget, target, 0.1)) {
             lastTarget = target;

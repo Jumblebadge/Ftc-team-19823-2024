@@ -6,21 +6,23 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DigitalChannelImpl;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.ServoImplEx;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.maths.ConstantsForPID;
+import org.firstinspires.ftc.teamcode.maths.Maths;
+import org.firstinspires.ftc.teamcode.maths.PID;
 import org.firstinspires.ftc.teamcode.subsystems.PivotingSlide;
-import org.firstinspires.ftc.teamcode.utility.wrappers.ServoImplExW;
+import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
+import org.firstinspires.ftc.teamcode.utility.ElapsedTimeW;
 
 import java.util.List;
 
 @Config
-@TeleOp(name="test ", group="Linear Opmode")
+@TeleOp(name="test", group="Linear Opmode")
 public class Test extends LinearOpMode {
-
-    public static double target = 0.5;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -31,10 +33,13 @@ public class Test extends LinearOpMode {
         //Bulk sensor reads
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
-        ServoImplExW servo = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "latch"));
-        ElapsedTime hzTimer = new ElapsedTime();
+        DigitalChannelImpl touch = hardwareMap.get(DigitalChannelImpl.class, "touch");
+
         Gamepad current1 = new Gamepad();
         Gamepad previous1 = new Gamepad();
+
+        Gamepad current2 = new Gamepad();
+        Gamepad previous2 = new Gamepad();
 
         for (LynxModule hub : allHubs) { hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL); }
 
@@ -42,17 +47,15 @@ public class Test extends LinearOpMode {
         while (opModeIsActive() && !isStopRequested()) {
             previous1.copy(current1);
             current1.copy(gamepad1);
+            previous2.copy(current2);
+            current2.copy(gamepad2);
 
             //Clear the cache for better loop times (bulk sensor reads)
             for (LynxModule hub : allHubs) hub.clearBulkCache();
 
-            servo.setPosition(target);
 
-
-            telemetry.addData("hstimes", hzTimer.milliseconds());
-            hzTimer.reset();
+            telemetry.addData("state", touch.getState());
             telemetry.update();
-
         }
     }
 }

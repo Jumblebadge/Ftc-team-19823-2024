@@ -4,9 +4,11 @@ import android.util.Size;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.stream.CameraStreamSource;
+import org.firstinspires.ftc.teamcode.utility.wrappers.ServoImplExW;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.VisionProcessor;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -19,10 +21,14 @@ public class CameraShenanigans {
     private FtcDashboard dashboard;
     private OpenCvWebcam webcam;
 
+    private ServoImplExW light;
+
     private VisionPortal portal;
 
     public CameraShenanigans(HardwareMap hardwareMap, FtcDashboard dashboard, OpenCvPipeline pipeline) {
         this.dashboard = dashboard;
+
+        light = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "light"));
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "webcam"), cameraMonitorViewId);
@@ -70,6 +76,10 @@ public class CameraShenanigans {
 
     public void resumeViewPort() {
         webcam.resumeViewport();
+    }
+
+    public void setLightPower(double power) {
+        light.setPosition(power);
     }
 
 }

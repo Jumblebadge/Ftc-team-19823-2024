@@ -27,16 +27,5 @@ android {
     namespace = 'com.qualcomm.ftcrobotcontroller'
 }
 
-repositories {
-    maven {
-        url = 'https://repo.dairy.foundation/snapshots'
-    }
-    maven {
-        url = 'https://repo.dairy.foundation/releases'
-    }
-}
-dependencies {
-    compileOnly "dev.frozenmilk:Sinister:2.0.1"
-}
 
 apply from: '../build.dependencies.gradle'

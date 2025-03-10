@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.maths.MedianFilter;
 import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
 
 @Config
+@Disabled
 @TeleOp(name="tune modulue pid", group="Linear Opmode")
 public class TuneModulePid extends LinearOpMode {
 

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.maths;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.opencv.core.Point;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,6 +72,10 @@ public class Maths {
 
     public static boolean epsilonEquals(double state, double equals) {
         return Math.abs(state - equals) < 1e-6;
+    }
+
+    public static boolean pointDistance(Point a, Point b, double thresh) {
+        return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2)) < thresh;
     }
 
     /**

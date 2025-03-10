@@ -17,12 +17,13 @@ public class PivotingSlide {
     private final MotorGroup slideMotors;
     private final DcMotorExW pivot;
     private double slideTarget = 0, pivotTarget = 0, slideOffset = 0;
+    private boolean isPivotManual = false;
     private final TouchSensor slideLimitSwitch;
     private final AnalogInput pivotEncoder;
-    private RunMotionProfile pivotProfile = new RunMotionProfile(1000,1000,1000,new ConstantsForPID(0.6,0,1,2,1,0));
-    private final RunMotionProfile slideProfile = new RunMotionProfile(20000,20000,20000,new ConstantsForPID(0.2,0,0.4,1,4,0));
+    private RunMotionProfile pivotProfile = new RunMotionProfile(2000,2000,2000,new ConstantsForPID(1,0,0,0,1,0));
+    private final RunMotionProfile slideProfile = new RunMotionProfile(200000,80000,80000,new ConstantsForPID(0.3,0,0.4,0.5,4,0));
 
-    public final double MIN = -5, MAX = 700, SET_POINT_1 = MAX / 4, SET_POINT_2 = MAX / 2, SET_POINT_3 = 3 * MAX / 4;
+    public final double MIN = -5, MAX = 420, SET_POINT_1 = MAX / 4, SET_POINT_2 = MAX / 2, SET_POINT_3 = 3 * MAX / 4;
     public enum States {
         MIN,
         SETPOINT_1,
@@ -60,14 +61,11 @@ public class PivotingSlide {
     public void movePivotTo(double target) { pivotTarget = target; }
 
     public void update() {
-        if (slideLimitSwitch.isPressed()) {
-            slideOffset = slideMotors.getPosition(0);
+        if (slideLimitSwitch.isPressed() || getSlidePosition() < 0) {
+            slideOffset = slideMotors.getPosition(2);
         }
-        if (getSlidePosition() < 0) {
-            resetEncoders();
-        }
-        slideMotors.setPowers(slideProfile.profiledSinMovement(slideTarget, getSlidePosition(), getPivotAngle()));
-        pivot.setPower(pivotProfile.profiledPivotMovement(pivotTarget, getPivotAngle()));
+        slideMotors.setPowers(slideProfile.profiledSlideMovement(slideTarget, getSlidePosition()));
+        if (!isPivotManual) ;//pivot.setPower(pivotProfile.profiledPivotMovement(pivotTarget, getPivotAngle()));
     }
 
     public void resetEncoders() {
@@ -75,9 +73,13 @@ public class PivotingSlide {
         slideOffset = 0;
     }
 
-    public void disabledPIDsetPower(double power) {
-        slideMotors.setPower(power,0);
-        slideMotors.setPower(power,1);
+    public void setPivotPower(double power) {
+        isPivotManual = true;
+        pivot.setPower(power);
+    }
+
+    public void setPivotManual(boolean on) {
+        isPivotManual = on;
     }
 
     public double getSlideError(){
@@ -93,14 +95,18 @@ public class PivotingSlide {
     public boolean isPositionDone() { return Math.abs(getSlideError()) < 22; }
 
     public void setMotionConstraints(double maxVel, double maxAccel, double maxJerk){
-        pivotProfile.setMotionConstraints(maxVel, maxAccel, maxJerk);
+        slideProfile.setMotionConstraints(maxVel, maxAccel, maxJerk);
     }
 
     public void setPidConstants(ConstantsForPID constants) {
-        pivotProfile.setPidConstants(constants);
+        slideProfile.setPidConstants(constants);
     }
 
-    public double getMotionTarget(){
+    public double getSlideMotionTarget(){
+        return slideProfile.getMotionTarget();
+    }
+
+    public double getPivotMotionTarget(){
         return pivotProfile.getMotionTarget();
     }
 

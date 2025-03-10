@@ -49,13 +49,13 @@ public class AutomationTest extends LinearOpMode {
 
         PivotingSlide slide = new PivotingSlide(hardwareMap, false);
         ButtonDetector pivotToggle = new ButtonDetector();
+        ButtonDetector hangToggle = new ButtonDetector();
 
-        Intake claw = new Intake(hardwareMap);
-        ButtonDetector clawToggle = new ButtonDetector();
+        Intake intake = new Intake(hardwareMap);
+        ButtonDetector latchToggle = new ButtonDetector();
         ButtonDetector wristToggle = new ButtonDetector();
+        ButtonDetector spinToggle  = new ButtonDetector(true);
         ButtonDetector rotatorToggle = new ButtonDetector();
-        boolean lastRotatorToggle = false;
-        ElapsedTimeW rotatorTimer = new ElapsedTimeW();
 
         Gamepad current1 = new Gamepad();
         Gamepad previous1 = new Gamepad();
@@ -79,18 +79,25 @@ public class AutomationTest extends LinearOpMode {
 
             double heading = swerve.getJustHeadingInDegrees();
 
+            double multiplier;
+            if (gamepad1.left_trigger > 0.25) {
+                multiplier = gamepad1.left_trigger;
+            }
+            else multiplier = 1;
+
             double rotation;
             if (headingPIDtoggle.toggle(gamepad1.right_bumper)) {
                 rotation = headingPID.pidAngleOut(headingTarget, heading);
                 gamepad1.setLedColor(1,0,0,Gamepad.LED_DURATION_CONTINUOUS);
             }
             else {
-                rotation = -gamepad1.right_stick_x;
+                rotation = -gamepad1.right_stick_x * multiplier;
                 gamepad1.setLedColor(0,1,0,Gamepad.LED_DURATION_CONTINUOUS);
             }
 
             if (current1.left_bumper && !previous1.left_bumper) {
                 headingTarget = heading;
+                headingPIDtoggle.toTrue();
             }
 
             if (gamepad1.options) {
@@ -117,24 +124,24 @@ public class AutomationTest extends LinearOpMode {
                 headingTarget = Math.toDegrees(Maths.peicewiseAtan2(-gamepad1.right_stick_y, gamepad1.right_stick_x)) - 90;
             }
 
-            swerve.drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, rotation);
+            swerve.drive(-gamepad1.left_stick_x * multiplier, -gamepad1.left_stick_y * multiplier, rotation);
 
-            if (current1.share) state = States.MANUAL;
+            if (current1.share) state = States.STANDBY;
 
             switch (state) {
                 case MANUAL:
 
-                    clawToggle.toggleVoid(gamepad2.left_trigger > 0.2);
+                    latchToggle.toggleVoid(gamepad2.left_trigger > 0.2);
 
                     wristToggle.toggleVoid(gamepad2.right_trigger > 0.2);
 
                     pivotToggle.toggleVoid(gamepad2.right_bumper);
 
-                    if (gamepad2.triangle && slide.getPivotAngle() > 20) {
+                    if (gamepad2.triangle && slide.getPivotAngle() > 30) {
                         slide.toMax();
                     }
                     if (gamepad2.circle) {
-                        slide.toSetPoint3();
+                        slide.toSetPoint2();
                     }
                     if (gamepad2.square) {
                         slide.toSetPoint1();
@@ -148,48 +155,42 @@ public class AutomationTest extends LinearOpMode {
                 case STANDBY:
 
                     slide.toMin();
-                    clawToggle.toFalse();
+                    latchToggle.toFalse();
                     wristToggle.toFalse();
                     pivotToggle.toFalse();
+                    spinToggle.toFalse();
 
-                    if (gamepad1.right_bumper) state = States.INTAKE;
+                    if (current1.right_bumper && !previous1.right_bumper) state = States.INTAKE;
 
                     break;
                 case INTAKE:
 
-                    if (gamepad2.circle) {
-                        slide.toSetPoint3();
-                    }
-                    if (gamepad2.square) {
-                        slide.toSetPoint1();
-                    }
-                    if (gamepad2.cross) {
-                        slide.toMin();
-                    }
+                    slide.toSetPoint3();
+                    latchToggle.toFalse();
+                    wristToggle.toTrue();
+                    spinToggle.toTrue();
+                    rotatorToggle.toFalse();
 
-                    clawToggle.toggleVoid(gamepad1.left_trigger > 0.2);
-
-                    wristToggle.toggleVoid(gamepad1.right_trigger > 0.2);
-
-                    if (gamepad1.right_bumper) state = States.HORIZONTAL_RETRACTION;
-                    if (gamepad1.left_bumper) state = States.STANDBY;
+                    if (current1.right_bumper && !previous1.right_bumper) state = States.HORIZONTAL_RETRACTION;
+                    if (current1.left_bumper && !previous1.left_bumper) state = States.STANDBY;
 
                     break;
                 case HORIZONTAL_RETRACTION:
 
-                    wristToggle.toFalse();
                     slide.toMin();
+                    wristToggle.toFalse();
+                    rotatorToggle.toTrue();
 
-                    if (gamepad1.right_bumper) state = States.PIVOT_STANDBY;
-                    if (gamepad1.left_bumper) state = States.INTAKE;
+                    if (current1.right_bumper && !previous1.right_bumper) state = States.PIVOT_STANDBY;
+                    if (current1.left_bumper && !previous1.left_bumper) state = States.INTAKE;
 
                     break;
                 case PIVOT_STANDBY:
 
                     pivotToggle.toTrue();
 
-                    if (gamepad1.right_bumper) state = States.SCORE;
-                    if (gamepad1.left_bumper) state = States.HORIZONTAL_RETRACTION;
+                    if (current1.right_bumper && !previous1.right_bumper) state = States.SCORE;
+                    if (current1.left_bumper && !previous1.left_bumper) state = States.HORIZONTAL_RETRACTION;
 
                     break;
 
@@ -197,25 +198,29 @@ public class AutomationTest extends LinearOpMode {
 
                     slide.toMax();
 
-                    clawToggle.toggleVoid(gamepad1.left_trigger > 0.2);
+                    if (slide.isTimeDone()) {
+                        wristToggle.toTrue();
+                        rotatorToggle.toTrue();
+                    }
 
-                    wristToggle.toggleVoid(gamepad1.right_trigger > 0.2);
+                    latchToggle.toggleVoid(gamepad1.right_trigger > 0.2);
 
-                    if (gamepad1.right_bumper) state = States.VERTICAL_RETRACTION;
-                    if (gamepad1.left_bumper) state = States.PIVOT_STANDBY;
+                    if (current1.right_bumper && !previous1.right_bumper) state = States.VERTICAL_RETRACTION;
+                    if (current1.left_bumper && !previous1.left_bumper) state = States.PIVOT_STANDBY;
 
                     break;
 
                 case VERTICAL_RETRACTION:
 
-                    clawToggle.toFalse();
-                    wristToggle.toTrue();
+                    latchToggle.toFalse();
+                    spinToggle.toFalse();
+                    wristToggle.toFalse();
 
                     slide.toMin();
                     pivotToggle.toFalse();
 
                     if (slide.getPivotAngle() < 20) state = States.STANDBY;
-                    if (gamepad1.left_bumper) state = States.SCORE;
+                    if (current1.left_bumper && !previous1.left_bumper) state = States.SCORE;
 
                     break;
             }
@@ -229,44 +234,47 @@ public class AutomationTest extends LinearOpMode {
                 gamepad2.setLedColor(0,0,0,Gamepad.LED_DURATION_CONTINUOUS);
             }
 
-            if (clawToggle.isTrue()) {
-                //claw.setClawClose();
-            }
-            else //claw.setClawOpen();
 
-            if (wristToggle.toggle(gamepad2.left_trigger > 0.2)) {
-                if (rotatorToggle.toggle(gamepad2.right_trigger > 0.2)) {
-                    claw.setRotatorTo180();
-                }
-                else {
-                    claw.setRotatorTo0();
-                }
-                if (rotatorTimer.seconds() < 0.2 && slide.getSlidePosition() < 50) {
-                    claw.setWristClear();
-                }
-                else {
-                    claw.setWristDown();
-                }
+            if (latchToggle.isTrue()) {
+                intake.setLatchOpen();
+            }
+            else intake.setLatchClose();
+
+            if (spinToggle.isTrue()) {
+                intake.setSpinIn();
+            }
+            else intake.setSpin0();
+
+            if (wristToggle.isTrue()) {
+                intake.setWristDown();
             }
             else {
-                claw.setWristUp();
-                claw.setRotatorTo0();
-                rotatorToggle.toFalse();
+                intake.setWristUp();
             }
 
-            if (rotatorToggle.isTrue() != lastRotatorToggle) {
-                lastRotatorToggle = rotatorToggle.isTrue();
-                rotatorTimer.reset();
+            if (rotatorToggle.isTrue()) {
+                intake.setRotatorTo180();
+            }
+            else {
+                intake.setRotatorTo0();
             }
 
-            if (slide.getSlidePosition() < 50) {
-                if (pivotToggle.isTrue()) {
-                    slide.movePivotTo(85);
-                }
-                else  {
-                    slide.movePivotTo(0);
+            if (hangToggle.toggle(gamepad2.right_stick_button && gamepad2.left_stick_button)) {
+                state = States.MANUAL;
+                slide.toMin();
+                slide.movePivotTo(0);
+            }
+            else {
+                if (slide.getSlidePosition() < 50) {
+                    if (pivotToggle.isTrue()) {
+                        slide.movePivotTo(100);
+                    }
+                    else  {
+                        slide.movePivotTo(0);
+                    }
                 }
             }
+
 
             slide.update();
 

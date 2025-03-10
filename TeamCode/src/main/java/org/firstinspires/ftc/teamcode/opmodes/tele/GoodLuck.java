@@ -72,13 +72,19 @@ public class GoodLuck extends LinearOpMode {
 
             double heading = swerve.getJustHeadingInDegrees();
 
+            double multiplier;
+            if (gamepad1.left_trigger > 0.25) {
+                multiplier = gamepad1.left_trigger;
+            }
+            else multiplier = 1;
+
             double rotation;
             if (headingPIDtoggle.toggle(gamepad1.right_bumper)) {
                 rotation = headingPID.pidAngleOut(headingTarget, heading);
                 gamepad1.setLedColor(1,0,0,Gamepad.LED_DURATION_CONTINUOUS);
             }
             else {
-                rotation = -gamepad1.right_stick_x;
+                rotation = -gamepad1.right_stick_x * multiplier;
                 gamepad1.setLedColor(0,1,0,Gamepad.LED_DURATION_CONTINUOUS);
             }
 
@@ -111,7 +117,7 @@ public class GoodLuck extends LinearOpMode {
                 headingTarget = Math.toDegrees(Maths.peicewiseAtan2(-gamepad1.right_stick_y, gamepad1.right_stick_x)) - 90;
             }
 
-            swerve.drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, rotation);
+            swerve.drive(-gamepad1.left_stick_x * multiplier, -gamepad1.left_stick_y * multiplier, rotation);
 
 
 
@@ -160,6 +166,7 @@ public class GoodLuck extends LinearOpMode {
             else {
                 intake.setRotatorTo0();
             }
+
 
             if (gamepad2.triangle && slide.getPivotAngle() > 30) {
                 slide.toMax();

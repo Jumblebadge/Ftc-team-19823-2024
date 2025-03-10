@@ -60,8 +60,11 @@ public class TuneSlidePid extends LinearOpMode {
             servo.setPosition(wristTarget);
 
             telemetry.addData("hstimes", hzTimer.milliseconds());
-            telemetry.addData("motionstate", slide.getMotionTarget());
-            telemetry.addData("tar", pivotTarget);
+            telemetry.addData("slide motion", slide.getSlideMotionTarget());
+            telemetry.addData("pivot motion", slide.getPivotMotionTarget());
+            telemetry.addData("pivot tar", pivotTarget);
+            telemetry.addData("slide tar", slideTarget);
+            telemetry.addData("slide", slide.getSlidePosition());
             telemetry.addData("pivot", slide.getPivotAngle());
             hzTimer.reset();
             telemetry.update();

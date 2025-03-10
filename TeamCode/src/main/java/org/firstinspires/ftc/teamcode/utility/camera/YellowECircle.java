@@ -36,6 +36,12 @@ public class YellowECircle extends OpenCvPipeline {
 
     private Point centroid;
     float[] radius = new float[1];
+    double leastX = 10000;
+
+    int notFoundCount = 0;
+    private Point lastCentroid;
+
+    private Scalar low = new Scalar(100, 120, 0), high = new Scalar(255, 190, 115);
 
     private final Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3,3));
 
@@ -60,29 +66,32 @@ public class YellowECircle extends OpenCvPipeline {
 
         Imgproc.cvtColor(input, ycrcb, Imgproc.COLOR_RGB2YCrCb);
 
-        Core.inRange(ycrcb, new Scalar(0, 120, 0), new Scalar(255, 225, 90), thresh);
+        Core.inRange(ycrcb, low, high, thresh);
 
         Imgproc.erode(thresh, thresh, kernel, new Point(-1, -1), 6);
         Imgproc.dilate(thresh, thresh, kernel, new Point(-1, -1), 6);
 
         Imgproc.GaussianBlur(thresh, thresh, new Size(11, 11), 0);
 
-        //i am worried about these values
         Imgproc.Canny(thresh, edges, 50, 150);
 
         //here comes the fun part!
-        // i am assigning hsv here because i do not need the heirarchy variable
+        // i am assigning ycrcb here because i do not need the heirarchy variable
         Imgproc.findContours(edges, contours, ycrcb, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
-
-        double leastX = 100000;
 
         closestContour = null;
 
         centroid = null;
 
+        if (notFoundCount > 6) {
+            clearX();
+        }
+
+        boolean loopRan = false;
+
         for (MatOfPoint contour : contours) {
             double area = Imgproc.contourArea(contour);
-            if (area < 1000) {
+            if (area < 5000) {
                 contour.release();
                 continue;
             }
@@ -101,27 +110,38 @@ public class YellowECircle extends OpenCvPipeline {
                 continue;
             }
 
+            loopRan = true;
+
             Moments moment = Imgproc.moments(contour);
             if (moment.get_m00() != 0) {
                 centroid = new Point(moment.get_m10() / moment.get_m00(), moment.get_m01() / moment.get_m00());
-                if (Math.abs(320 - centroid.x) < leastX) {
+                if (Math.abs(320 - centroid.x) < Math.abs(leastX)) {
+                    lastCentroid = new Point(centroid.x, centroid.y);
                     closestContour = contour;
                     leastX = 320 - centroid.x;
+                    notFoundCount = 0;
                 }
-                else contour.release();
+                else {
+                    contour.release();
+                    if (!Maths.pointDistance(lastCentroid, centroid, 20)) {
+                        notFoundCount++;
+                    }
+                }
             }
             else {
                 centroid = null;
                 contour.release();
+                notFoundCount++;
             }
-            telemetry.addData("leastX", leastX);
 
             approximation.release();
             contour2f.release();
         }
         contours.clear();
 
-        if (detected()) {
+        if (!loopRan) notFoundCount += 3;
+
+        if (closestContour != null) {
             Point temp = new Point();
             MatOfPoint2f point = new MatOfPoint2f(closestContour.toArray());
 
@@ -130,16 +150,19 @@ public class YellowECircle extends OpenCvPipeline {
             Imgproc.minEnclosingCircle(point, temp, radius);
             closestContour.release();
         }
-        return edges;
+
+        telemetry.addData("not foud", notFoundCount);
+        telemetry.addData("leastx", leastX);
+        return thresh;
     }
 
     @Override
     public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight, float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
         if (detected()) {
             paint.setColor(Color.CYAN);
-            canvas.drawCircle((float) centroid.x * scaleBmpPxToCanvasPx, (float) centroid.y * scaleBmpPxToCanvasPx, radius[0] * scaleBmpPxToCanvasPx, paint);
+            canvas.drawCircle((float) lastCentroid.x * scaleBmpPxToCanvasPx, (float) lastCentroid.y * scaleBmpPxToCanvasPx, radius[0] * scaleBmpPxToCanvasPx, paint);
             paint.setColor(Color.GREEN);
-            canvas.drawCircle((float) centroid.x * scaleBmpPxToCanvasPx, (float) centroid.y * scaleBmpPxToCanvasPx, 5, paint);
+            canvas.drawCircle((float) lastCentroid.x * scaleBmpPxToCanvasPx, (float) lastCentroid.y * scaleBmpPxToCanvasPx, 5, paint);
         }
     }
 
@@ -172,12 +195,26 @@ public class YellowECircle extends OpenCvPipeline {
      * @return X distance in pixels from center of image to the center of largest detected sample.
      */
     public double getSampleXValue() {
-        if (centroid == null) return 0;
-        return centroid.x - 320;
+        if (Math.abs(leastX) > 1000) {
+            return 0;
+        }
+        return leastX;
     }
 
     public boolean detected() {
-        return closestContour != null;
+        return lastCentroid != null;
+    }
+
+    public void clearX() {
+        leastX = 10000;
+        notFoundCount = 0;
+        lastCentroid = null;
+        closestContour = null;
+    }
+
+    public void setThresh(double lowY, double lowCr, double lowCb, double highY, double highCr, double highCb) {
+        low = new Scalar(lowY, lowCr, lowCb);
+        high = new Scalar(highY, highCr, highCb);
     }
 
     public void releaseMats() {
@@ -185,7 +222,7 @@ public class YellowECircle extends OpenCvPipeline {
         thresh.release();
         edges.release();
 
-        if (detected()) closestContour.release();
+        if (closestContour != null) closestContour.release();
 
 
         kernel.release();
