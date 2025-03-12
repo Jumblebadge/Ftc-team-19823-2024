@@ -6,9 +6,13 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.CRServoImpl;
+import com.qualcomm.robotcore.hardware.CRServoImplEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DigitalChannelImpl;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.maths.Maths;
 import org.firstinspires.ftc.teamcode.maths.PID;
@@ -17,12 +21,17 @@ import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 import org.firstinspires.ftc.teamcode.utility.ElapsedTimeW;
+import org.firstinspires.ftc.teamcode.utility.camera.BrushColor;
+import org.firstinspires.ftc.teamcode.utility.wrappers.CRServoImplExW;
+import org.firstinspires.ftc.teamcode.utility.wrappers.ServoImplExW;
 
 import java.util.List;
 
 @Config
 @TeleOp(name="test", group="Linear Opmode")
 public class Test extends LinearOpMode {
+
+    public static double pos = 0.5;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -33,7 +42,9 @@ public class Test extends LinearOpMode {
         //Bulk sensor reads
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
-        DigitalChannelImpl touch = hardwareMap.get(DigitalChannelImpl.class, "touch");
+        //2 rotate, 3 latch, 4 spin, 5 wrist
+
+        BrushColor color = new BrushColor(hardwareMap);
 
         Gamepad current1 = new Gamepad();
         Gamepad previous1 = new Gamepad();
@@ -53,8 +64,10 @@ public class Test extends LinearOpMode {
             //Clear the cache for better loop times (bulk sensor reads)
             for (LynxModule hub : allHubs) hub.clearBulkCache();
 
+            telemetry.addData("color",color.getDetection());
+            telemetry.addData("0", color.getPin0State());
+            telemetry.addData("1",color.getPin1State());
 
-            telemetry.addData("state", touch.getState());
             telemetry.update();
         }
     }

@@ -72,11 +72,7 @@ public class GoodLuck extends LinearOpMode {
 
             double heading = swerve.getJustHeadingInDegrees();
 
-            double multiplier;
-            if (gamepad1.left_trigger > 0.25) {
-                multiplier = gamepad1.left_trigger;
-            }
-            else multiplier = 1;
+            double multiplier = 1 - gamepad1.left_trigger * 0.75;
 
             double rotation;
             if (headingPIDtoggle.toggle(gamepad1.right_bumper)) {
@@ -189,12 +185,16 @@ public class GoodLuck extends LinearOpMode {
             else {
                 if (slide.getSlidePosition() < 50) {
                     if (pivotToggle.toggle(gamepad2.right_bumper)) {
-                        slide.movePivotTo(100);
+                        slide.movePivotTo(90);
+                        if (slide.getPivotAngle() > 80) {
+                            //slide.setPivotPower(0.1);
+                        }
                         rotatorToggle.toTrue();
                         wristToggle.toTrue();
                         spinToggle.toFalse();
                     }
                     else  {
+                        //slide.pivotProfiled();
                         slide.movePivotTo(0);
                         rotatorToggle.toFalse();
                         latchToggle.toFalse();

@@ -66,6 +66,7 @@ public class TuneSlidePid extends LinearOpMode {
             telemetry.addData("slide tar", slideTarget);
             telemetry.addData("slide", slide.getSlidePosition());
             telemetry.addData("pivot", slide.getPivotAngle());
+            telemetry.addData("limit", slide.limitState());
             hzTimer.reset();
             telemetry.update();
 

@@ -68,7 +68,7 @@ public class SwerveDrive {
         //mod2P = module2Filter.getFilteredValue(mod2P);
 
         //Retrieve the angle and power for each module
-        double[] output = swavemath.calculate(-x,-y,rot, pose.getHeading(), true);
+        double[] output = swavemath.calculate(x,y,rot, pose.getHeading(), true);
         double mod1power = -output[0];
         double mod2power = output[1];
 

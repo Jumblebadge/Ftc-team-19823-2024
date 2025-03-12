@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannelImpl;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
@@ -17,10 +18,10 @@ public class PivotingSlide {
     private final MotorGroup slideMotors;
     private final DcMotorExW pivot;
     private double slideTarget = 0, pivotTarget = 0, slideOffset = 0;
-    private boolean isPivotManual = false;
-    private final TouchSensor slideLimitSwitch;
+    private boolean isPivotManual = false, isReset = false;
+    private final DigitalChannelImpl slideLimitSwitch;
     private final AnalogInput pivotEncoder;
-    private RunMotionProfile pivotProfile = new RunMotionProfile(2000,2000,2000,new ConstantsForPID(1,0,0,0,1,0));
+    private RunMotionProfile pivotProfile = new RunMotionProfile(20000,5000,5000,new ConstantsForPID(1,0.03,0.4,0,4,0));
     private final RunMotionProfile slideProfile = new RunMotionProfile(200000,80000,80000,new ConstantsForPID(0.3,0,0.4,0.5,4,0));
 
     public final double MIN = -5, MAX = 420, SET_POINT_1 = MAX / 4, SET_POINT_2 = MAX / 2, SET_POINT_3 = 3 * MAX / 4;
@@ -45,7 +46,7 @@ public class PivotingSlide {
 
         pivot.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        slideLimitSwitch = hardwareMap.get(TouchSensor.class, "slideLimit");
+        slideLimitSwitch = hardwareMap.get(DigitalChannelImpl.class, "slideLimit");
 
         slideMotors = new MotorGroup(lift1, lift2, lift3);
 
@@ -56,16 +57,19 @@ public class PivotingSlide {
 
     public void moveSlideTo(double target) {
         slideTarget = target;
+        if (target > 10) isReset = false;
     }
 
     public void movePivotTo(double target) { pivotTarget = target; }
 
     public void update() {
-        if (slideLimitSwitch.isPressed() || getSlidePosition() < 0) {
+        if (!limitState() && getSlidePosition() < 10 || getSlidePosition() < 0) {
             slideOffset = slideMotors.getPosition(2);
+            isReset = true;
         }
         slideMotors.setPowers(slideProfile.profiledSlideMovement(slideTarget, getSlidePosition()));
-        if (!isPivotManual) ;//pivot.setPower(pivotProfile.profiledPivotMovement(pivotTarget, getPivotAngle()));
+
+        if (!isPivotManual) pivot.setPower(pivotProfile.profiledPivotMovement(pivotTarget, getPivotAngle()));
     }
 
     public void resetEncoders() {
@@ -78,8 +82,8 @@ public class PivotingSlide {
         pivot.setPower(power);
     }
 
-    public void setPivotManual(boolean on) {
-        isPivotManual = on;
+    public void pivotProfiled() {
+        isPivotManual = false;
     }
 
     public double getSlideError(){
@@ -95,15 +99,15 @@ public class PivotingSlide {
     public boolean isPositionDone() { return Math.abs(getSlideError()) < 22; }
 
     public void setMotionConstraints(double maxVel, double maxAccel, double maxJerk){
-        slideProfile.setMotionConstraints(maxVel, maxAccel, maxJerk);
+        pivotProfile.setMotionConstraints(maxVel, maxAccel, maxJerk);
     }
 
     public void setPidConstants(ConstantsForPID constants) {
-        slideProfile.setPidConstants(constants);
+        pivotProfile.setPidConstants(constants);
     }
 
     public double getSlideMotionTarget(){
-        return slideProfile.getMotionTarget();
+        return pivotProfile.getMotionTarget();
     }
 
     public double getPivotMotionTarget(){
@@ -115,32 +119,41 @@ public class PivotingSlide {
     public double getMotionTime() { return slideProfile.getCurrentTime(); }
 
     public void toMin() {
-        moveSlideTo(MIN);
+        if (isReset) moveSlideTo(0);
+        else moveSlideTo(MIN);
         state = States.MIN;
     }
 
     public void toSetPoint1() {
         moveSlideTo(SET_POINT_1);
         state = States.SETPOINT_1;
+        isReset = false;
     }
 
     public void toSetPoint2() {
         moveSlideTo(SET_POINT_2);
         state = States.SETPOINT_2;
+        isReset = false;
     }
 
     public void toSetPoint3() {
         moveSlideTo(SET_POINT_3);
         state = States.SETPOINT_3;
+        isReset = false;
     }
 
     public void toMax() {
         moveSlideTo(MAX);
         state = States.MAX;
+        isReset = false;
     }
 
     public States returnState() {
         return state;
+    }
+
+    public boolean limitState() {
+        return slideLimitSwitch.getState();
     }
 
 }

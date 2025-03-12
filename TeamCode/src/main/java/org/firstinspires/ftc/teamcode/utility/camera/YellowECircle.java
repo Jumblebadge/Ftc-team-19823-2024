@@ -36,7 +36,7 @@ public class YellowECircle extends OpenCvPipeline {
 
     private Point centroid;
     float[] radius = new float[1];
-    double leastX = 10000;
+    double leastTheta = 10000;
 
     int notFoundCount = 0;
     private Point lastCentroid;
@@ -83,9 +83,10 @@ public class YellowECircle extends OpenCvPipeline {
 
         centroid = null;
 
-        if (notFoundCount > 6) {
-            clearX();
+        if (notFoundCount > 0) {
+            //clearX();
         }
+        clearX();
 
         boolean loopRan = false;
 
@@ -115,15 +116,16 @@ public class YellowECircle extends OpenCvPipeline {
             Moments moment = Imgproc.moments(contour);
             if (moment.get_m00() != 0) {
                 centroid = new Point(moment.get_m10() / moment.get_m00(), moment.get_m01() / moment.get_m00());
-                if (Math.abs(320 - centroid.x) < Math.abs(leastX)) {
+                double theta = Math.toDegrees(Math.atan((320 - centroid.x) / (480 - centroid.y)));
+                if (Math.abs(theta) < Math.abs(leastTheta)) {
                     lastCentroid = new Point(centroid.x, centroid.y);
                     closestContour = contour;
-                    leastX = 320 - centroid.x;
+                    leastTheta = theta;
                     notFoundCount = 0;
                 }
                 else {
                     contour.release();
-                    if (!Maths.pointDistance(lastCentroid, centroid, 20)) {
+                    if (!Maths.pointDistance(lastCentroid, centroid, 10)) {
                         notFoundCount++;
                     }
                 }
@@ -152,8 +154,8 @@ public class YellowECircle extends OpenCvPipeline {
         }
 
         telemetry.addData("not foud", notFoundCount);
-        telemetry.addData("leastx", leastX);
-        return thresh;
+        telemetry.addData("leastTheta", leastTheta);
+        return input;
     }
 
     @Override
@@ -187,18 +189,18 @@ public class YellowECircle extends OpenCvPipeline {
     }
 
     public Point getCentroid() {
-        if (!detected()) return null;
-        return centroid;
+        if (lastCentroid != null) return lastCentroid;
+        else return new Point(0,0);
     }
 
     /**
      * @return X distance in pixels from center of image to the center of largest detected sample.
      */
-    public double getSampleXValue() {
-        if (Math.abs(leastX) > 1000) {
+    public double getSampleThetaValue() {
+        if (Math.abs(leastTheta) > 1000) {
             return 0;
         }
-        return leastX;
+        return leastTheta;
     }
 
     public boolean detected() {
@@ -206,7 +208,7 @@ public class YellowECircle extends OpenCvPipeline {
     }
 
     public void clearX() {
-        leastX = 10000;
+        leastTheta = 10000;
         notFoundCount = 0;
         lastCentroid = null;
         closestContour = null;
