@@ -23,7 +23,7 @@ public class SwerveDrive {
     final private MedianFilter module1Filter = new MedianFilter(7);
     final private MedianFilter module2Filter = new MedianFilter(7);
     final private Telemetry telemetry;
-    private double module1Offset = -45, module2Offset = -76;
+    private double module1Offset = -45, module2Offset = 55;
     private final PID module1PID = new PID(0.1,0.00188,0.1,0.05, 1);
     private final PID module2PID = new PID(0.1,0.00188,0.1,0.05, 1);
     private final swerveKinematics swavemath = new swerveKinematics();

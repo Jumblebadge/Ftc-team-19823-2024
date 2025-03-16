@@ -13,7 +13,7 @@ public class GVF {
     private Vector2d R, closestPoint, out;
     private Vector2d tangent, normal;
     ElapsedTime time = new ElapsedTime();
-    PID headingPID = new PID(0.1,0.00188,0,0.05,1);
+    PID headingPID = new PID(0.2,0.017,0,0.1,5);
     private final PID xPID = new PID(0.75,0.001,0.5,0.5, 1);
     private final PID yPID = new PID(0.75,0.001,0.5,0.5, 1);
     private double Kn, Kf, Ks;

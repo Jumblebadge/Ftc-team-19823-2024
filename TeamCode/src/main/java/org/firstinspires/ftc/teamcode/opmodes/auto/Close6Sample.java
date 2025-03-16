@@ -36,7 +36,6 @@ public class Close6Sample extends LinearOpMode {
     private double headingTarget = 0;
     private int cycleCount = 0;
     private int taskNumber = 0, lastTaskNumber = 0;
-    private double lastTheta = 0, lastY = 0;
     boolean pivotClear = false;
     boolean wristToggle = true;
     ElapsedTimeW timer = new ElapsedTimeW();
@@ -62,11 +61,6 @@ public class Close6Sample extends LinearOpMode {
 
         GVF gvf = new GVF(PathList.SideToScore, 0.5, 5, 0.8, telemetry);
 
-        YellowECircle pipeline = new YellowECircle(telemetry);
-        CameraShenanigans camera = new CameraShenanigans(hardwareMap, dashboard, pipeline, false);
-
-        SlewRateLimiter limiter = new SlewRateLimiter();
-
         PivotingSlide slide = new PivotingSlide(hardwareMap);
         ButtonDetector pivotToggle = new ButtonDetector();
 
@@ -82,8 +76,6 @@ public class Close6Sample extends LinearOpMode {
 
         //Bulk sensor reads
         for (LynxModule hub : allHubs) { hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL); }
-
-        camera.setLightPower(1);
 
         waitForStart();
 
@@ -106,7 +98,7 @@ public class Close6Sample extends LinearOpMode {
 
             Vector2d out = gvf.output(new Vector2d(pose.getX(), pose.getY()));
 
-            double rotation = gvf.headingOut(headingTarget + lastTheta ,swerve.getHeadingInDegrees());
+            double rotation = gvf.headingOut(headingTarget,swerve.getHeadingInDegrees());
             swerve.drive(out.getX(), out.getY(), rotation);
 
             switch(state) {
@@ -124,6 +116,7 @@ public class Close6Sample extends LinearOpMode {
                     }
                     else if (taskNumber == 2 && slide.isTimeDone()) {
                         rotatorToggle.toTrue();
+                        wristToggle = false;
                         //intake.setSpin0();
                         taskNumber++;
                     }
@@ -132,7 +125,7 @@ public class Close6Sample extends LinearOpMode {
                         //intake.setSpinIn();
                         taskNumber++;
                     }
-                    else if (taskNumber == 4 && timer.seconds() > 0.4) {
+                    else if (taskNumber == 4 && timer.seconds() > 0.5) {
                         pivotClear = true;
                         //intake.setSpin0();
                         rotatorToggle.toFalse();
@@ -145,7 +138,7 @@ public class Close6Sample extends LinearOpMode {
                     }
                     else if (taskNumber == 6 && slide.isTimeDone() && timer.seconds() > 0.2) {
                         taskNumber = 0;
-                        headingTarget = -100;
+                        headingTarget = -103;
                         state = ApexStates.CYCLE;
                         wristToggle = true;
                         latchToggle.toTrue();
@@ -173,6 +166,7 @@ public class Close6Sample extends LinearOpMode {
                         }
                         else if (taskNumber == 4 && slide.isTimeDone()) {
                             rotatorToggle.toTrue();
+                            wristToggle = false;
                             taskNumber++;
                         }
                         else if (taskNumber == 5 && timer.seconds() > 0.5) {
@@ -180,7 +174,7 @@ public class Close6Sample extends LinearOpMode {
                             //intake.setSpinIn();
                             taskNumber++;
                         }
-                        else if (taskNumber == 6 && timer.seconds() > 0.4) {
+                        else if (taskNumber == 6 && timer.seconds() > 0.5) {
                             pivotClear = true;
                             //intake.setSpin0();
                             rotatorToggle.toFalse();
@@ -193,7 +187,7 @@ public class Close6Sample extends LinearOpMode {
                         }
                         else if (taskNumber == 8 && slide.isTimeDone() && timer.seconds() > 0.2) {
                             taskNumber = 0;
-                            headingTarget = -85;
+                            headingTarget = -83;
                             cycleCount = 1;
                             wristToggle = true;
                             latchToggle.toTrue();
@@ -220,6 +214,7 @@ public class Close6Sample extends LinearOpMode {
                         }
                         else if (taskNumber == 4 && slide.isTimeDone()) {
                             rotatorToggle.toTrue();
+                            wristToggle = false;
                             taskNumber++;
                         }
                         else if (taskNumber == 5 && timer.seconds() > 0.5) {
@@ -227,7 +222,7 @@ public class Close6Sample extends LinearOpMode {
                             //intake.setSpinIn();
                             taskNumber++;
                         }
-                        else if (taskNumber == 6 && timer.seconds() > 0.4) {
+                        else if (taskNumber == 6 && timer.seconds() > 0.5) {
                             pivotClear = true;
                             //intake.setSpin0();
                             rotatorToggle.toFalse();
@@ -240,7 +235,7 @@ public class Close6Sample extends LinearOpMode {
                         }
                         else if (taskNumber == 8 && slide.isTimeDone() && timer.seconds() > 0.2) {
                             taskNumber = 0;
-                            headingTarget = -70;
+                            headingTarget = -68;
                             cycleCount = 2;
                             wristToggle = true;
                             latchToggle.toTrue();
@@ -267,6 +262,7 @@ public class Close6Sample extends LinearOpMode {
                         }
                         else if (taskNumber == 4 && slide.isTimeDone()) {
                             rotatorToggle.toTrue();
+                            wristToggle = false;
                             taskNumber++;
                         }
                         else if (taskNumber == 5 && timer.seconds() > 0.5) {
@@ -274,7 +270,7 @@ public class Close6Sample extends LinearOpMode {
                             //intake.setSpinIn();
                             taskNumber++;
                         }
-                        else if (taskNumber == 6 && timer.seconds() > 0.4) {
+                        else if (taskNumber == 6 && timer.seconds() > 0.5) {
                             pivotClear = true;
                             //intake.setSpin0();
                             rotatorToggle.toFalse();
@@ -292,42 +288,35 @@ public class Close6Sample extends LinearOpMode {
                             latchToggle.toTrue();
                             wristToggle = false;
                             intake.setWristUp();
-                            camera.openCamera();
-                            gvf.setPath(PathList.BasketToSub, 0.5, 5, 0.8, pose);
-                            state = ApexStates.CAMERA;
+                            //gvf.setPath(PathList.BasketToSub, 0.5, 5, 0.8, pose);
+                            state = ApexStates.STANDBY;
                         }
                     }
                     break;
 
                 case CAMERA:
                     if (taskNumber == 0 && gvf.isDone(4, 7)) {
-                        if (pipeline.getSampleThetaValue() != 0) {
-                            lastTheta = pipeline.getSampleThetaValue() * (Math.abs(swerve.getHeadingInDegrees()) / 10 + 1);
-                        }
-                        lastTheta = limiter.rateLimit(lastTheta, 14);
-                        if (lastTheta < 7) {
-                            taskNumber++;
-                        }
+                        taskNumber++;
                     }
                     else if (taskNumber == 1) {
-                        latchToggle.toTrue();
+                        latchToggle.toFalse();
                         intake.setWristOpen();
                         rotatorToggle.toTrue();
                         intake.setSpinIn();
                         taskNumber++;
                     }
-                    else if (taskNumber == 2 && timer.seconds() > 1) {
+                    else if (taskNumber == 2 && timer.seconds() > 0.4) {
                         rotatorToggle.toFalse();
                         intake.setWristDown();
                         taskNumber++;
                     }
-                    else if (taskNumber == 3 && timer.seconds() > 1) {
+                    else if (taskNumber == 3 && timer.seconds() > 0.5) {
                         slide.toSetPoint2();
                         if (intake.getColor() == BrushColor.ColorDetection.YELLOW) {
-                            latchToggle.toFalse();
-                            slide.toMin();
-                            intake.setWristUp();
-                            taskNumber++;
+                            latchToggle.toTrue();
+                            //slide.toMin();
+                            //intake.setWristUp();
+                            //taskNumber++;
                         }
                     }
                     else if (taskNumber == 4 && slide.isTimeDone()) {
@@ -335,8 +324,6 @@ public class Close6Sample extends LinearOpMode {
                         intake.setWristDown();
                         pivotToggle.toTrue();
                         headingTarget = -135;
-                        lastY = -1;
-                        lastTheta = 0;
                         taskNumber++;
                     }
                     else if (taskNumber == 5 && gvf.isDone(4, 7)) {
@@ -370,13 +357,14 @@ public class Close6Sample extends LinearOpMode {
                         wristToggle = false;
                         intake.setWristUp();
                         latchToggle.toTrue();
-                        gvf.setPath(PathList.BasketToSub, 0.5, 5, 0.6, pose);
+                        //gvf.setPath(PathList.BasketToSub, 0.5, 5, 0.6, pose);
                         state = ApexStates.STANDBY;
                     }
                     break;
 
                 case STANDBY:
                     slide.toMin();
+                    headingTarget = -90;
                     latchToggle.toFalse();
                     wristToggle = false;
                     intake.setWristUp();
@@ -396,7 +384,7 @@ public class Close6Sample extends LinearOpMode {
                 intake.setWristDown();
             }
             else {
-                //intake.setWristUp();
+                intake.setWristMiddle();
             }
 
             if (rotatorToggle.isTrue()) {
@@ -430,6 +418,7 @@ public class Close6Sample extends LinearOpMode {
             telemetry.addData("poseError",gvf.poseError);
             telemetry.addData("headingError", gvf.headingError);
             telemetry.addData("tasknum",taskNumber);
+            telemetry.addData("color", intake.getColor());
             telemetry.addData("path minus",PathList.SideToScore.temp);
             telemetry.addData("path arc in gvf",PathList.SideToScore.temp2);
             telemetry.addData("arc",gvf.arcLengthRemaining());
@@ -438,8 +427,5 @@ public class Close6Sample extends LinearOpMode {
             telemetry.addData("path", Arrays.toString(gvf.getPath().getControlPointList()));
             telemetry.update();
         }
-        camera.stopStreaming();
-        pipeline.releaseMats();
-        camera.setLightPower(0);
     }
 }

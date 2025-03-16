@@ -18,8 +18,8 @@ public class Intake {
     private final BrushColor color;
 
     public final double SPIN_IN = 0.75, SPIN_OUT = -SPIN_IN;
-    public final double LATCH_CLOSED = 0.3, LATCH_OPEN = 0.55;
-    public final double WRIST_UP = 1, WRIST_MIDDLE = 0.35, WRIST_OPEN = 0.2, WRIST_DOWN = 0.08;
+    public final double LATCH_CLOSED = 0.3, LATCH_OPEN = 0.57;
+    public final double WRIST_UP = 1, WRIST_MIDDLE = 0.25, WRIST_OPEN = 0.2, WRIST_DOWN = 0.03;
     public final double ROTATOR_0 = 0.8, ROTATOR_180 = 0.05;
 
     public Intake(HardwareMap hardwareMap) {
@@ -57,7 +57,8 @@ public class Intake {
         rotator.setPosition(position);
     }
 
-    public void setSpinPower(double power) { spin.setPower(power); }
+    public void setSpinPower(double power) { //spin.setPower(power);
+    }
 
     public void setLatchOpen() {
         setLatchPosition(LATCH_OPEN);

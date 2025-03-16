@@ -50,9 +50,6 @@ public class AutomationTest extends LinearOpMode {
         //Bulk sensor reads
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
-        ServoImplExW light = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "light"));
-        light.setPosition(0);
-
         SwerveDrive swerve = new SwerveDrive(telemetry, hardwareMap);
         PID headingPID = new PID(0.09,0.00188,0,0.025,1);
         ButtonDetector headingPIDtoggle  = new ButtonDetector();
@@ -65,7 +62,10 @@ public class AutomationTest extends LinearOpMode {
         ButtonDetector latchToggle = new ButtonDetector();
         ButtonDetector wristToggle = new ButtonDetector();
         ButtonDetector spinToggle  = new ButtonDetector(true);
+        ButtonDetector melonReverse = new ButtonDetector();
         ButtonDetector rotatorToggle = new ButtonDetector();
+
+        ElapsedTimeW timer = new ElapsedTimeW();
 
         Gamepad current1 = new Gamepad();
         Gamepad previous1 = new Gamepad();
@@ -74,6 +74,7 @@ public class AutomationTest extends LinearOpMode {
         Gamepad previous2 = new Gamepad();
 
         States state = States.STANDBY;
+        States lastState = state;
 
         for (LynxModule hub : allHubs) { hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL); }
 
@@ -138,6 +139,10 @@ public class AutomationTest extends LinearOpMode {
 
             if (current1.ps || current2.y && !previous2.y) state = States.STANDBY;
 
+            if (gamepad2.a) state = States.SCORE;
+
+            melonReverse.toggleVoid(gamepad2.b);
+
             switch (state) {
                 case MANUAL:
 
@@ -172,7 +177,7 @@ public class AutomationTest extends LinearOpMode {
                     wristMiddle = false;
 
                     if (current2.right_bumper && !previous2.right_bumper) state = States.HORIZONTAL_EXTENSION;
-                    if (current2.right_trigger > 0.4 && !(previous2.right_trigger > 0.4)) state = States.HORIZONTAL;
+                    if (current2.x && !previous2.x) state = States.HORIZONTAL;
 
                     break;
 
@@ -211,7 +216,7 @@ public class AutomationTest extends LinearOpMode {
                 case HORIZONTAL_RETRACTION:
 
                     slide.toMin();
-                    spinToggle.toFalse();
+                    //spinToggle.toFalse();
                     latchToggle.toFalse();
                     rotatorToggle.toTrue();
                     wristToggle.toFalse();
@@ -222,8 +227,9 @@ public class AutomationTest extends LinearOpMode {
                 case PIVOT_STANDBY:
 
                     pivotToggle.toTrue();
-                    if (slide.getPivotAngle() > 10)
+                    if (slide.getPivotAngle() > 10) {
                         wristToggle.toTrue();
+                    }
                     rotatorToggle.toTrue();
 
                     if (current2.right_bumper && !previous2.right_bumper) state = States.SCORE;
@@ -233,9 +239,12 @@ public class AutomationTest extends LinearOpMode {
                 case SCORE:
 
                     slide.toMax();
+                    pivotToggle.toTrue();
 
-                    latchToggle.toggleVoid(gamepad2.right_trigger > 0.2);
-                    if (latchToggle.isTrue()) spinToggle.toTrue();
+                    if (slide.isPositionDone()) {
+                        wristToggle.toFalse();
+                        wristMiddle = true;
+                    }
 
                     if (current2.right_bumper && !previous2.right_bumper) state = States.LATCH;
 
@@ -243,7 +252,6 @@ public class AutomationTest extends LinearOpMode {
 
                 case LATCH:
 
-                    slide.toMax();
                     latchToggle.toTrue();
                     spinToggle.toTrue();
 
@@ -256,8 +264,14 @@ public class AutomationTest extends LinearOpMode {
                     latchToggle.toFalse();
                     spinToggle.toFalse();
 
-                    slide.toMin();
-                    pivotToggle.toFalse();
+                    if (timer.seconds() < 0.25) {
+                        wristToggle.toTrue();
+                        wristMiddle = false;
+                    }
+                    else {
+                        slide.toMin();
+                        pivotToggle.toFalse();
+                    }
 
                     if (slide.getPivotAngle() < 20) {
                         wristToggle.toFalse();
@@ -275,7 +289,8 @@ public class AutomationTest extends LinearOpMode {
             else intake.setLatchClose();
 
             if (spinToggle.isTrue()) {
-                intake.setSpinIn();
+                if (melonReverse.isTrue()) intake.setSpinOut();
+                else intake.setSpinIn();
             }
             else intake.setSpin0();
 
@@ -312,6 +327,11 @@ public class AutomationTest extends LinearOpMode {
                 }
             }
 
+            if (lastState != state) {
+                lastState = state;
+                timer.reset();
+                melonReverse.toFalse();
+            }
 
             slide.update();
 
@@ -322,4 +342,3 @@ public class AutomationTest extends LinearOpMode {
         }
     }
 }
-

@@ -55,6 +55,6 @@ dependencies {
     implementation project(':FtcRobotController')
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
     implementation 'com.acmerobotics.roadrunner:core:0.5.6'
-    implementation "com.acmerobotics.slothboard:dashboard:0.1.1+0.4.16"
-    implementation "dev.frozenmilk.sinister:Sloth:0.1.0"
+    implementation "com.acmerobotics.slothboard:dashboard:0.2.0+0.4.16"
+    implementation "dev.frozenmilk.sinister:Sloth:0.2.0"
 }
