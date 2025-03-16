@@ -41,7 +41,7 @@ public class YellowECircle extends OpenCvPipeline {
     int notFoundCount = 0;
     private Point lastCentroid;
 
-    private Scalar low = new Scalar(100, 120, 0), high = new Scalar(255, 190, 115);
+    private Scalar low = new Scalar(85, 110, 0), high = new Scalar(255, 180, 116);
 
     private final Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3,3));
 
@@ -83,7 +83,7 @@ public class YellowECircle extends OpenCvPipeline {
 
         centroid = null;
 
-        if (notFoundCount > 0) {
+        if (notFoundCount > 3) {
             //clearX();
         }
         clearX();
@@ -106,7 +106,7 @@ public class YellowECircle extends OpenCvPipeline {
 
             int numEdges = approximation.toArray().length;
 
-            if (numEdges < 4 || numEdges > 6) {
+            if (numEdges < 4) {
                 contour.release();
                 continue;
             }
@@ -155,7 +155,7 @@ public class YellowECircle extends OpenCvPipeline {
 
         telemetry.addData("not foud", notFoundCount);
         telemetry.addData("leastTheta", leastTheta);
-        return input;
+        return thresh;
     }
 
     @Override

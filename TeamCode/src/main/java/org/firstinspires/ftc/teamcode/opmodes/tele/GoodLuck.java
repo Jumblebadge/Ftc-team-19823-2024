@@ -7,6 +7,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.maths.Maths;
@@ -15,6 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystems.PivotingSlide;
 import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
+import org.firstinspires.ftc.teamcode.utility.wrappers.ServoImplExW;
 
 import java.util.List;
 
@@ -33,11 +35,14 @@ public class GoodLuck extends LinearOpMode {
         //Bulk sensor reads
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
+        ServoImplExW light = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "light"));
+        light.setPosition(0);
+
         SwerveDrive swerve = new SwerveDrive(telemetry, hardwareMap);
         PID headingPID = new PID(0.2,0.017,0,0.1,5);
         ButtonDetector headingPIDtoggle  = new ButtonDetector();
 
-        PivotingSlide slide = new PivotingSlide(hardwareMap, false);
+        PivotingSlide slide = new PivotingSlide(hardwareMap);
         ButtonDetector pivotToggle = new ButtonDetector();
 
         ButtonDetector hangToggle = new ButtonDetector();
@@ -185,7 +190,7 @@ public class GoodLuck extends LinearOpMode {
             else {
                 if (slide.getSlidePosition() < 50) {
                     if (pivotToggle.toggle(gamepad2.right_bumper)) {
-                        slide.movePivotTo(90);
+                        slide.movePivotTo(100);
                         if (slide.getPivotAngle() > 80) {
                             //slide.setPivotPower(0.1);
                         }

@@ -33,6 +33,7 @@ public class PID {
 
         //integral and derivative values
         double derivative = (error - lastError) / timer.seconds();
+        if (Math.abs(error) < 2) derivative = 0;
         integralSum += (error * timer.seconds());
         integralSum = Range.clip(integralSum, -constants.Kl(), constants.Kl());
         //weight each term so that tuning makes a difference
@@ -53,6 +54,7 @@ public class PID {
 
         //integral and derivative values
         double derivative = (error - lastError) / timer.seconds();
+        if (Math.abs(error) < 2) derivative = 0;
         integralSum += (error * timer.seconds());
         integralSum = Range.clip(integralSum, -constants.Kl(), constants.Kl());
         //weight each term so that tuning makes a difference
@@ -73,6 +75,7 @@ public class PID {
 
         //integral and derivative values
         double derivative = (error - lastError) / timer.seconds();
+        if (Math.abs(error) < 2) derivative = 0;
         integralSum += (error * timer.seconds());
         integralSum = Range.clip(integralSum, -constants.Kl(), constants.Kl());
         //weight each term so that tuning makes a difference
@@ -92,6 +95,7 @@ public class PID {
         double error = Maths.angleWrapDegrees(reference - state);
         //integral and derivative values
         double derivative = (error - lastError) / timer.seconds();
+        if (Math.abs(error) < 2) derivative = 0;
         integralSum += (error * timer.seconds());
         integralSum = Range.clip(integralSum, -constants.Kl(), constants.Kl());
         //weight each term so that tuning makes a difference
@@ -113,6 +117,7 @@ public class PID {
         double error = Maths.angleWrapDegrees(reference - state);
         //integral and derivative values
         double derivative = (error - lastError) / timer.seconds();
+        if (Math.abs(error) < 2) derivative = 0;
         integralSum += (error * timer.seconds());
         integralSum = Range.clip(integralSum, -constants.Kl(), constants.Kl());
         //weight each term so that tuning makes a difference

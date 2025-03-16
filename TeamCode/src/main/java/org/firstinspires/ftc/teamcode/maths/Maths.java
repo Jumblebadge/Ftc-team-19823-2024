@@ -223,7 +223,7 @@ public class Maths {
      * @return [angle from 0 to sample, distance from center to sample]
      */
     public static double[] crownJewel(double distance) {
-        double xOffset = 4.5;
+        double xOffset = 4.5 + 5 / 16.0;
         double hypot = Math.hypot(distance, xOffset);
 
         //literally just law of cosines

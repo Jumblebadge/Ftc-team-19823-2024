@@ -40,9 +40,9 @@ public class JustPark extends LinearOpMode {
         //class to swerve the swerve
         SwerveDrive swerve = new SwerveDrive(telemetry, hardwareMap);
 
-        GVF gvf = new GVF(PathList.BluePark, 0.5, 5, 0.7, telemetry);
+        GVF gvf = new GVF(PathList.Park, 0.5, 5, 0.7, telemetry);
 
-        PivotingSlide slide = new PivotingSlide(hardwareMap, true);
+        PivotingSlide slide = new PivotingSlide(hardwareMap);
         ButtonDetector pivotToggle = new ButtonDetector();
 
         Intake claw = new Intake(hardwareMap);
@@ -105,8 +105,8 @@ public class JustPark extends LinearOpMode {
             telemetry.addData("total arc", gvf.temp3);
             telemetry.addData("poseError",gvf.poseError);
             telemetry.addData("headingError", gvf.headingError);
-            telemetry.addData("path minus",PathList.BlueSideToScore.temp);
-            telemetry.addData("path arc in gvf",PathList.BlueSideToScore.temp2);
+            telemetry.addData("path minus",PathList.SideToScore.temp);
+            telemetry.addData("path arc in gvf",PathList.SideToScore.temp2);
             telemetry.addData("arc",gvf.arcLengthRemaining());
             telemetry.addData("path", Arrays.toString(gvf.getPath().getControlPointList()));
             telemetry.update();

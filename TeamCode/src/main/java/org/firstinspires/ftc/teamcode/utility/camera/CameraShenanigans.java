@@ -21,6 +21,8 @@ public class CameraShenanigans {
     private FtcDashboard dashboard;
     private OpenCvWebcam webcam;
 
+    boolean isOpened = false;
+
     private ServoImplExW light;
 
     private VisionPortal portal;
@@ -35,6 +37,59 @@ public class CameraShenanigans {
 
         webcam.setPipeline(pipeline);
 
+        isOpened = true;
+        webcam.setMillisecondsPermissionTimeout(5000); // Timeout for obtaining permission is configurable. Set before opening.
+        webcam.openCameraDeviceAsync(new OpenCvWebcam.AsyncCameraOpenListener()
+        {
+            @Override
+            public void onOpened()
+            {
+                resumeStreaming();
+            }
+
+            @Override
+            public void onError(int errorCode)
+            {
+                /*
+                 * This will be called if the camera could not be opened
+                 */
+            }
+        });
+    }
+
+    public CameraShenanigans(HardwareMap hardwareMap, FtcDashboard dashboard, OpenCvPipeline pipeline, boolean streamNow) {
+        this.dashboard = dashboard;
+
+        light = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "light"));
+
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "webcam"), cameraMonitorViewId);
+
+        webcam.setPipeline(pipeline);
+
+        if (streamNow) {
+            webcam.setMillisecondsPermissionTimeout(5000); // Timeout for obtaining permission is configurable. Set before opening.
+            webcam.openCameraDeviceAsync(new OpenCvWebcam.AsyncCameraOpenListener()
+            {
+                @Override
+                public void onOpened()
+                {
+                    resumeStreaming();
+                }
+
+                @Override
+                public void onError(int errorCode)
+                {
+                    /*
+                     * This will be called if the camera could not be opened
+                     */
+                }
+            });
+        }
+    }
+
+    public void openCamera() {
+        isOpened = true;
         webcam.setMillisecondsPermissionTimeout(5000); // Timeout for obtaining permission is configurable. Set before opening.
         webcam.openCameraDeviceAsync(new OpenCvWebcam.AsyncCameraOpenListener()
         {
@@ -55,7 +110,7 @@ public class CameraShenanigans {
     }
 
     public void stopStreaming() {
-        webcam.stopStreaming();
+        if (isOpened) webcam.stopStreaming();
     }
 
     public void resumeStreaming() {

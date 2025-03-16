@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.maths;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.util.Range;
 
-import org.ejml.simple.UnsupportedOperation;
-
 import java.util.ArrayList;
 
 /**

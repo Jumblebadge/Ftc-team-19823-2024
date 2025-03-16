@@ -50,7 +50,7 @@ public class autotest extends LinearOpMode {
         double[] x = new double[60];
         double[] y = new double[x.length];
         for (int i = 0; i < x.length; i++) {
-            Vector2d point = PathList.MidYellowToBlueBasket.getPoint(((double) i  / (x.length - 1)) * 2.9999);
+            Vector2d point = PathList.MidYellowToBasket.getPoint(((double) i  / (x.length - 1)) * 2.9999);
             x[i] = point.getX();
             y[i] = point.getY();
         }
@@ -99,9 +99,9 @@ public class autotest extends LinearOpMode {
             telemetry.addData("pose",pose.toString());
             telemetry.addData("poseError",gvf.poseError);
             telemetry.addData("headingError", gvf.headingError);
-            telemetry.addData("path8", PathList.BlueSideToScore.getControlPoint(7));
-            telemetry.addData("path0", PathList.BlueSideToScore.getControlPoint(0));
-            telemetry.addData("raw", PathList.BlueSideToScore.temp);
+            telemetry.addData("path8", PathList.SideToScore.getControlPoint(7));
+            telemetry.addData("path0", PathList.SideToScore.getControlPoint(0));
+            telemetry.addData("raw", PathList.SideToScore.temp);
             telemetry.addData("outx",out.getX());
             telemetry.addData("outY", out.getY());
             telemetry.addData("gamex", gamepad1.left_stick_x);

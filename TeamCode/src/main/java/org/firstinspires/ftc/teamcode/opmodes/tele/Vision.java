@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.maths.Maths;
 import org.firstinspires.ftc.teamcode.maths.PID;
 import org.firstinspires.ftc.teamcode.maths.SlewRateLimiter;
+import org.firstinspires.ftc.teamcode.subsystems.PivotingSlide;
 import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 import org.firstinspires.ftc.teamcode.utility.camera.CameraShenanigans;
@@ -23,15 +24,12 @@ import java.util.List;
 @TeleOp(name="Gvsion", group="Linear Opmode")
 public class Vision extends LinearOpMode {
 
-    private double headingTarget = 0;
+    private double lastTheat = 0, lastY = 0;
+    double headingTarget = 0;
 
-    private double lastPipe = 0;
+    public static double r = 0;
 
-    public static double Kp = 0, Kd = 0, Ki = 0, Kf = 0, Kl = 0, r = 0;
-
-    //public static double lowY = 0, lowCr = 0, lowCb = 0, highY = 255, highCr = 255, highCb = 255;
-
-    public static boolean clear = false, pid = false;
+    public static double lowY = 0, lowCr = 0, lowCb = 0, highY = 255, highCr = 255, highCb = 255;
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -46,12 +44,13 @@ public class Vision extends LinearOpMode {
         CameraShenanigans camera = new CameraShenanigans(hardwareMap, dashboard, pipeline);
 
         SlewRateLimiter limiter = new SlewRateLimiter();
+        SlewRateLimiter limiter2 = new SlewRateLimiter();
 
         SwerveDrive swerve = new SwerveDrive(telemetry, hardwareMap);
         PID headingPID = new PID(0.2,0.017,0,0.1,5);
         ButtonDetector headingPIDtoggle  = new ButtonDetector();
 
-        //PivotingSlide slide = new PivotingSlide(hardwareMap, false);
+        PivotingSlide slide = new PivotingSlide(hardwareMap);
 
         ElapsedTime hzTimer = new ElapsedTime();
 
@@ -79,15 +78,12 @@ public class Vision extends LinearOpMode {
 
             double heading = swerve.getJustHeadingInDegrees();
 
-            //headingPID.setPIDgains(Kp, Kd, Ki, Kf, Kl);
-
-            if (clear) {
-                if (pipeline.getSampleThetaValue() != 0) {
-                    lastPipe = pipeline.getSampleThetaValue() * 1.5;
-                }
-                lastPipe = limiter.rateLimit(lastPipe, r);
-                headingTarget = lastPipe;
+            if (pipeline.getSampleThetaValue() != 0) {
+                lastTheat = pipeline.getSampleThetaValue() * (Math.abs(heading) / 10 + 1);
             }
+            lastTheat = limiter.rateLimit(lastTheat, r);
+            double h = lastTheat + headingTarget;
+
 
             double multiplier;
             if (gamepad1.left_trigger > 0.25) {
@@ -95,7 +91,7 @@ public class Vision extends LinearOpMode {
             }
             else multiplier = 1;
 
-            double rotation = headingPID.pidAngleOut(headingTarget, heading);
+            double rotation = headingPID.pidAngleOut(h, heading);
 
             if (current1.left_bumper && !previous1.left_bumper) {
                 headingTarget = heading;
@@ -126,24 +122,34 @@ public class Vision extends LinearOpMode {
                 headingTarget = Math.toDegrees(Maths.peicewiseAtan2(-gamepad1.right_stick_y, gamepad1.right_stick_x)) - 90;
             }
 
-            if (pid) swerve.drive(-gamepad1.left_stick_x * multiplier, -gamepad1.left_stick_y * multiplier, rotation);
+            //swerve.drive(-gamepad1.left_stick_x * multiplier, -gamepad1.left_stick_y * multiplier, rotation);
 
-            //pipeline.setThresh(lowY, lowCr, lowCb, highY, highCr, highCb);
-            //slide.moveSlideTo(0);
+            pipeline.setThresh(lowY, lowCr, lowCb, highY, highCr, highCb);
+
+            if (Math.abs(pipeline.getSampleThetaValue()) < 10 && pipeline.getSampleYValue() != -1) {
+                lastY = pipeline.getSampleYValue() * 25.4 / 1.415;
+            }
+            //lastY = limiter2.rateLimit(lastY, r);
+            if (lastY > 50) ;//slide.moveSlideTo(lastY - 50);
+            else slide.toMin();
+
+
 
             //slide.update();
 
             telemetry.addData("hz", hzTimer.milliseconds());
             telemetry.addData("peice",Math.toDegrees(Maths.peicewiseAtan2(-gamepad1.right_stick_y, gamepad1.right_stick_x)) - 90);
             telemetry.addData("theta", pipeline.getSampleThetaValue());
+            telemetry.addData("Y", pipeline.getSampleYValue());
             telemetry.addData("headTTT", headingTarget);
             telemetry.addData("current ", heading);
-            telemetry.addData("centroid", pipeline.getCentroid());
+            telemetry.addData("lastY", lastY);
             //telemetry.addData("pivot",slide.getPivotAngle());
 
             hzTimer.reset();
             telemetry.update();
         }
+        camera.stopStreaming();
         pipeline.releaseMats();
         camera.setLightPower(0);
     }

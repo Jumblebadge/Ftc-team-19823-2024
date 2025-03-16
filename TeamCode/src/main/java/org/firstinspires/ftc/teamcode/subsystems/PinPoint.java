@@ -14,7 +14,7 @@ public class PinPoint {
     private GoBildaPinpointDriver pinpoint;
     private double offset;
     private Pose2D pose;
-    private double heading;
+    private static double heading;
 
     public PinPoint(HardwareMap hardwareMap) {
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "odo");

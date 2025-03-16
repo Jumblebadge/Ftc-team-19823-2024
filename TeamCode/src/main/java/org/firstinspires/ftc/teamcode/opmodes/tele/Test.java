@@ -42,9 +42,9 @@ public class Test extends LinearOpMode {
         //Bulk sensor reads
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
-        //2 rotate, 3 latch, 4 spin, 5 wrist
-
         BrushColor color = new BrushColor(hardwareMap);
+
+        ServoImplExW servo = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "wrist"));
 
         Gamepad current1 = new Gamepad();
         Gamepad previous1 = new Gamepad();
@@ -63,6 +63,8 @@ public class Test extends LinearOpMode {
 
             //Clear the cache for better loop times (bulk sensor reads)
             for (LynxModule hub : allHubs) hub.clearBulkCache();
+
+            servo.setPosition(pos);
 
             telemetry.addData("color",color.getDetection());
             telemetry.addData("0", color.getPin0State());

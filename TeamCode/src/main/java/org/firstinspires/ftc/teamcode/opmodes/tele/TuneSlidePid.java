@@ -31,7 +31,7 @@ public class TuneSlidePid extends LinearOpMode {
         //Bulk sensor reads
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
-        PivotingSlide slide = new PivotingSlide(hardwareMap, false);
+        PivotingSlide slide = new PivotingSlide(hardwareMap);
 
         ServoImplExW servo = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "wrist"));
 
