@@ -17,10 +17,10 @@ public class Intake {
 
     private final BrushColor color;
 
-    public final double SPIN_IN = 0.75, SPIN_OUT = -SPIN_IN;
+    public final double SPIN_IN = 1, SPIN_OUT = -SPIN_IN;
     public final double LATCH_CLOSED = 0.3, LATCH_OPEN = 0.57;
-    public final double WRIST_UP = 1, WRIST_MIDDLE = 0.25, WRIST_OPEN = 0.2, WRIST_DOWN = 0.03;
-    public final double ROTATOR_0 = 0.8, ROTATOR_180 = 0.05;
+    public final double WRIST_UP = 0.9, WRIST_MIDDLE = 0.51, WRIST_OPEN = 0.46, WRIST_DOWN = 0.425;
+    public final double ROTATOR_0 = 0.78, ROTATOR_180 = 0.05;
 
     public Intake(HardwareMap hardwareMap) {
         spin = new CRServoImplExW(hardwareMap.get(CRServoImplEx.class, "spin"));
@@ -36,7 +36,7 @@ public class Intake {
         wrist.setPositionThreshold(0.002);
         rotator.setPositionThreshold(0.002);
 
-        //wrist.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        spin.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
         color = new BrushColor(hardwareMap);
     }
@@ -46,7 +46,7 @@ public class Intake {
     }
 
     public void setLatchPosition(double position) {
-        latch.setPosition(position);
+        //latch.setPosition(position);
     }
 
     public void setWristPosition(double position) {
@@ -57,7 +57,7 @@ public class Intake {
         rotator.setPosition(position);
     }
 
-    public void setSpinPower(double power) { //spin.setPower(power);
+    public void setSpinPower(double power) { spin.setPower(power);
     }
 
     public void setLatchOpen() {

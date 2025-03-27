@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannelImpl;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.teamcode.maths.ConstantsForPID;
 import org.firstinspires.ftc.teamcode.utility.wrappers.DcMotorExW;
@@ -92,9 +91,13 @@ public class PivotingSlide {
 
     public double getPivotAngle() { return  pivotEncoder.getVoltage() * -72 + 188.25; }
 
-    public boolean isTimeDone() { return slideProfile.getProfileDuration() + 0.5 < slideProfile.getCurrentTime(); }
+    public boolean isSlideTimeDone() { return slideProfile.getProfileDuration() + 0.5 < slideProfile.getCurrentTime(); }
 
-    public boolean isPositionDone() { return Math.abs(getSlideError()) < 22; }
+    public boolean isSlidePositionDone() { return Math.abs(getSlideError()) < 22; }
+
+    public boolean isPivotTimeDone() { return pivotProfile.getProfileDuration() + 0.5 < pivotProfile.getCurrentTime(); }
+
+    public boolean isPivotPositionDone() { return Math.abs(pivotTarget - getPivotAngle()) < 5; }
 
     public void setMotionConstraints(double maxVel, double maxAccel, double maxJerk){
         slideProfile.setMotionConstraints(maxVel, maxAccel, maxJerk);

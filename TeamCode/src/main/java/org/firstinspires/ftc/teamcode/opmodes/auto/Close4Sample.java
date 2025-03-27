@@ -106,7 +106,7 @@ public class Close4Sample extends LinearOpMode {
                         slide.toMax();
                         taskNumber++;
                     }
-                    else if (taskNumber == 2 && slide.isTimeDone()) {
+                    else if (taskNumber == 2 && slide.isSlideTimeDone()) {
                         rotatorToggle.toTrue();
                         //intake.setSpin0();
                         taskNumber++;
@@ -127,7 +127,7 @@ public class Close4Sample extends LinearOpMode {
                         pivotToggle.toFalse();
                         taskNumber++;
                     }
-                    else if (taskNumber == 6 && slide.isTimeDone() && timer.seconds() > 0.2) {
+                    else if (taskNumber == 6 && slide.isSlideTimeDone() && timer.seconds() > 0.2) {
                         taskNumber = 0;
                         headingTarget = -90;
                         state = ApexStates.CYCLE;
@@ -153,7 +153,7 @@ public class Close4Sample extends LinearOpMode {
                             //intake.setSpin0();
                             taskNumber++;
                         }
-                        else if (taskNumber == 3 && slide.isTimeDone()) {
+                        else if (taskNumber == 3 && slide.isSlideTimeDone()) {
                             rotatorToggle.toTrue();
                             taskNumber++;
                         }
@@ -173,7 +173,7 @@ public class Close4Sample extends LinearOpMode {
                             pivotToggle.toFalse();
                             taskNumber++;
                         }
-                        else if (taskNumber == 7 && slide.isTimeDone() && timer.seconds() > 0.2) {
+                        else if (taskNumber == 7 && slide.isSlideTimeDone() && timer.seconds() > 0.2) {
                             taskNumber = 0;
                             headingTarget = -90;
                             cycleCount = 1;
@@ -198,7 +198,7 @@ public class Close4Sample extends LinearOpMode {
                             //intake.setSpin0();
                             taskNumber++;
                         }
-                        else if (taskNumber == 3 && slide.isTimeDone()) {
+                        else if (taskNumber == 3 && slide.isSlideTimeDone()) {
                             rotatorToggle.toTrue();
                             taskNumber++;
                         }
@@ -218,7 +218,7 @@ public class Close4Sample extends LinearOpMode {
                             pivotToggle.toFalse();
                             taskNumber++;
                         }
-                        else if (taskNumber == 7 && slide.isTimeDone() && timer.seconds() > 0.4) {
+                        else if (taskNumber == 7 && slide.isSlideTimeDone() && timer.seconds() > 0.4) {
                             taskNumber = 0;
                             headingTarget = -60;
                             cycleCount = 2;
@@ -246,7 +246,7 @@ public class Close4Sample extends LinearOpMode {
                             //intake.setSpin0();
                             taskNumber++;
                         }
-                        else if (taskNumber == 4 && slide.isTimeDone()) {
+                        else if (taskNumber == 4 && slide.isSlideTimeDone()) {
                             rotatorToggle.toTrue();
                             taskNumber++;
                         }
@@ -266,7 +266,7 @@ public class Close4Sample extends LinearOpMode {
                             pivotToggle.toFalse();
                             taskNumber++;
                         }
-                        else if (taskNumber == 8 && slide.isTimeDone()) {
+                        else if (taskNumber == 8 && slide.isSlideTimeDone()) {
                             taskNumber = 0;
                             headingTarget = -90;
                             cycleCount = 3;

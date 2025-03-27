@@ -7,16 +7,13 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.ServoImplEx;
 
-import org.firstinspires.ftc.teamcode.maths.Maths;
 import org.firstinspires.ftc.teamcode.maths.PID;
 import org.firstinspires.ftc.teamcode.subsystems.PivotingSlide;
 import org.firstinspires.ftc.teamcode.subsystems.SwerveDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.utility.ButtonDetector;
 import org.firstinspires.ftc.teamcode.utility.ElapsedTimeW;
-import org.firstinspires.ftc.teamcode.utility.wrappers.ServoImplExW;
 
 import java.util.List;
 
@@ -175,7 +172,7 @@ public class AutomationTest extends LinearOpMode {
                     pivotToggle.toFalse();
                     spinToggle.toFalse();
                     wristMiddle = false;
-
+  
                     if (current2.right_bumper && !previous2.right_bumper) state = States.HORIZONTAL_EXTENSION;
                     if (current2.x && !previous2.x) state = States.HORIZONTAL;
 
@@ -241,7 +238,7 @@ public class AutomationTest extends LinearOpMode {
                     slide.toMax();
                     pivotToggle.toTrue();
 
-                    if (slide.isPositionDone()) {
+                    if (slide.isSlidePositionDone()) {
                         wristToggle.toFalse();
                         wristMiddle = true;
                     }
@@ -260,9 +257,6 @@ public class AutomationTest extends LinearOpMode {
                     break;
 
                 case VERTICAL_RETRACTION:
-
-                    latchToggle.toFalse();
-                    spinToggle.toFalse();
 
                     if (timer.seconds() < 0.25) {
                         wristToggle.toTrue();
