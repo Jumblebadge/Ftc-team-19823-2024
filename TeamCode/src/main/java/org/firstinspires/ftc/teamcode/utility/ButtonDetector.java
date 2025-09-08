@@ -35,6 +35,14 @@ public class ButtonDetector {
         return state;
     }
 
+    public boolean risingEdge() {
+        if (last != current) {
+            last = current;
+            return true;
+        }
+        return false;
+    }
+
     public void toFalse() {
         current = false;
     }

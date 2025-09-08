@@ -31,7 +31,9 @@ import java.util.List;
 @TeleOp(name="test", group="Linear Opmode")
 public class Test extends LinearOpMode {
 
-    public static double pos = 0.5;
+    public static boolean on = false;
+
+    ElapsedTimeW timer = new ElapsedTimeW();
 
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -42,9 +44,8 @@ public class Test extends LinearOpMode {
         //Bulk sensor reads
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
+        Intake intake = new Intake(hardwareMap);
         BrushColor color = new BrushColor(hardwareMap);
-
-        ServoImplExW servo = new ServoImplExW(hardwareMap.get(ServoImplEx.class, "wrist"));
 
         Gamepad current1 = new Gamepad();
         Gamepad previous1 = new Gamepad();
@@ -52,7 +53,9 @@ public class Test extends LinearOpMode {
         Gamepad current2 = new Gamepad();
         Gamepad previous2 = new Gamepad();
 
-        for (LynxModule hub : allHubs) { hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL); }
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
 
         waitForStart();
         while (opModeIsActive() && !isStopRequested()) {
@@ -64,14 +67,28 @@ public class Test extends LinearOpMode {
             //Clear the cache for better loop times (bulk sensor reads)
             for (LynxModule hub : allHubs) hub.clearBulkCache();
 
-            servo.setPosition(pos);
+            intake.setWristDown();
+            intake.setSpinIn();
+            intake.setRotatorTo0();
 
-            telemetry.addData("color",color.getDetection());
+            if (!(intake.getColor() == BrushColor.ColorDetection.YELLOW || intake.getColor() == BrushColor.ColorDetection.BLUE)) {
+                timer.reset();
+            }
+            on = timer.seconds() > 0.5;
+
+
+            if (intake.getColor() == BrushColor.ColorDetection.RED) {
+            intake.setLatchOpen();
+            }
+            else intake.setLatchClose();
+
+
+            telemetry.addData("color", color.getDetection());
             telemetry.addData("0", color.getPin0State());
-            telemetry.addData("1",color.getPin1State());
+            telemetry.addData("1", color.getPin1State());
+            telemetry.addData("on", on);
 
             telemetry.update();
         }
     }
 }
-

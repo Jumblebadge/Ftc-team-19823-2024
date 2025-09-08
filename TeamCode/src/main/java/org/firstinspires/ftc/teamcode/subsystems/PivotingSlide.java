@@ -91,7 +91,9 @@ public class PivotingSlide {
 
     public double getPivotAngle() { return  pivotEncoder.getVoltage() * -72 + 188.25; }
 
-    public boolean isSlideTimeDone() { return slideProfile.getProfileDuration() + 0.5 < slideProfile.getCurrentTime(); }
+    public boolean isSlideTimeDone() { return slideProfile.getProfileDuration() + 0.375 < slideProfile.getCurrentTime(); }
+
+    public boolean isSlideTimeDone(double delay) { return slideProfile.getProfileDuration() + delay < slideProfile.getCurrentTime(); }
 
     public boolean isSlidePositionDone() { return Math.abs(getSlideError()) < 22; }
 

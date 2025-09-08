@@ -27,4 +27,8 @@ public class ElapsedTimeW extends ElapsedTime {
         isPaused = false;
     }
 
+    public boolean isPaused() {
+        return isPaused;
+    }
+
 }

@@ -35,7 +35,7 @@ public class PathList {
 
 
     public static final CubicPath BasketToSub = new CubicPath(new double [] {
-            55,55,46,50.3,43.5,48.4,42,40,40.4,31.3,38.7,25.2,33,14.3,24,12
+            55.25,55.25,46,50.3,43.5,48.4,42,40,40.4,31.3,38.7,25.2,33,14.3,24,12
     });
     public static final CubicPath SubToBasket = reversePath(BasketToSub);
 
